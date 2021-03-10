@@ -8,7 +8,7 @@ describe('HTTP resolver', () => {
     let httpResolver;
 
     beforeEach(() => {
-        httpResolver = require('../src/handlers/http-resolver'); // eslint-disable-line
+        httpResolver = require('../src/http-resolver'); // eslint-disable-line
         jest.spyOn(http2.auto, 'resolveProtocol').mockResolvedValue({ alpnProtocol: protocol });
     });
 

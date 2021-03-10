@@ -3,7 +3,7 @@ const HttpsProxyAgent = require('https-proxy-agent');
 const HttpProxyAgent = require('http-proxy-agent');
 
 const { proxyHandler } = require('../src/handlers/proxy');
-const httpResolver = require('../src/handlers/http-resolver');
+const httpResolver = require('../src/http-resolver');
 
 const {
     HttpOverHttp2,

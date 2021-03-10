@@ -1,7 +1,7 @@
 const http2 = require('http2-wrapper');
 const HttpsProxyAgent = require('https-proxy-agent');
 const HttpProxyAgent = require('http-proxy-agent');
-const httpResolver = require('./http-resolver');
+const httpResolver = require('../http-resolver');
 
 const {
     HttpOverHttp2,
