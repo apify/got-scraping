@@ -1,6 +1,7 @@
 const http2 = require('http2-wrapper');
 const HttpsProxyAgent = require('https-proxy-agent');
 const HttpProxyAgent = require('http-proxy-agent');
+const httpResolver = require('./http-resolver');
 
 const {
     HttpOverHttp2,
@@ -10,30 +11,22 @@ const {
     Http2OverHttp,
 } = http2.proxies;
 
-/**
- *
- * @param {string|undefined} rawProxyUrl
- * @returns {import('got/dist/source').HandlerFunction} - got handler.
- */
-exports.createProxyHandler = (rawProxyUrl) => {
-    if (rawProxyUrl) {
-        return (options, next) => {
-            options.agent = getAgent(rawProxyUrl, options.http2);
+exports.proxyHandler = async (options, next) => {
+    const { context: { proxyUrl } } = options;
 
-            return next(options);
-        };
+    if (proxyUrl) {
+        options.agent = await getAgent(proxyUrl);
     }
 
-    return (options, next) => next(options);
+    return next(options);
 };
 
 /**
  *
  * @param {string} rawProxyUrl
- * @param {bolean} isHttp2
  * @returns {object}
  */
-function getAgent(rawProxyUrl, isHttp2) {
+async function getAgent(rawProxyUrl) {
     const proxy = {
         proxyOptions: {
             url: new URL(rawProxyUrl),
@@ -43,10 +36,12 @@ function getAgent(rawProxyUrl, isHttp2) {
     };
 
     const proxyUrl = proxy.proxyOptions.url;
-
     let agent;
 
     if (proxyUrl.protocol === 'https:') {
+        const protocol = await httpResolver.resolveHttpVersion(proxyUrl);
+        const isHttp2 = protocol === 'h2';
+
         if (isHttp2) {
             agent = {
                 http: new HttpOverHttp2(proxy),

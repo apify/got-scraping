@@ -1,14 +1,26 @@
-const requestAsBrowser = require('../src/main');
+const gotScraping = require('../src/main');
 
-describe('extensions', () => {
+describe('GotScraping', () => {
+    test('should allow passing custom properties', async () => {
+        const requestOptions = {
+            url: 'https://apify.com/',
+            headersGeneratorOptions: {
+                browsers: ['firefox'],
+            },
+        };
+
+        const response = await gotScraping(requestOptions);
+        const { request: { options } } = response;
+        expect(options.context.headersGeneratorOptions).toMatchObject(requestOptions.headersGeneratorOptions);
+    });
     test('should automatically resolve protocol correctly', async () => {
-        const response = await requestAsBrowser({ url: 'https://apify.com/' });
+        const response = await gotScraping({ url: 'https://apify.com/' });
         expect(response.statusCode).toBe(200);
         expect(response.request.options).toMatchObject({ http2: true });
     });
 
     test('should work with proxyUrl and http2', async () => {
-        const response = await requestAsBrowser({
+        const response = await gotScraping({
             url: 'https://apify.com/',
             proxyUrl: `http://session-my_session:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
         });
@@ -17,7 +29,7 @@ describe('extensions', () => {
     });
 
     test('should add headers', async () => {
-        const response = await requestAsBrowser({
+        const response = await gotScraping({
             url: 'https://apify.com/',
         });
         expect(response.statusCode).toBe(200);

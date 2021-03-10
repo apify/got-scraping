@@ -2,42 +2,64 @@ const http2 = require('http2-wrapper');
 
 class HttpResolver {
     constructor() {
-        this.cache = new Map();
+        this._cache = new Map();
+        this._maxCacheSize = 1000;
     }
 
     /**
      *
-     * @param {string} url
-     * @returns {Promise<import('got/dist/source').HandlerFunction>} - got handler
+     * @param {URL} parsedUrl
+     * @param {Blob} rejectUnauthorized
+     * @returns {string} resolved protocol
      */
-    async createResolverHandler(url) {
-        const httpVersion = await this._resolveHttpVersion(url);
+    async resolveHttpVersion(parsedUrl, rejectUnauthorized) {
+        const { hostname, port } = parsedUrl;
+        const cacheKey = `${hostname}:${port}`;
 
-        return (options, next) => {
-            options.http2 = httpVersion === 'h2';
-            return next(options);
-        };
-    }
-
-    async _resolveHttpVersion(url) {
-        const parsedUrl = new URL(url);
-        const cacheKey = parsedUrl.hostname;
-
-        let httpVersion = this.cache.get(cacheKey);
+        let httpVersion = this._getFromCache(cacheKey);
 
         if (!httpVersion) {
             const result = await http2.auto.resolveProtocol({
-                host: parsedUrl.hostname,
-                servername: parsedUrl.hostname,
-                port: 443,
+                host: hostname,
+                servername: hostname,
+                port,
                 ALPNProtocols: ['h2', 'http/1.1'],
-                rejectUnauthorized: false,
+                rejectUnauthorized,
             });
             httpVersion = result.alpnProtocol;
-            this.cache.set(cacheKey, httpVersion);
+            this._maybeRemoveOldestKey();
+            this._setToCache(cacheKey, httpVersion); // more than => 1000 removed oldest using iterator
         }
 
         return httpVersion;
+    }
+
+    /**
+    *
+    * @param {string} key - proxy host unique key
+    * @returns {string} - http version
+    */
+    _getFromCache(key) {
+        return this._cache.get(key);
+    }
+
+    /**
+     *
+     * @param {string} key - proxy host unique key
+     * @param {string} value - http version
+     */
+    _setToCache(key, value) {
+        this._cache.set(key, value);
+    }
+
+    /**
+     * Removes the oldest record from the cache to free memory for new record.
+     */
+    _maybeRemoveOldestKey() {
+        if (this._cache.size >= this._maxCacheSize) {
+            const oldestKey = this._cache.keys().next().value;
+            this._cache.delete(oldestKey);
+        }
     }
 }
 
