@@ -14,7 +14,7 @@ There is one more good news for loyal `got` users. This package is modified got 
   - [Motivation](#motivation)
   - [Simulating browser-like requests](#simulating-browser-like-requests)
   - [Proxies](#proxies)
-  - [Instalation](#instalation)
+  - [Installation](#installation)
   - [Examples](#examples)
     - [Simple GET request](#simple-get-request)
     - [GET request with proxy](#get-request-with-proxy)
@@ -41,7 +41,7 @@ Got Scraping package makes using proxies with your requests ridiculously easy. I
 | http       	| http1              	| http2, https, http 	|
 
 The proxy type and proxy HTTP version is a type of connection to a proxy, and the agents are supported connections from the proxy to the target, let's say, website.
-## Instalation
+## Installation
 
 ```bash
 $ npm install got-scraping
