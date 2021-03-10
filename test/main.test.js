@@ -1,4 +1,4 @@
-const gotScraping = require('../src/main');
+const gotScraping = require('../src');
 
 describe('GotScraping', () => {
     test('should allow passing custom properties', async () => {

@@ -53,17 +53,4 @@ gotScraping({ url:'https://apify.com', proxyUrl: 'http://myproxy.com:1234' }).th
 
 ## API reference
 
-<a name="RequestOptions"></a>
-
-### `RequestOptions` ⇐ <code>GotOptions</code>
-**Extends**: <code>GotOptions</code>  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| [proxyUrl] | <code>string</code> | HTTPS or HTTP proxy url - Support for SOCKS? |
-| headersGeneratorOptions | <code>HeadersGeneratorOptions</code> | options of the header generator. |
-
-
-* * *
-
+{{>all-docs~}}
