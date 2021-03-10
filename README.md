@@ -1,5 +1,7 @@
 # Got Scraping
 
+## Motivation
+
 With the increasing popularity of web scraping, it is becoming more important to blend in with the typical internet traffic. This package implements multiple mimics to make document GET requests similar to browsers. Thanks to the `headers-generator` package, you can choose various browsers from different operating systems and devices. This package generates all the headers for you so that you can focus on the important stuff. But it doesn't end here. This package also tries to mimic the full request fingerprint, including the correct HTTP protocol and TLS ciphers.
 
 Proxies are essential in the web scraping industry. Another goal of this package is to simplify the usage of `HTTP` and `HTTPS` proxies. All you have to do is pass the `proxyUrl` option.
@@ -8,13 +10,17 @@ There is one more good news for loyal `got` users. This package is modified got 
 
 <!-- toc -->
 
-- [Simulating browser-like requests](#simulating-browser-like-requests)
-- [Proxies](#proxies)
-- [Examples](#examples)
-  * [Simple GET request](#simple-get-request)
-  * [GET request with proxy](#get-request-with-proxy)
-  * [Overriding request headers](#overriding-request-headers)
-- [API reference](#api-reference)
+- [Got Scraping](#got-scraping)
+  - [Motivation](#motivation)
+  - [Simulating browser-like requests](#simulating-browser-like-requests)
+  - [Proxies](#proxies)
+  - [Instalation](#instalation)
+  - [Examples](#examples)
+    - [Simple GET request](#simple-get-request)
+    - [GET request with proxy](#get-request-with-proxy)
+    - [Overriding request headers](#overriding-request-headers)
+  - [API reference](#api-reference)
+    - [`RequestOptions` ⇐ <code>GotOptions</code>](#requestoptions--gotoptions)
 
 <!-- tocstop -->
 
@@ -28,6 +34,7 @@ This package should provide a solid start for your browser request emulation pro
 
 ## Proxies
 
+## Instalation
 ## Examples
 These examples should help you to quickly grasp the concept of the `got-scraping` package.
 ### Simple GET request

@@ -1,6 +1,12 @@
 const gotScraping = require('../src');
 
 describe('GotScraping', () => {
+    test('should have got interface', () => {
+        expect(typeof gotScraping.post).toBe('function');
+        expect(typeof gotScraping.get).toBe('function');
+        expect(typeof gotScraping.extend).toBe('function');
+        expect(typeof gotScraping).toBe('function');
+    });
     test('should allow passing custom properties', async () => {
         const requestOptions = {
             url: 'https://apify.com/',
@@ -13,6 +19,7 @@ describe('GotScraping', () => {
         const { request: { options } } = response;
         expect(options.context.headersGeneratorOptions).toMatchObject(requestOptions.headersGeneratorOptions);
     });
+
     test('should automatically resolve protocol correctly', async () => {
         const response = await gotScraping({ url: 'https://apify.com/' });
         expect(response.statusCode).toBe(200);
