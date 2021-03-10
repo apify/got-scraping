@@ -1,14 +1,14 @@
 const got = require('got');
 
-exports.browserHeadersHandler = (options, next) => {
-    const { http2, context } = options;
+exports.browserHeadersHandler = async (options, next) => {
+    const { http2, headers, context } = options;
     const { browserHeadersGeneratorOptions } = context;
-    const headers = {
+    const generatedHeaders = {
         'user-agent': 'test',
     };
     let newOptions;
     if (http2) { // generate http2 headers
-        newOptions = got.mergeOptions(options, { headers });
+        newOptions = got.mergeOptions(options, { headers: generatedHeaders }, { headers });
     } else {
         const optionsWithHooks = {
             hooks: {

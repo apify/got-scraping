@@ -20,6 +20,27 @@ describe('GotScraping', () => {
         expect(options.context.headersGeneratorOptions).toMatchObject(requestOptions.headersGeneratorOptions);
     });
 
+    test('should allow overrding generated options using handlers', async () => {
+        const requestOptions = {
+            url: 'https://apify.com/',
+            headers: {
+                referer: 'test',
+            },
+        };
+
+        let opts;
+        const extendedGot = gotScraping.extend({
+            handlers: [
+                (options, next) => {
+                    opts = options;
+                    return next(options);
+                },
+            ],
+        });
+        await extendedGot(requestOptions);
+        expect(opts.headers).toMatchObject(requestOptions.headers);
+    });
+
     test('should automatically resolve protocol correctly', async () => {
         const response = await gotScraping({ url: 'https://apify.com/' });
         expect(response.statusCode).toBe(200);
