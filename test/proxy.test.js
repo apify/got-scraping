@@ -19,6 +19,7 @@ describe('Proxy', () => {
     beforeEach(() => {
         options = {
             context: {},
+            https: {},
         };
         next = () => {};
     });

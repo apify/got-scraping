@@ -4,6 +4,7 @@
 	"description": "This is a boilerplate of an Apify actor.",
 	"main": "src/index.js",
 	"dependencies": {
+		"@petrpatek/headers-generator": "0.1.0-beta1",
 		"got": "^11.8.1",
 		"http-proxy-agent": "^4.0.1",
 		"http2-wrapper": "git+https://github.com/szmarczak/http2-wrapper",
@@ -15,15 +16,17 @@
 		"eslint": "^7.0.0",
 		"fs-extra": "^9.1.0",
 		"jest": "^26.6.3",
+		"jest-extended": "^0.11.5",
 		"jsdoc-to-markdown": "^7.0.0",
 		"markdown-toc": "^1.2.0"
 	},
+	
 	"scripts": {
 		"build-docs": "npm run build-toc && node docs/build-docs.js",
 		"build-toc": "markdown-toc docs/README.md -i",
 		"lint": "./node_modules/.bin/eslint ./src --ext .js,.jsx",
 		"lint:fix": "./node_modules/.bin/eslint ./src --ext .js,.jsx --fix",
-		"test": "jest --maxWorkers=3 --forceExit"
+		"test": "jest --maxWorkers=3 --collect-coverage"
 	},
 	"author": {
 		"name": "Apify",

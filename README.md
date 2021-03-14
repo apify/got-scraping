@@ -12,12 +12,15 @@ There is one more good news for loyal `got` users. This package is modified got 
 
 - [Simulating browser-like requests](#simulating-browser-like-requests)
 - [Proxies](#proxies)
-- [Instalation](#instalation)
+- [Installation](#installation)
 - [Examples](#examples)
   * [Simple GET request](#simple-get-request)
   * [GET request with proxy](#get-request-with-proxy)
   * [Overriding request headers](#overriding-request-headers)
+  * [Get JSON](#get-json)
 - [API reference](#api-reference)
+  * [Got scraping extra options](#got-scraping-extra-options)
+  * [Errors recovery](#errors-recovery)
 
 <!-- tocstop -->
 
@@ -39,7 +42,7 @@ Got Scraping package makes using proxies with your requests ridiculously easy. I
 | http       	| http1              	| http2, https, http 	|
 
 The proxy type and proxy HTTP version is a type of connection to a proxy, and the agents are supported connections from the proxy to the target, let's say, website.
-## Instalation
+## Installation
 
 ```bash
 $ npm install got-scraping
@@ -63,24 +66,56 @@ gotScraping({ url:'https://apify.com', proxyUrl: 'http://myproxy.com:1234' }).th
 
 ### Overriding request headers
 
-// options
+By passing options:
+```javascript
+ const response = await gotScraping({
+            url: 'https://apify.com/',
+            headers: {
+                'user-agent': 'test',
+            },
+        });
+```
 
-// handler 
+By using handler in custom instance creation process:
 
+```javascript
+const headers = { 'user-agent': 'test' };
+
+ const extendedGot = gotScraping.extend({
+     handlers: [
+                (options, next) => {
+                    return next(got.mergeOptions(
+                        options,
+                        {
+                            headers,
+                        },
+                    ));
+                },
+            ],
+ });
+```
+### Get JSON
+You can get `JSON` body with this package too, but please bear in mind that the request header generation is done specifically for `HTML` content type. You might want to alter the generated headers to match the browser ones.
+
+```javascript
+ const response = await gotScraping({
+            responseType: 'json',
+            url: 'https://api.apify.com/v2/browser-info',
+            ciphers: undefined,
+        });
+```
 
 ## API reference
 
-<a name="RequestOptions"></a>
+Got scraping package is build using `got.extend` functionality and supports all of the [got options](). On top of that, it adds few more options to the original once and then passes them by a handler to the `got` context object.
+### Got scraping extra options
+`proxyUrl` - Url of HTTPS or HTTP based proxy. HTTP2 proxies are supported.
 
-### `RequestOptions` ⇐ <code>GotOptions</code>
-**Extends**: <code>GotOptions</code>  
-**Properties**
+`useHeaderGenerator` - Turns on the generation of the browser-like header. By default, it is set to `true`.
 
-| Name | Type | Description |
-| --- | --- | --- |
-| [proxyUrl] | <code>string</code> | HTTPS or HTTP proxy url - Support for SOCKS? |
-| headersGeneratorOptions | <code>HeadersGeneratorOptions</code> | options of the header generator. |
+`headerGeneratorOptions` - @TODO: Link to header generator repo.
 
+### Errors recovery
+This section covers possible errors that might happen due to different site implementations.
 
-* * *
-
+`RequestError: Client network socket disconnected before secure TLS connection was established` - Try changing the ciphers parameter to either `undefined` or a custom value.

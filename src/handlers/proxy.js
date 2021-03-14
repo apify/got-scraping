@@ -11,11 +11,11 @@ const {
     Http2OverHttp,
 } = http2.proxies;
 
-exports.proxyHandler = async (options, next) => {
+const proxyHandler = async (options, next) => {
     const { context: { proxyUrl } } = options;
 
     if (proxyUrl) {
-        options.agent = await getAgent(proxyUrl);
+        options.agent = await getAgent(proxyUrl, options.https.rejectUnauthorized);
     }
 
     return next(options);
@@ -24,14 +24,15 @@ exports.proxyHandler = async (options, next) => {
 /**
  *
  * @param {string} rawProxyUrl
+ * @param {boolean} rejectUnauthorized
  * @returns {object}
  */
-async function getAgent(rawProxyUrl) {
+async function getAgent(rawProxyUrl, rejectUnauthorized) {
     const proxy = {
         proxyOptions: {
             url: new URL(rawProxyUrl),
 
-            rejectUnauthorized: false, // based on the got https.rejectUnauthorized option.
+            rejectUnauthorized, // based on the got https.rejectUnauthorized option.
         },
     };
 
@@ -65,3 +66,7 @@ async function getAgent(rawProxyUrl) {
 
     return agent;
 }
+
+module.exports = {
+    proxyHandler,
+};

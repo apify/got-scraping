@@ -1,11 +1,16 @@
-exports.customOptionsHandler = (options, next) => {
-    const { proxyUrl, headersGeneratorOptions, ...gotOptions } = options;
+const customOptionsHandler = (options, next) => {
+    const { proxyUrl, headerGeneratorOptions, useHeaderGenerator, ...gotOptions } = options;
 
     gotOptions.context = {
         proxyUrl,
-        headersGeneratorOptions,
+        headerGeneratorOptions,
+        useHeaderGenerator,
         ...gotOptions.context,
     };
 
     return next(gotOptions);
+};
+
+module.exports = {
+    customOptionsHandler,
 };

@@ -8,13 +8,14 @@ describe('Custom options', () => {
         const options = {
             url: 'testUrl',
             proxyUrl: 'test',
-            headersGeneratorOptions: {
+            headerGeneratorOptions: {
                 browsers: [
                     {
                         name: 'firefox',
                     },
                 ],
             },
+            useHeaderGenerator: false,
         };
         jest.spyOn(nextHolder, 'next');
 
@@ -24,7 +25,8 @@ describe('Custom options', () => {
             url: options.url,
             context: {
                 proxyUrl: options.proxyUrl,
-                headersGeneratorOptions: options.headersGeneratorOptions,
+                headerGeneratorOptions: options.headerGeneratorOptions,
+                useHeaderGenerator: false,
             },
         });
     });

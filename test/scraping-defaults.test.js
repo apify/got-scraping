@@ -1,23 +1,19 @@
-const { scrapingDefaultsHandler, SCRAPING_DEFAULT_OPTIONS } = require('../src/handlers/scraping-defaults');
+const { SCRAPING_DEFAULT_OPTIONS } = require('../src/scraping-defaults');
+const gotScraping = require('../src/index');
 
 describe('Scraping defaults', () => {
-    const nextHolder = {
-        next() {},
-    };
+    test('should set correct defaults', async () => {
+        const { useHeaderGenerator, ...gotDefaults } = SCRAPING_DEFAULT_OPTIONS;
 
-    beforeEach(() => {
-        nextHolder.next = () => { };
-        jest.spyOn(nextHolder, 'next');
+        const response = await gotScraping.get('https://apify.com');
+        expect(response.request.options).toMatchObject(gotDefaults);
+        expect(response.request.options.context).toMatchObject({ useHeaderGenerator });
     });
 
-    test('should set correct defaults', () => {
-        scrapingDefaultsHandler({}, nextHolder.next);
-        expect(nextHolder.next).toBeCalledWith(expect.objectContaining(SCRAPING_DEFAULT_OPTIONS));
-    });
+    test('should allow user to override the defaults', async () => {
+        const customOptions = { ciphers: undefined, http2: false, throwHttpErrors: false };
+        const response = await gotScraping.get('https://apify.com', customOptions);
 
-    test('should allow user to override the defaults', () => {
-        const customOptions = { ciphers: 'TEST', http: false, throwOnHttpErrors: false };
-        scrapingDefaultsHandler(customOptions, nextHolder.next);
-        expect(nextHolder.next).toBeCalledWith(expect.objectContaining(customOptions));
+        expect(response.request.options).toMatchObject(customOptions);
     });
 });
