@@ -2,7 +2,21 @@ const got = require('got');
 
 const gotScraping = require('../src');
 
+const { startDummyServer } = require('./helpers/dummy-server');
+
 describe('GotScraping', () => {
+    let server;
+    let port;
+
+    beforeAll(async () => {
+        server = await startDummyServer();
+        port = server.address().port; //eslint-disable-line
+    });
+
+    afterAll(() => {
+        server.close();
+    });
+
     test('should have got interface', () => {
         expect(typeof gotScraping.post).toBe('function');
         expect(typeof gotScraping.get).toBe('function');
@@ -16,7 +30,7 @@ describe('GotScraping', () => {
 
     test('should allow passing custom properties', async () => {
         const requestOptions = {
-            url: 'https://apify.com/',
+            url: `http://localhost:${port}/html`,
             headerGeneratorOptions: {
                 browsers: [{ name: 'firefox' }],
             },
@@ -29,7 +43,7 @@ describe('GotScraping', () => {
 
     test('should allow overrding generated options using handlers', async () => {
         const requestOptions = {
-            url: 'https://apify.com/',
+            url: `http://localhost:${port}/html`,
         };
         const headers = {
             referer: 'test',
@@ -53,7 +67,7 @@ describe('GotScraping', () => {
 
     test('should add custom headers', async () => {
         const response = await gotScraping({
-            url: 'https://apify.com/',
+            url: `http://localhost:${port}/html`,
             headers: {
                 'user-agent': 'test',
             },
@@ -71,8 +85,7 @@ describe('GotScraping', () => {
     test('should get json', async () => {
         const response = await gotScraping({
             responseType: 'json',
-            url: 'https://api.apify.com/v2/browser-info',
-            ciphers: undefined,
+            url: `http://localhost:${port}/json`,
         });
 
         expect(response.statusCode).toBe(200);
@@ -101,6 +114,8 @@ describe('GotScraping', () => {
             expect(response.statusCode).toBe(200);
             expect(response.request.options).toMatchObject({ http2: true });
 
+            expect(responseProxy.statusCode).toBe(200);
+
             expect(response.body.clientIp).not.toBe(responseProxy.body.clientIp);
             expect(responseProxy.httpVersion).toBe('2.0');
         });
@@ -124,6 +139,7 @@ describe('GotScraping', () => {
             expect(response.statusCode).toBe(200);
             expect(response.request.options).toMatchObject({ http2: false });
 
+            expect(responseProxy.statusCode).toBe(200);
             expect(response.body.clientIp).not.toBe(responseProxy.body.clientIp);
             expect(responseProxy.httpVersion).toBe('1.1');
         });

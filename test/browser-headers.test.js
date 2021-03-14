@@ -3,6 +3,8 @@ const HeaderGenerator = require('@petrpatek/headers-generator');
 const { browserHeadersHandler } = require('../src/handlers/browser-headers');
 const gotScraping = require('../src/index');
 
+const { startDummyServer } = require('./helpers/dummy-server');
+
 describe('Browser headers', () => {
     let nextHolder;
     let options;
@@ -11,6 +13,13 @@ describe('Browser headers', () => {
         'user-agent': 'test',
         referer: 'test',
     };
+    let server;
+    let port;
+
+    beforeAll(async () => {
+        server = await startDummyServer();
+        port = server.address().port; //eslint-disable-line
+    });
 
     beforeEach(() => {
         options = {
@@ -22,6 +31,10 @@ describe('Browser headers', () => {
         };
         jest.spyOn(nextHolder, 'next');
         generatorSpy = jest.spyOn(HeaderGenerator.prototype, 'getHeaders').mockReturnValue(mockedHeaders);
+    });
+
+    afterAll(() => {
+        server.close();
     });
 
     test('should generate headers only if header generation is on', () => {
@@ -128,7 +141,7 @@ describe('Browser headers', () => {
                 ],
             },
         };
-        options.url = 'https://apify.com';
+        options.url = `http://localhost:${port}/html`;
         options.http2 = false;
         const response = await gotScraping(options);
 
