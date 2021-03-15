@@ -9,7 +9,7 @@ class HttpResolver {
     /**
      *
      * @param {URL} parsedUrl
-     * @param {Blob} rejectUnauthorized
+     * @param {boolean} rejectUnauthorized
      * @returns {string} resolved protocol
      */
     async resolveHttpVersion(parsedUrl, rejectUnauthorized) {
