@@ -1,5 +1,3 @@
-const got = require('got');
-
 const SCRAPING_DEFAULT_OPTIONS = {
     http2: true,
     https: {
