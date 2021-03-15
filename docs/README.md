@@ -10,20 +10,18 @@ There is one more good news for loyal `got` users. This package is modified got 
 
 <!-- toc -->
 
-- [Got Scraping](#got-scraping)
-  - [Motivation](#motivation)
-  - [Simulating browser-like requests](#simulating-browser-like-requests)
-  - [Proxies](#proxies)
-  - [Installation](#installation)
-  - [Examples](#examples)
-    - [Simple GET request](#simple-get-request)
-    - [GET request with proxy](#get-request-with-proxy)
-    - [Overriding request headers](#overriding-request-headers)
-    - [Get JSON](#get-json)
-  - [API reference](#api-reference)
-    - [Got scraping default values](#got-scraping-default-values)
-    - [Got scraping extra options](#got-scraping-extra-options)
-    - [Errors recovery](#errors-recovery)
+- [Simulating browser-like requests](#simulating-browser-like-requests)
+- [Proxies](#proxies)
+- [Installation](#installation)
+- [Examples](#examples)
+  * [Simple GET request](#simple-get-request)
+  * [GET request with proxy](#get-request-with-proxy)
+  * [Overriding request headers](#overriding-request-headers)
+  * [Get JSON](#get-json)
+- [API reference](#api-reference)
+  * [Got scraping default values](#got-scraping-default-values)
+  * [Got scraping extra options](#got-scraping-extra-options)
+  * [Errors recovery](#errors-recovery)
 
 <!-- tocstop -->
 

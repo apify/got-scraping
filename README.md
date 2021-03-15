@@ -19,6 +19,7 @@ There is one more good news for loyal `got` users. This package is modified got 
   * [Overriding request headers](#overriding-request-headers)
   * [Get JSON](#get-json)
 - [API reference](#api-reference)
+  * [Got scraping default values](#got-scraping-default-values)
   * [Got scraping extra options](#got-scraping-extra-options)
   * [Errors recovery](#errors-recovery)
 
@@ -107,7 +108,20 @@ You can get `JSON` body with this package too, but please bear in mind that the 
 
 ## API reference
 
-Got scraping package is build using `got.extend` functionality and supports all of the [got API](https://github.com/sindresorhus/got#api). On top of that, it adds few more options to the original once and then passes them by a handler to the `got` context object.
+Got scraping package is build using `got.extend` functionality and supports all of the [got API](https://github.com/sindresorhus/got#api). On top of that, it adds few more options to the original once and then passes them by a handler to the `got` context object. This package also alters got defaults to be more scraping friendly.
+
+### Got scraping default values
+```javascript
+const SCRAPING_DEFAULT_OPTIONS = {
+    http2: true,
+    https: {
+        rejectUnauthorized: false,
+    },
+    throwHttpErrors: false,
+    ciphers: 'TLS_AES_256_GCM_SHA384',
+    useHeaderGenerator: true,
+};
+```
 ### Got scraping extra options
 `proxyUrl` - Url of HTTPS or HTTP based proxy. HTTP2 proxies are supported.
 
