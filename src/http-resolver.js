@@ -1,5 +1,8 @@
 const http2 = require('http2-wrapper');
 
+/**
+ * The HttpResolver resolves server's prefered HTTP version and caches the results.
+ */
 class HttpResolver {
     constructor() {
         this._cache = new Map();
@@ -7,7 +10,6 @@ class HttpResolver {
     }
 
     /**
-     *
      * @param {URL} parsedUrl
      * @param {boolean} rejectUnauthorized
      * @returns {string} resolved protocol
@@ -27,7 +29,7 @@ class HttpResolver {
                 rejectUnauthorized,
             });
             httpVersion = result.alpnProtocol;
-            this._maybeRemoveOldestKey();
+
             this._setToCache(cacheKey, httpVersion); // more than => 1000 removed oldest using iterator
         }
 
@@ -35,20 +37,20 @@ class HttpResolver {
     }
 
     /**
-    *
-    * @param {string} key - proxy host unique key
-    * @returns {string} - http version
-    */
+     * @param {string} key - proxy host unique key
+     * @returns {string} - http version
+     */
     _getFromCache(key) {
         return this._cache.get(key);
     }
 
     /**
-     *
      * @param {string} key - proxy host unique key
      * @param {string} value - http version
      */
     _setToCache(key, value) {
+        this._maybeRemoveOldestKey();
+
         this._cache.set(key, value);
     }
 
