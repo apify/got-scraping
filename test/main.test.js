@@ -108,7 +108,7 @@ describe('GotScraping', () => {
             const responseProxy = await gotScraping({
                 json: true,
                 url: 'https://api.apify.com/v2/browser-info',
-                proxyUrl: `http://groups-SHADER+BUYPROXIES94952,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+                proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
                 ciphers: undefined,
             });
             expect(response.statusCode).toBe(200);
@@ -132,7 +132,7 @@ describe('GotScraping', () => {
             const responseProxy = await gotScraping({
                 json: true,
                 url: 'https://api.apify.com/v2/browser-info',
-                proxyUrl: `http://groups-SHADER+BUYPROXIES94952,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+                proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
                 ciphers: undefined,
                 http2: false,
             });
