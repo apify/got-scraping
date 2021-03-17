@@ -11,26 +11,44 @@ const {
     Http2OverHttp,
 } = http2.proxies;
 
-const proxyHandler = async (options, next) => {
+/**
+ * @param {object} options
+ * @param {function} next
+ * @returns {import('got').GotReturn}
+ */
+async function proxyHandler(options, next) {
     const { context: { proxyUrl } } = options;
 
     if (proxyUrl) {
-        options.agent = await getAgent(proxyUrl, options.https.rejectUnauthorized);
+        const parsedProxy = new URL(proxyUrl);
+
+        validateProxyProtocol(parsedProxy.protocol);
+        options.agent = await getAgent(parsedProxy, options.https.rejectUnauthorized);
     }
 
     return next(options);
-};
+}
 
 /**
- *
- * @param {string} rawProxyUrl
+ * @param {string} protocol
+ */
+function validateProxyProtocol(protocol) {
+    const isSupported = protocol === 'http:' || protocol === 'https:';
+
+    if (!isSupported) {
+        throw new Error(`Invalid proxy protocol "${protocol}"`);
+    }
+}
+
+/**
+ * @param {object} parsedProxyUrl parsed proxyUrl
  * @param {boolean} rejectUnauthorized
  * @returns {object}
  */
-async function getAgent(rawProxyUrl, rejectUnauthorized) {
+async function getAgent(parsedProxyUrl, rejectUnauthorized) {
     const proxy = {
         proxyOptions: {
-            url: new URL(rawProxyUrl),
+            url: parsedProxyUrl,
 
             rejectUnauthorized, // based on the got https.rejectUnauthorized option.
         },

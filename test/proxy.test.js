@@ -35,6 +35,13 @@ describe('Proxy', () => {
         expect(options.agent).toBeDefined();
     });
 
+    test('should throw on invalid proxy protocol', async () => {
+        jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('h2');
+        options.context.proxyUrl = 'ftp://localhost:132';
+
+        expect(proxyHandler(options, next)).toReject(expect.stringContaining('Invalid proxy protocol'));
+    });
+
     describe('agents', () => {
         test('should support http proxy via http2, https and http', async () => {
             options.context.proxyUrl = 'http://localhost:132';
