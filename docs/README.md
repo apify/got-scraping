@@ -10,18 +10,20 @@ There is one more good news for loyal `got` users. This package is modified got 
 
 <!-- toc -->
 
-- [Simulating browser-like requests](#simulating-browser-like-requests)
-- [Proxies](#proxies)
-- [Installation](#installation)
-- [Examples](#examples)
-  * [Simple GET request](#simple-get-request)
-  * [GET request with proxy](#get-request-with-proxy)
-  * [Overriding request headers](#overriding-request-headers)
-  * [Get JSON](#get-json)
-- [API reference](#api-reference)
-  * [Got scraping default values](#got-scraping-default-values)
-  * [Got scraping extra options](#got-scraping-extra-options)
-  * [Errors recovery](#errors-recovery)
+- [Got Scraping](#got-scraping)
+  - [Motivation](#motivation)
+  - [Simulating browser-like requests](#simulating-browser-like-requests)
+  - [Proxies](#proxies)
+  - [Installation](#installation)
+  - [Examples](#examples)
+    - [Simple GET request](#simple-get-request)
+    - [GET request with proxy](#get-request-with-proxy)
+    - [Overriding request headers](#overriding-request-headers)
+    - [Get JSON](#get-json)
+  - [API reference](#api-reference)
+    - [Got scraping default values](#got-scraping-default-values)
+    - [Got scraping extra options](#got-scraping-extra-options)
+    - [Errors recovery](#errors-recovery)
 
 <!-- tocstop -->
 
@@ -44,6 +46,8 @@ Got Scraping package makes using proxies with your requests ridiculously easy. I
 
 The proxy type and proxy HTTP version is a type of connection to a proxy. The agents are supported connections from the proxy to the target, let's say, a website.
 ## Installation
+
+We strongly recommend using Node 12+ because of the compatible TLS ciphers we use to emulate the browser. However, this package is compatible with Node 10+.
 
 ```bash
 $ npm install got-scraping
@@ -113,12 +117,20 @@ Got scraping package is build using `got.extend` functionality and supports all 
 ### Got scraping default values
 ```javascript
 const SCRAPING_DEFAULT_OPTIONS = {
+    // Most of the new browsers use HTTP2
     http2: true,
     https: {
+        // We usually don't want to fail because of SSL errors.
+        // We want the content.
         rejectUnauthorized: false,
     },
+    // This would fail all of 404, 403 responses.
+    // We usually don't want to consider these as errors.
+    // We want to take some action after this.
     throwHttpErrors: false,
-    ciphers: 'TLS_AES_256_GCM_SHA384',
+    // Node js uses different TLS ciphers by default.
+    ciphers: getCiphersBasedOnNode(),
+    // We need to have browser-like headers to blend in.
     useHeaderGenerator: true,
 };
 ```

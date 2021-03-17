@@ -29,4 +29,14 @@ describe('Scraping defaults', () => {
 
         expect(response.request.options).toMatchObject(customOptions);
     });
+
+    test('should have compatible defaults with node 10', () => {
+        const nodeVersion = parseFloat(process.versions.node);
+
+        if (nodeVersion < 12) {
+            expect(SCRAPING_DEFAULT_OPTIONS.ciphers).toBe(undefined);
+        } else {
+            expect(SCRAPING_DEFAULT_OPTIONS.ciphers).toBe('TLS_AES_256_GCM_SHA384');
+        }
+    });
 });
