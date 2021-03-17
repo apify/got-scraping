@@ -21,11 +21,12 @@ There is one more good news for loyal `got` users. This package is modified got 
     - [Simple GET request](#simple-get-request)
     - [GET request with proxy](#get-request-with-proxy)
     - [Overriding request headers](#overriding-request-headers)
+    - [Customizing Header generator options](#customizing-header-generator-options)
     - [Get JSON](#get-json)
   - [API reference](#api-reference)
     - [Got scraping default values](#got-scraping-default-values)
     - [Got scraping extra options](#got-scraping-extra-options)
-    - [Errors recovery](#errors-recovery)
+    - [Error recovery](#error-recovery)
 
 <!-- tocstop -->
 
@@ -63,60 +64,71 @@ These examples should help you to grasp the concept of the `got-scraping` packag
 ```javascript
 const gotScraping = require('got-scraping');
 
-gotScraping.get('https://apify.com').then( ({ body }) => console.log(body))
+gotScraping
+    .get('https://apify.com')
+    .then( ({ body }) => console.log(body))
 ```
 
 ### GET request with proxy
 ```javascript
 const gotScraping = require('got-scraping');
 
-gotScraping({ url:'https://apify.com', proxyUrl: 'http://myproxy.com:1234' }).then( ({ body }) => console.log(body))
+gotScraping({
+    url: 'https://apify.com',
+    proxyUrl: 'http://myproxy.com:1234',
+})
+    .then(({ body }) => console.log(body));
+
 ```
 
 ### Overriding request headers
 
 By passing options:
 ```javascript
- const response = await gotScraping({
-            url: 'https://apify.com/',
-            headers: {
-                'user-agent': 'test',
-            },
-        });
+const response = await gotScraping({
+    url: 'https://apify.com/',
+    headers: {
+        'user-agent': 'test',
+    },
+});
 ```
 
-By using handler in custom instance creation process:
+You can check out how to override request headers using handlers in the original got repo under the [instances](https://github.com/sindresorhus/got#instances) section. 
+
+### Customizing Header generator options
 
 ```javascript
-const headers = { 'user-agent': 'test' };
-
- const extendedGot = gotScraping.extend({
-     handlers: [
-                (options, next) => {
-                    return next(got.mergeOptions(
-                        options,
-                        {
-                            headers,
-                        },
-                    ));
-                },
-            ],
- });
+const response = await gotScraping({
+    url: 'https://api.apify.com/v2/browser-info',
+    headerGeneratorOptions:{
+        browsers:[
+            {
+                name: 'chrome',
+                minVersion: 87,
+                maxVersion: 89
+            }
+        ],
+        devices: ['desktop'],
+        languages: ['de-DE', 'en-US'],
+        operatingSystems: ['windows', 'linux'] 
+    }
+});
 ```
+
 ### Get JSON
 You can get `JSON` body with this package too, but please bear in mind that the request header generation is done specifically for `HTML` content type. You might want to alter the generated headers to match the browser ones.
 
 ```javascript
- const response = await gotScraping({
-            responseType: 'json',
-            url: 'https://api.apify.com/v2/browser-info',
-            ciphers: undefined,
-        });
+const response = await gotScraping({
+    responseType: 'json',
+    url: 'https://api.apify.com/v2/browser-info',
+    ciphers: undefined,
+});
 ```
 
 ## API reference
 
-Got scraping package is build using `got.extend` functionality and supports all of the [got API](https://github.com/sindresorhus/got#api). On top of that, it adds few more options to the original once and then passes them by a handler to the `got` context object. This package also alters got defaults to be more scraping friendly.
+Got scraping package is built using `got.extend` functionality and supports all of the [got API](https://github.com/sindresorhus/got#api). On top of that, it adds few more options to the got once and then passes them by a handler to the `got` context object. This package also alters got defaults to be more scraping friendly.
 
 ### Got scraping default values
 ```javascript
@@ -143,9 +155,9 @@ const SCRAPING_DEFAULT_OPTIONS = {
 
 `useHeaderGenerator` - Turns on the generation of the browser-like header. By default, it is set to `true`.
 
-`headerGeneratorOptions` - @TODO: Link to header generator repo.
+`headerGeneratorOptions` - See the @TODO: proper link (HeaderGeneratroOptions)[https://github.com/apify/header-generator]
 
-### Errors recovery
+### Error recovery
 This section covers possible errors that might happen due to different site implementations.
 
 `RequestError: Client network socket disconnected before secure TLS connection was established` - Try changing the ciphers parameter to either `undefined` or a custom value.
