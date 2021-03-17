@@ -1,4 +1,5 @@
 const HeaderGenerator = require('@petrpatek/headers-generator');
+const got = require('got');
 
 const { browserHeadersHandler } = require('../src/handlers/browser-headers');
 const gotScraping = require('../src/index');
@@ -9,12 +10,14 @@ describe('Browser headers', () => {
     let nextHolder;
     let options;
     let generatorSpy;
+    let server;
+    let port;
+
     const mockedHeaders = {
         'user-agent': 'test',
         referer: 'test',
     };
-    let server;
-    let port;
+    const headerGenerator = new HeaderGenerator();
 
     beforeAll(async () => {
         server = await startDummyServer();
@@ -42,6 +45,7 @@ describe('Browser headers', () => {
         expect(nextHolder.next).toBeCalledWith(options);
 
         options.context = {
+            headerGenerator,
             useHeaderGenerator: true,
             headerGeneratorOptions: {
                 browsers: [
@@ -59,6 +63,7 @@ describe('Browser headers', () => {
 
     test('should add headers by option when http2 is used', () => {
         options.context = {
+            headerGenerator,
             useHeaderGenerator: true,
             headerGeneratorOptions: {
                 browsers: [
@@ -77,6 +82,7 @@ describe('Browser headers', () => {
     test('should add headers by beforeRequestHook when http1 is used', () => {
         options.http2 = false;
         options.context = {
+            headerGenerator,
             useHeaderGenerator: true,
             headerGeneratorOptions: {
                 browsers: [
@@ -97,6 +103,7 @@ describe('Browser headers', () => {
 
     test('should pass option to header generator', () => {
         options.context = {
+            headerGenerator,
             useHeaderGenerator: true,
             headerGeneratorOptions: {
                 browsers: [
@@ -109,11 +116,29 @@ describe('Browser headers', () => {
         expect(generatorSpy).toHaveBeenLastCalledWith(expect.objectContaining(options.context.headerGeneratorOptions));
     });
 
+    test('should override default ua header', () => {
+        options.context = {
+            headerGenerator,
+            useHeaderGenerator: true,
+            headers: {
+                ...got.defaults.options.headers,
+            },
+        };
+        browserHeadersHandler(options, nextHolder.next);
+
+        expect(nextHolder.next).toHaveBeenLastCalledWith(expect.objectContaining({
+            headers: {
+                ...mockedHeaders,
+            },
+        }));
+    });
+
     // Just an health check - header generator should have its own tests.
     test('should have working generator', () => {
         generatorSpy.mockRestore();
 
         options.context = {
+            headerGenerator,
             useHeaderGenerator: true,
             headerGeneratorOptions: {
                 browsers: [

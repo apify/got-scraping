@@ -1,9 +1,17 @@
 const got = require('got');
-const HeaderGenerator = require('@petrpatek/headers-generator');
 
-const browserHeadersHandler = (options, next) => {
+/**
+ * @param {object} options
+ * @param {function} next
+ * @returns {import('got').GotReturn}
+ */
+function browserHeadersHandler(options, next) {
     const { http2, headers = {}, context } = options;
-    const { headerGeneratorOptions, useHeaderGenerator } = context;
+    const {
+        headerGeneratorOptions,
+        useHeaderGenerator,
+        headerGenerator,
+    } = context;
 
     if (!useHeaderGenerator) {
         return next(options);
@@ -15,45 +23,53 @@ const browserHeadersHandler = (options, next) => {
         httpVersion: http2 ? '2' : '1',
         ...headerGeneratorOptions,
     };
-    const headerGenerator = new HeaderGenerator(); // We could pass the options here in constructor
-    const generatedHeaders = headerGenerator.getHeaders(mergedHeaderGeneratorOptions); // But we are passing them here because of testing.
+    const generatedHeaders = headerGenerator.getHeaders(mergedHeaderGeneratorOptions);
 
     let newOptions;
 
     if (http2) { // generate http2 headers
-        newOptions = got.mergeOptions(
-            options,
-            { headers: generatedHeaders },
-            { headers },
-        );
-    } else {
-        const optionsWithHooks = {
-            hooks: {
-                beforeRequest: [
-                    (gotOptions) => {
-                        gotOptions.headers = {
-                            ...generatedHeaders,
-                            headers,
-                        };
-                    },
-                ],
+        newOptions = {
+            headers: {
+                ...generatedHeaders,
+                ...headers,
             },
         };
-
-        newOptions = got.mergeOptions(options, optionsWithHooks);
+    } else {
+        newOptions = createOptionsWithBeforeRequestHook(generatedHeaders, headers);
     }
 
     return next(got.mergeOptions(options, newOptions));
-};
+}
 
 /**
- *
  * @param {object} headers
  */
 function deleteDefaultGotUserAgent(headers) {
-    if (headers['user-agent'] && headers['user-agent'].includes('got (https://github.com/sindresorhus/got)')) {
+    const gotDefaultUserAgent = got.defaults.options.headers['user-agent'];
+    if (headers['user-agent'] && headers['user-agent'] === gotDefaultUserAgent) {
         delete headers['user-agent'];
     }
+}
+
+/**
+ * Creates options with beforeRequestHooks in order to have case-sensitive headers.
+ * @param {object} generatedHeaders
+ * @param {object} headerOverrides
+ * @returns
+ */
+function createOptionsWithBeforeRequestHook(generatedHeaders, headerOverrides) {
+    return {
+        hooks: {
+            beforeRequest: [
+                (gotOptions) => {
+                    gotOptions.headers = {
+                        ...generatedHeaders,
+                        ...headerOverrides,
+                    };
+                },
+            ],
+        },
+    };
 }
 
 module.exports = {

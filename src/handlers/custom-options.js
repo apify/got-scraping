@@ -1,11 +1,11 @@
 const customOptionsHandler = (options, next) => {
-    const { proxyUrl, headerGeneratorOptions, useHeaderGenerator, ...gotOptions } = options;
+    const { proxyUrl, headerGeneratorOptions, useHeaderGenerator, context, ...gotOptions } = options;
 
     gotOptions.context = {
         proxyUrl,
         headerGeneratorOptions,
         useHeaderGenerator,
-        ...gotOptions.context,
+        ...context,
     };
 
     return next(gotOptions);
