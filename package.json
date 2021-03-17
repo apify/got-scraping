@@ -22,8 +22,8 @@
 		"markdown-toc": "^1.2.0"
 	},
 	"scripts": {
-		"build-docs": "npm run build-toc && node docs/build-docs.js",
-		"build-toc": "markdown-toc docs/README.md -i",
+		"build-docs": "npm run build-toc",
+		"build-toc": "markdown-toc ./README.md -i",
 		"lint": "./node_modules/.bin/eslint ./src --ext .js,.jsx",
 		"lint:fix": "./node_modules/.bin/eslint ./src --ext .js,.jsx --fix",
 		"test": "jest --maxWorkers=3 --collect-coverage"
