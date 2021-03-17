@@ -1,5 +1,5 @@
 # Got Scraping
-Got Scraping is a small, but powerful and extensible library, that allows you to seamlessly send browser-like requests with only a little configuration, and a single function call.
+Got Scraping is a small but powerful got extension that allows you to send browser-like requests with only a little configuration seamlessly and with a single function call. [Got](https://github.com/sindresorhus/got) is a widely use and powerful client that provides extensibility and customization. Sending browser-like requests is essential in the web scraping industry to blend in with the website traffic. You can read more about the mimics [here](#simulating-browser-like-requests).
 
 ## Motivation
 With the increasing popularity of web scraping, it is becoming more important to blend in with the typical internet traffic. This package implements multiple mimics to make document GET requests similar to browsers. Thanks to the `header-generator` package, you can choose various browsers from different operating systems and devices. This package generates all the headers for you so that you can focus on the important stuff. But it doesn't end here. This package also tries to mimic the full request fingerprint, including the correct HTTP protocol and TLS ciphers.
