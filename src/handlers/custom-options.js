@@ -3,8 +3,13 @@
  * @param {function} next
  * @returns {import('got').GotReturn}
  */
-const customOptionsHandler = (options, next) => {
-    const { proxyUrl, headerGeneratorOptions, useHeaderGenerator, context, ...gotOptions } = options;
+function customOptionsHandler(options, next) {
+    const {
+        proxyUrl,
+        headerGeneratorOptions,
+        useHeaderGenerator,
+        context,
+        ...gotOptions } = options;
 
     // Got expects custom properties inside the context option.
     gotOptions.context = {
@@ -15,7 +20,7 @@ const customOptionsHandler = (options, next) => {
     };
 
     return next(gotOptions);
-};
+}
 
 module.exports = {
     customOptionsHandler,

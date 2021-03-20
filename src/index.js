@@ -3,6 +3,7 @@ const HeaderGenerator = require('@petrpatek/headers-generator');
 
 const { SCRAPING_DEFAULT_OPTIONS } = require('./scraping-defaults');
 
+const { optionsValidationHandler } = require('./handlers/options-validation');
 const { customOptionsHandler } = require('./handlers/custom-options');
 const { browserHeadersHandler } = require('./handlers/browser-headers');
 const { proxyHandler } = require('./handlers/proxy');
@@ -24,6 +25,7 @@ const gotScraping = got.extend(
     mutableGot,
     {
         handlers: [
+            optionsValidationHandler,
             customOptionsHandler,
             proxyHandler,
             browserHeadersHandler,

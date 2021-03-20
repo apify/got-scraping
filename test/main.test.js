@@ -25,7 +25,7 @@ describe('GotScraping', () => {
     });
 
     test('should use all handlers', async () => {
-        expect(gotScraping.defaults.handlers).toHaveLength(3);
+        expect(gotScraping.defaults.handlers).toHaveLength(4);
     });
 
     test('should allow passing custom properties', async () => {
@@ -97,51 +97,60 @@ describe('GotScraping', () => {
             expect(response.statusCode).toBe(200);
             expect(response.httpVersion).toBe('2.0');
         });
-        test('should work with proxyUrl and http2', async () => {
+        test('should work with proxyUrl and http1', async () => {
             jest.setTimeout(60000);
             const response = await gotScraping({
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
                 ciphers: undefined,
-            });
-
-            const responseProxy = await gotScraping({
-                json: true,
-                url: 'https://api.apify.com/v2/browser-info',
-                proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
-                ciphers: undefined,
-            });
-            expect(response.statusCode).toBe(200);
-            expect(response.request.options).toMatchObject({ http2: true });
-
-            expect(responseProxy.statusCode).toBe(200);
-
-            expect(response.body.clientIp).not.toBe(responseProxy.body.clientIp);
-            expect(responseProxy.httpVersion).toBe('2.0');
-        });
-
-        test('should work with proxyUrl and http1', async () => {
-            jest.setTimeout(20000);
-            const response = await gotScraping({
-                responseType: 'json',
-                url: 'https://api.apify.com/v2/browser-info',
-                ciphers: undefined,
                 http2: false,
             });
 
             const responseProxy = await gotScraping({
                 json: true,
-                url: 'https://api.apify.com/v2/browser-info',
+                url: 'https://apify.com',
                 proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
-                ciphers: undefined,
                 http2: false,
+
             });
             expect(response.statusCode).toBe(200);
             expect(response.request.options).toMatchObject({ http2: false });
 
             expect(responseProxy.statusCode).toBe(200);
+
             expect(response.body.clientIp).not.toBe(responseProxy.body.clientIp);
             expect(responseProxy.httpVersion).toBe('1.1');
+        });
+
+        test('should work with proxyUrl and http2', async () => {
+            jest.setTimeout(20000);
+
+            const response = await gotScraping({
+                responseType: 'json',
+                url: 'https://api.apify.com/v2/browser-info',
+                ciphers: undefined,
+            });
+
+            expect(response.statusCode).toBe(200);
+            expect(response.request.options).toMatchObject({ http2: true });
+
+            const nodeVersion = parseFloat(process.versions.node);
+
+            const proxyPromise = gotScraping({
+                json: true,
+                url: 'https://api.apify.com/v2/browser-info',
+                proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+                ciphers: undefined,
+            });
+
+            if (nodeVersion < 12) {
+                await expect(proxyPromise).rejects.toThrow(/Proxy with HTTP2 target is supported only in node v12+/);
+            } else {
+                const responseProxy = await proxyPromise;
+                expect(responseProxy.statusCode).toBe(200);
+                expect(response.body.clientIp).not.toBe(responseProxy.body.clientIp);
+                expect(responseProxy.httpVersion).toBe('2.0');
+            }
         });
     });
 });
