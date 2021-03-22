@@ -36,5 +36,4 @@ function isUnsupportedNodeVersion() {
 
 module.exports = {
     optionsValidationHandler,
-    isUnsupportedNodeVersion,
 };

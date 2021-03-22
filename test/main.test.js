@@ -98,7 +98,6 @@ describe('GotScraping', () => {
             expect(response.httpVersion).toBe('2.0');
         });
         test('should work with proxyUrl and http1', async () => {
-            jest.setTimeout(60000);
             const response = await gotScraping({
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
@@ -123,8 +122,6 @@ describe('GotScraping', () => {
         });
 
         test('should work with proxyUrl and http2', async () => {
-            jest.setTimeout(20000);
-
             const response = await gotScraping({
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
@@ -143,6 +140,7 @@ describe('GotScraping', () => {
                 ciphers: undefined,
             });
 
+            // We need this because we run tests in CI for various node versions.
             if (nodeVersion < 12) {
                 await expect(proxyPromise).rejects.toThrow(/Proxy with HTTP2 target is supported only in node v12+/);
             } else {

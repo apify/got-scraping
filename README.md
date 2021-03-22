@@ -1,5 +1,5 @@
 # Got Scraping
-Got Scraping is a small but powerful got extension that allows you to send browser-like requests with only a little configuration seamlessly and with a single function call. [Got](https://github.com/sindresorhus/got) is a widely use and powerful client that provides extensibility and customization. Sending browser-like requests is essential in the web scraping industry to blend in with the website traffic. You can read more about the mimics [here](#simulating-browser-like-requests).
+Got Scraping is a small but powerful `got` extension that allows you to send browser-like requests with only a little configuration seamlessly and with a single function call. [Got](https://github.com/sindresorhus/got) is a widely used and powerful client that provides extensibility and customization. Sending browser-like requests is essential in the web scraping industry to blend in with the website traffic. You can read more about the mimics [here](#simulating-browser-like-requests).
 
 ## Motivation
 With the increasing popularity of web scraping, it is becoming more important to blend in with the typical internet traffic. This package implements multiple mimics to make GET requests similar to browsers. Thanks to the included [`header-generator`](https://github.com/apify/header-generator) package, you can choose various browsers from different operating systems and devices. The `header-generator` package generates all the headers for you so that you can focus on the important stuff.
@@ -8,7 +8,7 @@ But the `got-scraping` doesn't stop here. The `got-scraping` package also tries 
 
 Proxies are essential in the web scraping industry. Another goal of this package is to simplify the usage of `HTTP` and `HTTPS` proxies. All you have to do is pass the `proxyUrl` option.
 
-There is one more good news for loyal `got` users. This package is modified got instance using handlers so that you can use the got interface as always. We've added just a few extras.
+There is one more good news for loyal `got` users. This package is modified `got` instance using handlers so that you can use the `got` interface as always. We've added just a few extras.
 
 <!-- toc -->
 
@@ -33,7 +33,7 @@ The Got Scraping package's primary goal is to make the document GET request look
 
 This package can only generate all the standard attributes. There still might be site-specific attributes that you need to add. One of those attributes you might want to add is the `referer` header. Referer header might add more credibility to your request and hence reduce the blocking. Check out more info about the `referer` header [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer). Please bear in mind that these headers are made for GET requests for HTML documents. If you want to make POST requests or GET requests for any other content type, you should alter these headers according to your needs. You can do so by passing a headers option or writing a custom [got handler](https://github.com/sindresorhus/got/blob/main/documentation/advanced-creation.md#examples).
 
-The second colossal factor is using the same HTTP version as browsers. Most modern browsers use HTTP v2, so using it when the server supports it takes you one more step further to look like a browser. Luckily you don't have to care about the server HTTP version support since got automatically handles [ALPN protocol negotiation](https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation) and uses the HTTP v2 only if it is supported.
+The second colossal factor is using the same HTTP version as browsers. Most modern browsers use HTTP v2, so using it when the server supports it takes you one more step further to look like a browser. Luckily you don't have to care about the server HTTP version support since `got` automatically handles [ALPN protocol negotiation](https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation) and uses the HTTP v2 only if it is supported.
 The last step is to have a browser-like TLS suite and ciphers. According to our research, the cipher `TLS_AES_256_GCM_SHA384` is used among all modern browsers. We use this cipher as a default one. However, feel free to change it.
 
 This package should provide a solid start for your browser request emulation process. All websites are built differently, and some of them might require some additional special care.
@@ -91,7 +91,7 @@ const response = await gotScraping({
 });
 ```
 
-You can check out how to override request headers using handlers in the original got repo under the [instances](https://github.com/sindresorhus/got#instances) section. 
+You can check out how to override request headers using handlers in the original `got` repo under the [instances](https://github.com/sindresorhus/got#instances) section. 
 
 ### Customizing Header generator options
 
@@ -126,7 +126,7 @@ const response = await gotScraping({
 
 ## API reference
 
-Got scraping package is built using `got.extend` functionality and supports all of the [got API](https://github.com/sindresorhus/got#api). On top of that, it adds few more options to the got once and then passes them by a handler to the `got` context object. This package also alters got defaults to be more scraping friendly.
+Got scraping package is built using `got.extend` functionality and supports all of the [got API](https://github.com/sindresorhus/got#api). On top of that, it adds few more options to the `got` once and then passes them by a handler to the `got` context object. This package also alters `got` defaults to be more scraping friendly.
 
 ### Got scraping default values
 ```javascript
