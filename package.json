@@ -3,6 +3,9 @@
 	"version": "0.0.1",
 	"description": "This is a boilerplate of an Apify actor.",
 	"main": "src/index.js",
+	"files": [
+		"src"
+	],
 	"dependencies": {
 		"@petrpatek/headers-generator": "0.1.0-beta1",
 		"got": "^11.8.1",
