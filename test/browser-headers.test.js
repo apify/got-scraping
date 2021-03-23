@@ -1,7 +1,7 @@
 const HeaderGenerator = require('@petrpatek/headers-generator');
 const got = require('got');
 
-const { browserHeadersHandler } = require('../src/handlers/browser-headers');
+const { browserHeadersHandler, mergeHeaders } = require('../src/handlers/browser-headers');
 const gotScraping = require('../src/index');
 
 const { startDummyServer } = require('./helpers/dummy-server');
@@ -176,6 +176,60 @@ describe('Browser headers', () => {
 
         expect(response.request.options.headers).toMatchObject({
             'User-Agent': expect.stringContaining('Chrome'),
+        });
+    });
+    describe('mergeHeaders', () => {
+        test('should merge headers and respect original casing', () => {
+            const generatedHeaders = {
+                'User-Agent': 'TEST',
+            };
+            const userOverrides = {
+                'user-agent': 'TEST2',
+            };
+
+            const mergedHeaders = mergeHeaders(generatedHeaders, userOverrides);
+
+            expect(mergedHeaders['User-Agent']).toEqual(userOverrides['user-agent']);
+            expect(mergedHeaders['user-agent']).toBeUndefined();
+        });
+
+        test('should merge headers', () => {
+            const generatedHeaders = {
+                accept: 'TEST',
+            };
+            const userOverrides = {
+                accept: 'TEST2',
+            };
+
+            const mergedHeaders = mergeHeaders(generatedHeaders, userOverrides);
+
+            expect(mergedHeaders.accept).toEqual(userOverrides.accept);
+        });
+
+        test('should allow deleting header', () => {
+            const generatedHeaders = {
+                accept: 'TEST',
+            };
+            const userOverrides = {
+                accept: undefined,
+            };
+
+            const mergedHeaders = mergeHeaders(generatedHeaders, userOverrides);
+
+            expect(mergedHeaders.accept).toBeUndefined();
+        });
+
+        test('should allow adding header', () => {
+            const generatedHeaders = {
+                accept: 'TEST',
+            };
+            const userOverrides = {
+                referer: 'test2',
+            };
+
+            const mergedHeaders = mergeHeaders(generatedHeaders, userOverrides);
+
+            expect(mergedHeaders.referer).toEqual(userOverrides.referer);
         });
     });
 });

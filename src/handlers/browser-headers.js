@@ -29,10 +29,7 @@ function browserHeadersHandler(options, next) {
 
     if (http2) { // generate http2 headers
         newOptions = {
-            headers: {
-                ...generatedHeaders,
-                ...headers,
-            },
+            headers: mergeHeaders(generatedHeaders, headers),
         };
     } else {
         newOptions = createOptionsWithBeforeRequestHook(generatedHeaders, headers);
@@ -62,16 +59,45 @@ function createOptionsWithBeforeRequestHook(generatedHeaders, headerOverrides) {
         hooks: {
             beforeRequest: [
                 (gotOptions) => {
-                    gotOptions.headers = {
-                        ...generatedHeaders,
-                        ...headerOverrides,
-                    };
+                    gotOptions.headers = mergeHeaders(generatedHeaders, headerOverrides);
                 },
             ],
         },
     };
 }
 
+/**
+ * Merges original generated headers and user provided overrides.
+ * All header overrides will have the original header case, because of antiscraping.
+ * @param {object} original
+ * @param {object} overrides
+ * @returns
+ */
+function mergeHeaders(original, overrides) {
+    const mergedHeaders = new Map();
+
+    Object.entries(original).forEach(([nameSensitive, value]) => mergedHeaders.set(nameSensitive.toLowerCase(), { nameSensitive, value }));
+
+    Object.entries(overrides).forEach(([nameSensitive, value]) => {
+        const headerRecord = mergedHeaders.get(nameSensitive.toLowerCase());
+
+        if (headerRecord) {
+            const { nameSensitive: oldNameSensitive } = headerRecord;
+
+            mergedHeaders.set(nameSensitive.toLowerCase(), { nameSensitive: oldNameSensitive, value });
+        } else {
+            mergedHeaders.set(nameSensitive.toLowerCase(), { nameSensitive, value });
+        }
+    });
+
+    const finalHeaders = {};
+
+    mergedHeaders.forEach(({ nameSensitive, value }) => { finalHeaders[nameSensitive] = value; });
+
+    return finalHeaders;
+}
+
 module.exports = {
     browserHeadersHandler,
+    mergeHeaders,
 };
