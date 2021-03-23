@@ -39,7 +39,9 @@ describe('Proxy', () => {
         jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('h2');
         options.context.proxyUrl = 'ftp://localhost:132';
 
-        expect(proxyHandler(options, next)).toReject(expect.stringContaining('Invalid proxy protocol'));
+        await expect(proxyHandler(options, next))
+            .rejects
+            .toThrow(/is not supported. Please use HTTP or HTTPS./);
     });
 
     describe('agents', () => {

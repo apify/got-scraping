@@ -36,7 +36,7 @@ function validateProxyProtocol(protocol) {
     const isSupported = protocol === 'http:' || protocol === 'https:';
 
     if (!isSupported) {
-        throw new Error(`Invalid proxy protocol "${protocol}"`);
+        throw new Error(`Proxy URL protocol "${protocol}" is not supported. Please use HTTP or HTTPS.`);
     }
 }
 
