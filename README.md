@@ -155,7 +155,7 @@ const SCRAPING_DEFAULT_OPTIONS = {
 
 `useHeaderGenerator` - Turns on the generation of the browser-like header. By default, it is set to `true`.
 
-`headerGeneratorOptions` - See the @TODO: proper link (HeaderGeneratroOptions)[https://github.com/apify/header-generator]
+`headerGeneratorOptions` - See the [HeaderGeneratorOptions](https://github.com/apify/header-generator/tree/master#headergeneratoroptions).
 
 ### Error recovery
 This section covers possible errors that might happen due to different site implementations.
