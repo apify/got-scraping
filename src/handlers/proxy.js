@@ -1,6 +1,7 @@
 const http2 = require('http2-wrapper');
 const HttpsProxyAgent = require('https-proxy-agent');
 const HttpProxyAgent = require('http-proxy-agent');
+const httpResolver = require('../http-resolver');
 
 const {
     HttpOverHttp2,
@@ -11,42 +12,55 @@ const {
 } = http2.proxies;
 
 /**
- *
- * @param {string|undefined} rawProxyUrl
- * @returns {import('got/dist/source').HandlerFunction} - got handler.
+ * @param {object} options
+ * @param {function} next
+ * @returns {import('got').GotReturn}
  */
-exports.createProxyHandler = (rawProxyUrl) => {
-    if (rawProxyUrl) {
-        return (options, next) => {
-            options.agent = getAgent(rawProxyUrl, options.http2);
+async function proxyHandler(options, next) {
+    const { context: { proxyUrl } } = options;
 
-            return next(options);
-        };
+    if (proxyUrl) {
+        const parsedProxy = new URL(proxyUrl);
+
+        validateProxyProtocol(parsedProxy.protocol);
+        options.agent = await getAgent(parsedProxy, options.https.rejectUnauthorized);
     }
 
-    return (options, next) => next(options);
-};
+    return next(options);
+}
 
 /**
- *
- * @param {string} rawProxyUrl
- * @param {bolean} isHttp2
+ * @param {string} protocol
+ */
+function validateProxyProtocol(protocol) {
+    const isSupported = protocol === 'http:' || protocol === 'https:';
+
+    if (!isSupported) {
+        throw new Error(`Proxy URL protocol "${protocol}" is not supported. Please use HTTP or HTTPS.`);
+    }
+}
+
+/**
+ * @param {object} parsedProxyUrl parsed proxyUrl
+ * @param {boolean} rejectUnauthorized
  * @returns {object}
  */
-function getAgent(rawProxyUrl, isHttp2) {
+async function getAgent(parsedProxyUrl, rejectUnauthorized) {
     const proxy = {
         proxyOptions: {
-            url: new URL(rawProxyUrl),
+            url: parsedProxyUrl,
 
-            rejectUnauthorized: false, // based on the got https.rejectUnauthorized option.
+            rejectUnauthorized, // based on the got https.rejectUnauthorized option.
         },
     };
 
     const proxyUrl = proxy.proxyOptions.url;
-
     let agent;
 
     if (proxyUrl.protocol === 'https:') {
+        const protocol = await httpResolver.resolveHttpVersion(proxyUrl);
+        const isHttp2 = protocol === 'h2';
+
         if (isHttp2) {
             agent = {
                 http: new HttpOverHttp2(proxy),
@@ -70,3 +84,7 @@ function getAgent(rawProxyUrl, isHttp2) {
 
     return agent;
 }
+
+module.exports = {
+    proxyHandler,
+};
