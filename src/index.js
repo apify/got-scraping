@@ -1,5 +1,5 @@
 const got = require('got');
-const HeaderGenerator = require('@petrpatek/headers-generator');
+const HeaderGenerator = require('header-generator');
 
 const { SCRAPING_DEFAULT_OPTIONS } = require('./scraping-defaults');
 
