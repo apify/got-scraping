@@ -1,7 +1,7 @@
 {
 	"name": "got-scraping",
 	"version": "0.0.1",
-	"description": "This is a boilerplate of an Apify actor.",
+	"description": "HTTP client made for scraping based on got.",
 	"main": "src/index.js",
 	"files": [
 		"src"
@@ -37,5 +37,12 @@
 		"email": "support@apify.com",
 		"url": "https://apify.com"
 	},
-	"license": "ISC"
+	"license": "Apache-2.0",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/apify/got-scrapings"
+	},
+	"bugs": {
+		"url": "https://github.com/apify/got-scraping/issues"
+	}
 }
