@@ -1,4 +1,4 @@
-const HeaderGenerator = require('@petrpatek/headers-generator');
+const HeaderGenerator = require('header-generator');
 const got = require('got');
 
 const { browserHeadersHandler, mergeHeaders } = require('../src/handlers/browser-headers');
