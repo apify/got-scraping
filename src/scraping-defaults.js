@@ -14,6 +14,7 @@ const SCRAPING_DEFAULT_OPTIONS = {
     ciphers: getCiphersBasedOnNode(),
     // We need to have browser-like headers to blend in.
     useHeaderGenerator: true,
+    timeout: 60000,
 };
 
 /**
