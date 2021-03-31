@@ -15,6 +15,8 @@ const SCRAPING_DEFAULT_OPTIONS = {
     // We need to have browser-like headers to blend in.
     useHeaderGenerator: true,
     timeout: 60000,
+    retry: { retries: 0, maxRetryAfter: 0 },
+
 };
 
 /**
