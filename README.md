@@ -149,7 +149,10 @@ const SCRAPING_DEFAULT_OPTIONS = {
     // We need to have browser-like headers to blend in.
     useHeaderGenerator: true,
     // Got has infinite timeout by default. In scraping we have to count with bad proxies. Without custom timeout it would just hang.
-    timeout: 60000
+    timeout: 60000,
+    // Retries should be handled by a crawler not the request package.
+    retry: { retries: 0, maxRetryAfter: 0 },
+
 };
 ```
 ### Got scraping extra options
