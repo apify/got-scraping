@@ -1,6 +1,6 @@
 {
 	"name": "got-scraping",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "HTTP client made for scraping based on got.",
 	"main": "src/index.js",
 	"files": [
