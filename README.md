@@ -109,7 +109,7 @@ const response = await gotScraping({
             }
         ],
         devices: ['desktop'],
-        languages: ['de-DE', 'en-US'],
+        locales: ['de-DE', 'en-US'],
         operatingSystems: ['windows', 'linux'] 
     }
 });
