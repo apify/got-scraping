@@ -18,6 +18,10 @@ const startDummyServer = async (port) => {
         res.json({ test: 123 });
     });
 
+    app.post('/jsonPost', (req, res) => {
+        res.json(req.body);
+    });
+
     app.get('/html', (req, res) => {
         res.setHeader('content-type', 'text/html');
         res.send('<html></html>');

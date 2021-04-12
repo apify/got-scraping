@@ -91,6 +91,37 @@ describe('GotScraping', () => {
         expect(response.statusCode).toBe(200);
     });
 
+    test('should post json', async () => {
+        const body = { foo: 'bar' };
+
+        const response = await gotScraping({
+            responseType: 'json',
+            url: `http://localhost:${port}/jsonPost`,
+            json: body,
+            method: 'POST',
+        });
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toMatchObject(body);
+    });
+
+    test('should post body', async () => {
+        const body = { foo: 'bar' };
+
+        const response = await gotScraping({
+            url: `http://localhost:${port}/jsonPost`,
+            body: JSON.stringify(body),
+            responseType: 'json',
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json; charset=UTF-8',
+            },
+        });
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toMatchObject(body);
+    });
+
     describe('Integration', () => {
         test('should use http2 first', async () => {
             const response = await gotScraping({ url: 'https://apify.com/' });
