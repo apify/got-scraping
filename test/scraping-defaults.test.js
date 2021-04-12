@@ -36,7 +36,7 @@ describe('Scraping defaults', () => {
         if (nodeVersion < 12) {
             expect(SCRAPING_DEFAULT_OPTIONS.ciphers).toBe(undefined);
         } else {
-            expect(SCRAPING_DEFAULT_OPTIONS.ciphers).toBe('TLS_AES_256_GCM_SHA384');
+            expect(SCRAPING_DEFAULT_OPTIONS.ciphers).toBe('TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256');
         }
     });
 });

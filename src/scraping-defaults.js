@@ -28,7 +28,7 @@ function getCiphersBasedOnNode() {
     if (nodeVersion < 12) {
         return;
     }
-    return 'TLS_AES_256_GCM_SHA384';
+    return 'TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256';
 }
 
 module.exports = {
