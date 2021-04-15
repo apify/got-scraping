@@ -1,13 +1,26 @@
-const { customOptionsHandler } = require('../src/handlers/custom-options');
+const gotScraping = require('../src');
+const { startDummyServer } = require('./helpers/dummy-server');
 
 describe('Custom options', () => {
-    test('should move custom options to context', () => {
-        const nextHolder = {
-            next() {},
-        };
+    let server;
+    let port;
+
+    beforeAll(async () => {
+        server = await startDummyServer();
+        port = server.address().port; //eslint-disable-line
+    });
+
+    afterAll(() => {
+        server.close();
+    });
+
+    test('should move custom options to context', async () => {
+        expect.assertions(2);
+
         const options = {
-            url: 'testUrl',
-            proxyUrl: 'test',
+            url: `http://localhost:${port}/html`,
+            proxyUrl: 'http://localhost:8080',
+            http2: false,
             headerGeneratorOptions: {
                 browsers: [
                     {
@@ -16,18 +29,24 @@ describe('Custom options', () => {
                 ],
             },
             useHeaderGenerator: false,
-        };
-        jest.spyOn(nextHolder, 'next');
+            hooks: {
+                beforeRequest: [
+                    (opts) => {
+                        expect(opts.context).toMatchObject({
+                            proxyUrl: options.proxyUrl,
+                            headerGeneratorOptions: options.headerGeneratorOptions,
+                            useHeaderGenerator: false,
+                        });
 
-        customOptionsHandler(options, nextHolder.next);
-
-        expect(nextHolder.next).toBeCalledWith({
-            url: options.url,
-            context: {
-                proxyUrl: options.proxyUrl,
-                headerGeneratorOptions: options.headerGeneratorOptions,
-                useHeaderGenerator: false,
+                        throw new Error('request aborted');
+                    },
+                ],
             },
-        });
+        };
+        try {
+            await gotScraping(options);
+        } catch (e) {
+            expect(e.message).toBe('request aborted');
+        }
     });
 });
