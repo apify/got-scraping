@@ -91,6 +91,37 @@ describe('GotScraping', () => {
         expect(response.statusCode).toBe(200);
     });
 
+    test('should post json', async () => {
+        const body = { foo: 'bar' };
+
+        const response = await gotScraping({
+            responseType: 'json',
+            url: `http://localhost:${port}/jsonPost`,
+            json: body,
+            method: 'POST',
+        });
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toEqual(body);
+    });
+
+    test('should post body', async () => {
+        const body = { foo: 'bar' };
+
+        const response = await gotScraping({
+            url: `http://localhost:${port}/jsonPost`,
+            body: JSON.stringify(body),
+            responseType: 'json',
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json; charset=UTF-8',
+            },
+        });
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toEqual(body);
+    });
+
     describe('Integration', () => {
         test('should use http2 first', async () => {
             const response = await gotScraping({ url: 'https://apify.com/' });
@@ -106,10 +137,11 @@ describe('GotScraping', () => {
             });
 
             const responseProxy = await gotScraping({
-                json: true,
-                url: 'https://apify.com',
+                responseType: 'json',
+                url: 'https://api.apify.com/v2/browser-info',
                 proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
                 http2: false,
+                ciphers: undefined,
 
             });
             expect(response.statusCode).toBe(200);
@@ -134,7 +166,7 @@ describe('GotScraping', () => {
             const nodeVersion = parseFloat(process.versions.node);
 
             const proxyPromise = gotScraping({
-                json: true,
+                responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
                 proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
                 ciphers: undefined,

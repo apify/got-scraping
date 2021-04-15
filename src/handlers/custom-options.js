@@ -1,3 +1,5 @@
+const got = require('got');
+
 /**
  * @param {object} options
  * @param {function} next
@@ -9,17 +11,23 @@ function customOptionsHandler(options, next) {
         headerGeneratorOptions,
         useHeaderGenerator,
         context,
-        ...gotOptions } = options;
+    } = options;
 
     // Got expects custom properties inside the context option.
-    gotOptions.context = {
+    const newContext = {
         ...context,
         proxyUrl,
         headerGeneratorOptions,
         useHeaderGenerator,
     };
 
-    return next(gotOptions);
+    delete options.proxyUrl;
+    delete options.headerGeneratorOptions;
+    delete options.useHeaderGenerator;
+
+    const finalOptions = got.mergeOptions(options, { context: newContext });
+
+    return next(finalOptions);
 }
 
 module.exports = {
