@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 const SCRAPING_DEFAULT_OPTIONS = {
     // Most of the new browsers use HTTP2
     http2: true,
@@ -28,7 +30,18 @@ function getCiphersBasedOnNode() {
     if (nodeVersion < 12) {
         return;
     }
-    return 'TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256';
+    return ensureModernTlsFirst();
+}
+
+/**
+ * @returns {string} ciphers list
+ */
+function ensureModernTlsFirst() {
+    const modernTlsCiphers = 'TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256:';
+    let defaultCiphers = crypto.constants.defaultCipherList.replace(modernTlsCiphers, '');
+    defaultCiphers = defaultCiphers.split(':').filter((cipher) => !!cipher);
+
+    return modernTlsCiphers + defaultCiphers.join(':');
 }
 
 module.exports = {

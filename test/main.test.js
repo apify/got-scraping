@@ -1,5 +1,4 @@
 const got = require('got');
-
 const gotScraping = require('../src');
 
 const { startDummyServer } = require('./helpers/dummy-server');
@@ -132,7 +131,6 @@ describe('GotScraping', () => {
             const response = await gotScraping({
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
-                ciphers: undefined,
                 http2: false,
             });
 
@@ -141,7 +139,6 @@ describe('GotScraping', () => {
                 url: 'https://api.apify.com/v2/browser-info',
                 proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
                 http2: false,
-                ciphers: undefined,
 
             });
             expect(response.statusCode).toBe(200);
@@ -157,7 +154,6 @@ describe('GotScraping', () => {
             const response = await gotScraping({
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
-                ciphers: undefined,
             });
 
             expect(response.statusCode).toBe(200);
@@ -169,7 +165,6 @@ describe('GotScraping', () => {
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
                 proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
-                ciphers: undefined,
             });
 
             // We need this because we run tests in CI for various node versions.
@@ -181,6 +176,13 @@ describe('GotScraping', () => {
                 expect(response.body.clientIp).not.toBe(responseProxy.body.clientIp);
                 expect(responseProxy.httpVersion).toBe('2.0');
             }
+        });
+
+        test('should support tls 1.2', async () => {
+            const url = 'https://tls-v1-2.badssl.com:1012/';
+
+            const response = await gotScraping.get(url);
+            expect(response.statusCode).toBe(200);
         });
     });
 });
