@@ -6,6 +6,7 @@ const { startDummyServer } = require('./helpers/dummy-server');
 describe('GotScraping', () => {
     let server;
     let port;
+    const nodeVersion = parseFloat(process.versions.node);
 
     beforeAll(async () => {
         server = await startDummyServer();
@@ -159,8 +160,6 @@ describe('GotScraping', () => {
             expect(response.statusCode).toBe(200);
             expect(response.request.options).toMatchObject({ http2: true });
 
-            const nodeVersion = parseFloat(process.versions.node);
-
             const proxyPromise = gotScraping({
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
@@ -185,12 +184,14 @@ describe('GotScraping', () => {
             expect(response.statusCode).toBe(200);
         });
 
-        test('should support tls 1.3', async () => {
-            const url = 'https://www.howsmyssl.com/a/check';
+        if (nodeVersion >= 12) {
+            test('should support tls 1.3', async () => {
+                const url = 'https://www.howsmyssl.com/a/check';
 
-            const response = await gotScraping.get(url, { responseType: 'json' });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.tls_version).toBe('TLS 1.3');
-        });
+                const response = await gotScraping.get(url, { responseType: 'json' });
+                expect(response.statusCode).toBe(200);
+                expect(response.body.tls_version).toBe('TLS 1.3');
+            });
+        }
     });
 });
