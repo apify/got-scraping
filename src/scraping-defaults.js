@@ -34,14 +34,16 @@ function getCiphersBasedOnNode() {
 }
 
 /**
+ * Reorders the default NodeJs ciphers so the request tries to negotiate the modern TLS version first, same as browsers do.
  * @returns {string} ciphers list
  */
 function ensureModernTlsFirst() {
-    const modernTlsCiphers = 'TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256:';
-    let defaultCiphers = crypto.constants.defaultCipherList.replace(modernTlsCiphers, '');
-    defaultCiphers = defaultCiphers.split(':').filter((cipher) => !!cipher);
-
-    return modernTlsCiphers + defaultCiphers.join(':');
+    const modernTlsCiphers = ['TLS_AES_256_GCM_SHA384', 'TLS_AES_128_GCM_SHA256', 'TLS_CHACHA20_POLY1305_SHA256'];
+    const defaultCiphers = new Set(crypto.constants.defaultCipherList.split(':'));
+    // First we will remove the modern ciphers from the set.
+    modernTlsCiphers.forEach((cipher) => defaultCiphers.delete(cipher));
+    // Then we will add the modern ciphers at the beginning
+    return modernTlsCiphers.concat(Array.from(defaultCiphers)).join(':');
 }
 
 module.exports = {

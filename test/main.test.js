@@ -184,5 +184,13 @@ describe('GotScraping', () => {
             const response = await gotScraping.get(url);
             expect(response.statusCode).toBe(200);
         });
+
+        test('should support tls 1.3', async () => {
+            const url = 'https://www.howsmyssl.com/a/check';
+
+            const response = await gotScraping.get(url, { responseType: 'json' });
+            expect(response.statusCode).toBe(200);
+            expect(response.body.tls_version).toBe('TLS 1.3');
+        });
     });
 });
