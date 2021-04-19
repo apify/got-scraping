@@ -122,7 +122,6 @@ You can get `JSON` body with this package too, but please bear in mind that the 
 const response = await gotScraping({
     responseType: 'json',
     url: 'https://api.apify.com/v2/browser-info',
-    ciphers: undefined,
 });
 ```
 

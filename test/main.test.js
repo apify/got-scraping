@@ -1,5 +1,4 @@
 const got = require('got');
-
 const gotScraping = require('../src');
 
 const { startDummyServer } = require('./helpers/dummy-server');
@@ -7,6 +6,7 @@ const { startDummyServer } = require('./helpers/dummy-server');
 describe('GotScraping', () => {
     let server;
     let port;
+    const nodeVersion = parseFloat(process.versions.node);
 
     beforeAll(async () => {
         server = await startDummyServer();
@@ -132,7 +132,6 @@ describe('GotScraping', () => {
             const response = await gotScraping({
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
-                ciphers: undefined,
                 http2: false,
             });
 
@@ -141,7 +140,6 @@ describe('GotScraping', () => {
                 url: 'https://api.apify.com/v2/browser-info',
                 proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
                 http2: false,
-                ciphers: undefined,
 
             });
             expect(response.statusCode).toBe(200);
@@ -157,19 +155,15 @@ describe('GotScraping', () => {
             const response = await gotScraping({
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
-                ciphers: undefined,
             });
 
             expect(response.statusCode).toBe(200);
             expect(response.request.options).toMatchObject({ http2: true });
 
-            const nodeVersion = parseFloat(process.versions.node);
-
             const proxyPromise = gotScraping({
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
                 proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
-                ciphers: undefined,
             });
 
             // We need this because we run tests in CI for various node versions.
@@ -182,5 +176,22 @@ describe('GotScraping', () => {
                 expect(responseProxy.httpVersion).toBe('2.0');
             }
         });
+
+        test('should support tls 1.2', async () => {
+            const url = 'https://tls-v1-2.badssl.com:1012/';
+
+            const response = await gotScraping.get(url);
+            expect(response.statusCode).toBe(200);
+        });
+
+        if (nodeVersion >= 12) {
+            test('should support tls 1.3', async () => {
+                const url = 'https://www.howsmyssl.com/a/check';
+
+                const response = await gotScraping.get(url, { responseType: 'json' });
+                expect(response.statusCode).toBe(200);
+                expect(response.body.tls_version).toBe('TLS 1.3');
+            });
+        }
     });
 });
