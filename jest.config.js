@@ -6,4 +6,5 @@ module.exports = {
     rootDir: path.join(__dirname, './'),
     testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)'],
     setupFilesAfterEnv: ['jest-extended'],
+    timeout: 10e3,
 };
