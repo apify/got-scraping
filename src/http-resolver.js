@@ -24,7 +24,7 @@ class HttpResolver {
             const result = await http2.auto.resolveProtocol({
                 host: hostname,
                 servername: hostname,
-                port,
+                port: port || 443,
                 ALPNProtocols: ['h2', 'http/1.1'],
                 rejectUnauthorized,
             });

@@ -21,7 +21,11 @@ describe('Proxy', () => {
             context: {},
             https: {},
         };
-        next = () => {};
+        next = () => { };
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
     test('should modify agents only if proxyUrl provided', async () => {

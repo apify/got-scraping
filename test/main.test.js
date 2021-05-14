@@ -25,7 +25,7 @@ describe('GotScraping', () => {
     });
 
     test('should use all handlers', async () => {
-        expect(gotScraping.defaults.handlers).toHaveLength(4);
+        expect(gotScraping.defaults.handlers).toHaveLength(5);
     });
 
     test('should allow passing custom properties', async () => {
@@ -41,7 +41,7 @@ describe('GotScraping', () => {
         expect(options.context.headerGeneratorOptions).toMatchObject(requestOptions.headerGeneratorOptions);
     });
 
-    test('should allow overrding generated options using handlers', async () => {
+    test('should allow overriding generated options using handlers', async () => {
         const requestOptions = {
             url: `http://localhost:${port}/html`,
         };
@@ -75,9 +75,9 @@ describe('GotScraping', () => {
 
         expect(response.statusCode).toBe(200);
         expect(response.request.options).toMatchObject({
-            http2: true,
+            http2: false,
             headers: {
-                'user-agent': 'test',
+                'User-Agent': 'test',
             },
         });
     });
@@ -128,6 +128,25 @@ describe('GotScraping', () => {
             expect(response.statusCode).toBe(200);
             expect(response.httpVersion).toBe('2.0');
         });
+
+        test('Should auto downgrade protocol', async () => {
+            const response = await gotScraping({ url: 'https://eshop.coop-box.cz/' });
+            expect(response.statusCode).toBe(200);
+            expect(response.httpVersion).toBe('1.1');
+            expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
+        });
+
+        test('Should allow https target via http proxy when auto downgrading', async () => {
+            const response = await gotScraping({
+                url: 'https://eshop.coop-box.cz/',
+                proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+
+            });
+            expect(response.statusCode).toBe(200);
+            expect(response.httpVersion).toBe('1.1');
+            expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
+        });
+
         test('should work with proxyUrl and http1', async () => {
             const response = await gotScraping({
                 responseType: 'json',
