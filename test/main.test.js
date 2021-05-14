@@ -136,16 +136,18 @@ describe('GotScraping', () => {
             expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
         });
 
-        test('Should allow https target via http proxy when auto downgrading', async () => {
-            const response = await gotScraping({
-                url: 'https://eshop.coop-box.cz/',
-                proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+        if (nodeVersion >= 12) {
+            test('Should allow https target via http proxy when auto downgrading', async () => {
+                const response = await gotScraping({
+                    url: 'https://eshop.coop-box.cz/',
+                    proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
 
+                });
+                expect(response.statusCode).toBe(200);
+                expect(response.httpVersion).toBe('1.1');
+                expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
             });
-            expect(response.statusCode).toBe(200);
-            expect(response.httpVersion).toBe('1.1');
-            expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
-        });
+        }
 
         test('should work with proxyUrl and http1', async () => {
             const response = await gotScraping({
