@@ -59,7 +59,9 @@ function createOptionsWithBeforeRequestHook(generatedHeaders, headerOverrides) {
         hooks: {
             beforeRequest: [
                 (gotOptions) => {
-                    gotOptions.headers = mergeHeaders(generatedHeaders, headerOverrides);
+                    const mergedOriginalHeaders = mergeHeaders(generatedHeaders, gotOptions.headers);
+
+                    gotOptions.headers = mergeHeaders(mergedOriginalHeaders, headerOverrides);
                 },
             ],
         },

@@ -7,6 +7,7 @@ const { optionsValidationHandler } = require('./handlers/options-validation');
 const { customOptionsHandler } = require('./handlers/custom-options');
 const { browserHeadersHandler } = require('./handlers/browser-headers');
 const { proxyHandler } = require('./handlers/proxy');
+const { alpnHandler } = require('./handlers/alpn');
 
 const isResponseOk = (response) => {
     const { statusCode } = response;
@@ -46,6 +47,9 @@ const gotScraping = got.extend(
         handlers: [
             optionsValidationHandler,
             customOptionsHandler,
+            // ALPN negotiation is handled by got (http2-wrapper) by default.
+            // However, its caching is causing problems with http proxies and https targets on http 1.1
+            alpnHandler,
             proxyHandler,
             browserHeadersHandler,
         ],
