@@ -40,7 +40,7 @@
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/apify/got-scrapings"
+		"url": "git+https://github.com/apify/got-scraping"
 	},
 	"bugs": {
 		"url": "https://github.com/apify/got-scraping/issues"
