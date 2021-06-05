@@ -5,6 +5,7 @@ import { auto } from 'http2-wrapper';
  */
 class HttpResolver {
     _cache = new Map();
+
     _maxCacheSize = 1000;
 
     async resolveHttpVersion(parsedUrl: URL, rejectUnauthorized?: boolean): Promise<string> {

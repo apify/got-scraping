@@ -19,7 +19,7 @@ export const optionsValidationHandler: HandlerFunction = async (options, next) =
     }
 
     return next(options as unknown as NormalizedOptions);
-}
+};
 
 function isUnsupportedNodeVersion(): boolean {
     const nodeVersion = parseFloat(process.versions.node);

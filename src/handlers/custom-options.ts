@@ -24,4 +24,4 @@ export const customOptionsHandler: HandlerFunction = async (options, next) => {
     const finalOptions = got.mergeOptions(options, { context: newContext });
 
     return next(finalOptions);
-}
+};

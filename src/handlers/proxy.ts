@@ -1,8 +1,10 @@
+import type { NormalizedOptions, HandlerFunction } from 'got';
+
 import { proxies } from 'http2-wrapper';
 import HttpsProxyAgent from 'https-proxy-agent';
 import HttpProxyAgent from 'http-proxy-agent';
+
 import httpResolver from '../http-resolver';
-import type { NormalizedOptions, HandlerFunction } from 'got/dist/source'
 
 const {
     HttpOverHttp2,
@@ -23,7 +25,7 @@ export const proxyHandler: HandlerFunction = async (options, next) => {
     }
 
     return next(options as NormalizedOptions);
-}
+};
 
 function validateProxyProtocol(protocol: string) {
     const isSupported = protocol === 'http:' || protocol === 'https:';

@@ -31,7 +31,7 @@ export const browserHeadersHandler: HandlerFunction = async (options, next) => {
     }
 
     return next(got.mergeOptions(options, newOptions));
-}
+};
 
 function deleteDefaultGotUserAgent(headers: Record<string, any>) {
     const gotDefaultUserAgent = got.defaults.options.headers['user-agent'];

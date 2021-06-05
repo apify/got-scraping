@@ -1,5 +1,5 @@
+import type { NormalizedOptions, HandlerFunction } from 'got';
 import httpResolver from '../http-resolver';
-import type { NormalizedOptions, HandlerFunction } from 'got'
 
 export const alpnHandler: HandlerFunction = async (options, next) => {
     const { url, http2 } = options;
@@ -19,4 +19,4 @@ export const alpnHandler: HandlerFunction = async (options, next) => {
     }
 
     return next(options as NormalizedOptions);
-}
+};

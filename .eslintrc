@@ -1,6 +1,12 @@
 {
     "extends": "@apify",
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
     "parserOptions": {
+        "project": "./tsconfig.eslint.json",
         "ecmaVersion": 2020
+    },
+    "rules": {
+        "import/extensions": 0
     }
 }
