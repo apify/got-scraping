@@ -1,15 +1,15 @@
-const got = require('got');
-const HeaderGenerator = require('header-generator');
+import got, { Response } from 'got';
+import HeaderGenerator from 'header-generator';
 
-const { SCRAPING_DEFAULT_OPTIONS } = require('./scraping-defaults');
+import { SCRAPING_DEFAULT_OPTIONS } from './scraping-defaults';
 
-const { optionsValidationHandler } = require('./handlers/options-validation');
-const { customOptionsHandler } = require('./handlers/custom-options');
-const { browserHeadersHandler } = require('./handlers/browser-headers');
-const { proxyHandler } = require('./handlers/proxy');
-const { alpnHandler } = require('./handlers/alpn');
+import { optionsValidationHandler } from './handlers/options-validation';
+import { customOptionsHandler } from './handlers/custom-options';
+import { browserHeadersHandler } from './handlers/browser-headers';
+import { proxyHandler } from './handlers/proxy';
+import { alpnHandler } from './handlers/alpn';
 
-const isResponseOk = (response) => {
+const isResponseOk = (response: Response) => {
     const { statusCode } = response;
     const limitStatusCode = response.request.options.followRedirect ? 299 : 399;
 
@@ -56,4 +56,4 @@ const gotScraping = got.extend(
     },
 );
 
-module.exports = gotScraping;
+export default gotScraping;

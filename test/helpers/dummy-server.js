@@ -1,5 +1,5 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+import express from 'express';
+import { urlencoded, json } from 'body-parser';
 
 const startExpressAppPromise = (app, port) => {
     return new Promise((resolve) => {
@@ -7,12 +7,12 @@ const startExpressAppPromise = (app, port) => {
     });
 };
 
-const startDummyServer = async (port) => {
+export const startDummyServer = async (port) => {
     const app = express();
-    app.use(bodyParser.urlencoded({
+    app.use(urlencoded({
         extended: true,
     }));
-    app.use(bodyParser.json());
+    app.use(json());
 
     app.get('/json', (req, res) => {
         res.json({ test: 123 });
@@ -28,8 +28,4 @@ const startDummyServer = async (port) => {
     });
 
     return startExpressAppPromise(app, port);
-};
-
-module.exports = {
-    startDummyServer,
 };

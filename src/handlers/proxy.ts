@@ -1,7 +1,8 @@
-const http2 = require('http2-wrapper');
-const HttpsProxyAgent = require('https-proxy-agent');
-const HttpProxyAgent = require('http-proxy-agent');
-const httpResolver = require('../http-resolver');
+import { proxies } from 'http2-wrapper';
+import HttpsProxyAgent from 'https-proxy-agent';
+import HttpProxyAgent from 'http-proxy-agent';
+import httpResolver from '../http-resolver';
+import type { NormalizedOptions, HandlerFunction } from 'got/dist/source'
 
 const {
     HttpOverHttp2,
@@ -9,30 +10,22 @@ const {
     Http2OverHttp2,
     Http2OverHttps,
     Http2OverHttp,
-} = http2.proxies;
+} = proxies;
 
-/**
- * @param {object} options
- * @param {function} next
- * @returns {import('got').GotReturn}
- */
-async function proxyHandler(options, next) {
-    const { context: { proxyUrl } } = options;
+export const proxyHandler: HandlerFunction = async (options, next) => {
+    const { proxyUrl } = options.context!;
 
     if (proxyUrl) {
-        const parsedProxy = new URL(proxyUrl);
+        const parsedProxy = new URL(proxyUrl as any);
 
         validateProxyProtocol(parsedProxy.protocol);
-        options.agent = await getAgent(parsedProxy, options.https.rejectUnauthorized);
+        options.agent = await getAgent(parsedProxy, options?.https?.rejectUnauthorized);
     }
 
-    return next(options);
+    return next(options as NormalizedOptions);
 }
 
-/**
- * @param {string} protocol
- */
-function validateProxyProtocol(protocol) {
+function validateProxyProtocol(protocol: string) {
     const isSupported = protocol === 'http:' || protocol === 'https:';
 
     if (!isSupported) {
@@ -40,13 +33,8 @@ function validateProxyProtocol(protocol) {
     }
 }
 
-/**
- * @param {object} parsedProxyUrl parsed proxyUrl
- * @param {boolean} rejectUnauthorized
- * @returns {object}
- */
-async function getAgent(parsedProxyUrl, rejectUnauthorized) {
-    const proxy = {
+async function getAgent(parsedProxyUrl: URL, rejectUnauthorized: boolean | undefined) {
+    const proxy: any = {
         proxyOptions: {
             url: parsedProxyUrl,
 
@@ -69,22 +57,18 @@ async function getAgent(parsedProxyUrl, rejectUnauthorized) {
             };
         } else {
             agent = {
-                http: new HttpsProxyAgent(proxyUrl.href),
-                https: new HttpsProxyAgent(proxyUrl.href),
+                http: HttpsProxyAgent(proxyUrl.href),
+                https: HttpsProxyAgent(proxyUrl.href),
                 http2: new Http2OverHttps(proxy),
             };
         }
     } else {
         agent = {
-            http: new HttpProxyAgent(proxyUrl.href),
-            https: new HttpsProxyAgent(proxyUrl.href),
+            http: HttpProxyAgent(proxyUrl.href),
+            https: HttpsProxyAgent(proxyUrl.href),
             http2: new Http2OverHttp(proxy),
         };
     }
 
     return agent;
 }
-
-module.exports = {
-    proxyHandler,
-};

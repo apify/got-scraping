@@ -1,10 +1,10 @@
-const HeaderGenerator = require('header-generator');
-const got = require('got');
+import HeaderGenerator from 'header-generator';
+import got from 'got';
 
-const { browserHeadersHandler, mergeHeaders } = require('../src/handlers/browser-headers');
-const gotScraping = require('../src/index');
+import { browserHeadersHandler, mergeHeaders } from '../lib/handlers/browser-headers';
+import gotScraping from '../lib/index';
 
-const { startDummyServer } = require('./helpers/dummy-server');
+import { startDummyServer } from './helpers/dummy-server';
 
 describe('Browser headers', () => {
     let nextHolder;

@@ -1,27 +1,20 @@
-const http2 = require('http2-wrapper');
+import { auto } from 'http2-wrapper';
 
 /**
  * The HttpResolver resolves server's prefered HTTP version and caches the results.
  */
 class HttpResolver {
-    constructor() {
-        this._cache = new Map();
-        this._maxCacheSize = 1000;
-    }
+    _cache = new Map();
+    _maxCacheSize = 1000;
 
-    /**
-     * @param {URL} parsedUrl
-     * @param {boolean} rejectUnauthorized
-     * @returns {string} resolved protocol
-     */
-    async resolveHttpVersion(parsedUrl, rejectUnauthorized) {
+    async resolveHttpVersion(parsedUrl: URL, rejectUnauthorized?: boolean): Promise<string> {
         const { hostname, port } = parsedUrl;
         const cacheKey = `${hostname}:${port}`;
 
         let httpVersion = this._getFromCache(cacheKey);
 
         if (!httpVersion) {
-            const result = await http2.auto.resolveProtocol({
+            const result = await (auto as any).resolveProtocol({
                 host: hostname,
                 servername: hostname,
                 port: port || 443,
@@ -40,7 +33,7 @@ class HttpResolver {
      * @param {string} key - proxy host unique key
      * @returns {string} - http version
      */
-    _getFromCache(key) {
+    _getFromCache(key: string): string {
         return this._cache.get(key);
     }
 
@@ -48,7 +41,7 @@ class HttpResolver {
      * @param {string} key - proxy host unique key
      * @param {string} value - http version
      */
-    _setToCache(key, value) {
+    _setToCache(key: string, value: string) {
         this._maybeRemoveOldestKey();
 
         this._cache.set(key, value);
@@ -65,4 +58,4 @@ class HttpResolver {
     }
 }
 
-module.exports = new HttpResolver();
+export default new HttpResolver();

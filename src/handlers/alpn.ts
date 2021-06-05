@@ -1,15 +1,12 @@
-const httpResolver = require('../http-resolver');
+import httpResolver from '../http-resolver';
+import type { NormalizedOptions, HandlerFunction } from 'got'
 
-/**
- * @param {object} options
- * @param {function} next
- * @returns {import('got').GotReturn}
- */
-async function alpnHandler(options, next) {
+export const alpnHandler: HandlerFunction = async (options, next) => {
     const { url, http2 } = options;
 
     if (http2) {
-        const parsedUrl = new URL(url);
+        // TODO: is this correct?
+        const parsedUrl = new URL(url as any);
 
         if (parsedUrl.protocol === 'https:') {
             const protocol = await httpResolver.resolveHttpVersion(parsedUrl);
@@ -21,9 +18,5 @@ async function alpnHandler(options, next) {
         }
     }
 
-    return next(options);
+    return next(options as NormalizedOptions);
 }
-
-module.exports = {
-    alpnHandler,
-};

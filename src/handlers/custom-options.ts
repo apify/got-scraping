@@ -1,17 +1,13 @@
-const got = require('got');
+import got, { HandlerFunction } from 'got';
+import { Options } from '../definitions';
 
-/**
- * @param {object} options
- * @param {function} next
- * @returns {import('got').GotReturn}
- */
-function customOptionsHandler(options, next) {
+export const customOptionsHandler: HandlerFunction = async (options, next) => {
     const {
         proxyUrl,
         headerGeneratorOptions,
         useHeaderGenerator,
         context,
-    } = options;
+    } = (options as unknown as Options);
 
     // Got expects custom properties inside the context option.
     const newContext = {
@@ -21,15 +17,11 @@ function customOptionsHandler(options, next) {
         useHeaderGenerator,
     };
 
-    delete options.proxyUrl;
-    delete options.headerGeneratorOptions;
-    delete options.useHeaderGenerator;
+    delete (options as unknown as Options).proxyUrl;
+    delete (options as unknown as Options).headerGeneratorOptions;
+    delete (options as unknown as Options).useHeaderGenerator;
 
     const finalOptions = got.mergeOptions(options, { context: newContext });
 
     return next(finalOptions);
 }
-
-module.exports = {
-    customOptionsHandler,
-};

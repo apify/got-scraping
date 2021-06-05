@@ -1,7 +1,7 @@
-const got = require('got');
-const gotScraping = require('../src');
+import got from 'got';
+import gotScraping from '../lib';
 
-const { startDummyServer } = require('./helpers/dummy-server');
+import { startDummyServer } from './helpers/dummy-server';
 
 describe('GotScraping', () => {
     let server;

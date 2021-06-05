@@ -1,9 +1,9 @@
-const http2 = require('http2-wrapper');
-const HttpsProxyAgent = require('https-proxy-agent');
-const HttpProxyAgent = require('http-proxy-agent');
+import { proxies } from 'http2-wrapper';
+import HttpsProxyAgent from 'https-proxy-agent';
+import HttpProxyAgent from 'http-proxy-agent';
 
-const { proxyHandler } = require('../src/handlers/proxy');
-const httpResolver = require('../src/http-resolver');
+import { proxyHandler } from '../lib/handlers/proxy';
+import httpResolver from '../lib/http-resolver';
 
 const {
     HttpOverHttp2,
@@ -11,7 +11,7 @@ const {
     Http2OverHttp2,
     Http2OverHttps,
     Http2OverHttp,
-} = http2.proxies;
+} = proxies;
 
 describe('Proxy', () => {
     let next;

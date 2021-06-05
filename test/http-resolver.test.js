@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-const http2 = require('http2-wrapper');
+import { auto } from 'http2-wrapper';
 
 describe('HTTP resolver', () => {
     const protocol = 'h2';
@@ -8,8 +8,8 @@ describe('HTTP resolver', () => {
     let httpResolver;
 
     beforeEach(() => {
-        httpResolver = require('../src/http-resolver'); // eslint-disable-line
-        jest.spyOn(http2.auto, 'resolveProtocol').mockResolvedValue({ alpnProtocol: protocol });
+        httpResolver = require('../lib/http-resolver').default; // eslint-disable-line
+        jest.spyOn(auto, 'resolveProtocol').mockResolvedValue({ alpnProtocol: protocol });
     });
 
     afterEach(() => {

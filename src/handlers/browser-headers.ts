@@ -1,31 +1,26 @@
-const got = require('got');
+import got, { NormalizedOptions, HandlerFunction } from 'got';
 
-/**
- * @param {object} options
- * @param {function} next
- * @returns {import('got').GotReturn}
- */
-function browserHeadersHandler(options, next) {
+export const browserHeadersHandler: HandlerFunction = async (options, next) => {
     const { http2, headers = {}, context } = options;
     const {
         headerGeneratorOptions,
         useHeaderGenerator,
         headerGenerator,
-    } = context;
+    } = context!;
 
     if (!useHeaderGenerator) {
-        return next(options);
+        return next(options as NormalizedOptions);
     }
 
     deleteDefaultGotUserAgent(headers);
 
     const mergedHeaderGeneratorOptions = {
         httpVersion: http2 ? '2' : '1',
-        ...headerGeneratorOptions,
+        ...(headerGeneratorOptions as any),
     };
-    const generatedHeaders = headerGenerator.getHeaders(mergedHeaderGeneratorOptions);
+    const generatedHeaders = (headerGenerator as any).getHeaders(mergedHeaderGeneratorOptions);
 
-    let newOptions;
+    let newOptions: any;
 
     if (http2) { // generate http2 headers
         newOptions = {
@@ -38,10 +33,7 @@ function browserHeadersHandler(options, next) {
     return next(got.mergeOptions(options, newOptions));
 }
 
-/**
- * @param {object} headers
- */
-function deleteDefaultGotUserAgent(headers) {
+function deleteDefaultGotUserAgent(headers: Record<string, any>) {
     const gotDefaultUserAgent = got.defaults.options.headers['user-agent'];
     if (headers['user-agent'] && headers['user-agent'] === gotDefaultUserAgent) {
         delete headers['user-agent'];
@@ -50,11 +42,8 @@ function deleteDefaultGotUserAgent(headers) {
 
 /**
  * Creates options with beforeRequestHooks in order to have case-sensitive headers.
- * @param {object} generatedHeaders
- * @param {object} headerOverrides
- * @returns
  */
-function createOptionsWithBeforeRequestHook(generatedHeaders, headerOverrides) {
+function createOptionsWithBeforeRequestHook(generatedHeaders: any, headerOverrides: any) {
     return {
         hooks: {
             beforeRequest: [
@@ -65,17 +54,14 @@ function createOptionsWithBeforeRequestHook(generatedHeaders, headerOverrides) {
                 },
             ],
         },
-    };
+    } as Partial<NormalizedOptions>;
 }
 
 /**
  * Merges original generated headers and user provided overrides.
  * All header overrides will have the original header case, because of antiscraping.
- * @param {object} original
- * @param {object} overrides
- * @returns
  */
-function mergeHeaders(original, overrides) {
+export function mergeHeaders(original: any, overrides: any) {
     const mergedHeaders = new Map();
 
     Object.entries(original).forEach(([nameSensitive, value]) => mergedHeaders.set(nameSensitive.toLowerCase(), { nameSensitive, value }));
@@ -92,14 +78,9 @@ function mergeHeaders(original, overrides) {
         }
     });
 
-    const finalHeaders = {};
+    const finalHeaders: Record<string, any> = {};
 
     mergedHeaders.forEach(({ nameSensitive, value }) => { finalHeaders[nameSensitive] = value; });
 
     return finalHeaders;
 }
-
-module.exports = {
-    browserHeadersHandler,
-    mergeHeaders,
-};

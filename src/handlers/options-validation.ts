@@ -1,11 +1,7 @@
-const { default: ow } = require('ow');
+import ow from 'ow';
+import type { NormalizedOptions, HandlerFunction } from 'got';
 
-/**
- * @param {object} options
- * @param {function} next
- * @returns {import('got').GotReturn}
- */
-function optionsValidationHandler(options, next) {
+export const optionsValidationHandler: HandlerFunction = async (options, next) => {
     const validationSchema = {
         proxyUrl: ow.optional.string.url,
         useHeaderGenerator: ow.optional.boolean,
@@ -22,18 +18,11 @@ function optionsValidationHandler(options, next) {
         }
     }
 
-    return next(options);
+    return next(options as unknown as NormalizedOptions);
 }
 
-/**
- * @returns {boolean}
- */
-function isUnsupportedNodeVersion() {
+function isUnsupportedNodeVersion(): boolean {
     const nodeVersion = parseFloat(process.versions.node);
 
     return nodeVersion < 12;
 }
-
-module.exports = {
-    optionsValidationHandler,
-};

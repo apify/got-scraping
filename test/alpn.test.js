@@ -1,5 +1,5 @@
-const { alpnHandler } = require('../src/handlers/alpn');
-const httpResolver = require('../src/http-resolver');
+import { alpnHandler } from '../lib/handlers/alpn';
+import httpResolver from '../lib/http-resolver';
 
 describe('ALPN', () => {
     let next;
