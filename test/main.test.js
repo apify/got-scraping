@@ -1,4 +1,4 @@
-import got from 'got';
+import { Options } from 'got-cjs';
 import gotScraping from '../lib';
 
 import { startDummyServer } from './helpers/dummy-server';
@@ -52,12 +52,7 @@ describe('GotScraping', () => {
         const extendedGot = gotScraping.extend({
             handlers: [
                 (options, next) => {
-                    return next(got.mergeOptions(
-                        options,
-                        {
-                            headers,
-                        },
-                    ));
+                    return next(new Options({ headers }, undefined, options));
                 },
             ],
         });

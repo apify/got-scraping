@@ -1,4 +1,4 @@
-import got, { NormalizedOptions, HandlerFunction } from 'got';
+import got, { Options, HandlerFunction } from 'got-cjs';
 
 export const browserHeadersHandler: HandlerFunction = async (options, next) => {
     const { http2, headers = {}, context } = options;
@@ -9,7 +9,7 @@ export const browserHeadersHandler: HandlerFunction = async (options, next) => {
     } = context!;
 
     if (!useHeaderGenerator) {
-        return next(options as NormalizedOptions);
+        return next(options);
     }
 
     deleteDefaultGotUserAgent(headers);
@@ -30,7 +30,7 @@ export const browserHeadersHandler: HandlerFunction = async (options, next) => {
         newOptions = createOptionsWithBeforeRequestHook(generatedHeaders, headers);
     }
 
-    return next(got.mergeOptions(options, newOptions));
+    return next(new Options(newOptions, undefined, options));
 };
 
 function deleteDefaultGotUserAgent(headers: Record<string, any>) {
@@ -54,7 +54,7 @@ function createOptionsWithBeforeRequestHook(generatedHeaders: any, headerOverrid
                 },
             ],
         },
-    } as Partial<NormalizedOptions>;
+    } as Partial<Options>;
 }
 
 /**

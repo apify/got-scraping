@@ -1,4 +1,4 @@
-import got, { Response } from 'got';
+import got, { Options, Response } from 'got-cjs';
 import HeaderGenerator from 'header-generator';
 
 import { SCRAPING_DEFAULT_OPTIONS } from './scraping-defaults';
@@ -15,6 +15,13 @@ const isResponseOk = (response: Response) => {
 
     return (statusCode >= 200 && statusCode <= limitStatusCode) || statusCode === 304;
 };
+
+// we need to define the properties on the prototype to get around strict options validation in `got`
+Object.defineProperties(Options.prototype, {
+    proxyUrl: { value: undefined, writable: true, configurable: true },
+    useHeaderGenerator: { value: undefined, writable: true, configurable: true },
+    headerGeneratorOptions: { value: undefined, writable: true, configurable: true },
+});
 
 const mutableGot = got.extend({
     // Must be mutable in order to override the defaults
@@ -39,7 +46,7 @@ const mutableGot = got.extend({
 });
 
 // Overriding the mutableGot defaults by merging its defaults and our scraping defaults.
-mutableGot.defaults.options = got.mergeOptions(mutableGot.defaults.options, SCRAPING_DEFAULT_OPTIONS);
+mutableGot.defaults.options = new Options(SCRAPING_DEFAULT_OPTIONS, undefined, mutableGot.defaults.options);
 
 const gotScraping = got.extend(
     mutableGot,
@@ -55,5 +62,10 @@ const gotScraping = got.extend(
         ],
     },
 );
+
+process.on('unhandledRejection', (reason, p) => {
+    console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+    // application specific logging, throwing an error, or other logic here
+});
 
 export default gotScraping;

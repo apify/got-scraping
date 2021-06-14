@@ -1,4 +1,4 @@
-import type { NormalizedOptions, HandlerFunction } from 'got';
+import type { Options as NormalizedOptions, HandlerFunction } from 'got-cjs';
 
 import { proxies } from 'http2-wrapper';
 import HttpsProxyAgent from 'https-proxy-agent';
@@ -21,7 +21,7 @@ export const proxyHandler: HandlerFunction = async (options, next) => {
         const parsedProxy = new URL(proxyUrl as any);
 
         validateProxyProtocol(parsedProxy.protocol);
-        options.agent = await getAgent(parsedProxy, options?.https?.rejectUnauthorized);
+        options.agent = await getAgent(parsedProxy, options?.httpsOptions?.rejectUnauthorized);
     }
 
     return next(options as NormalizedOptions);

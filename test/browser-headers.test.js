@@ -1,5 +1,5 @@
 import HeaderGenerator from 'header-generator';
-import got from 'got';
+import got from 'got-cjs';
 
 import { browserHeadersHandler, mergeHeaders } from '../lib/handlers/browser-headers';
 import gotScraping from '../lib/index';

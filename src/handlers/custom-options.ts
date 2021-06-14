@@ -1,13 +1,13 @@
-import got, { HandlerFunction } from 'got';
+import { Options as GotOptions, HandlerFunction } from 'got-cjs';
 import { Options } from '../definitions';
 
-export const customOptionsHandler: HandlerFunction = async (options, next) => {
+export const customOptionsHandler: HandlerFunction = async (options: Options, next) => {
     const {
         proxyUrl,
         headerGeneratorOptions,
         useHeaderGenerator,
         context,
-    } = (options as unknown as Options);
+    } = options;
 
     // Got expects custom properties inside the context option.
     const newContext = {
@@ -17,11 +17,13 @@ export const customOptionsHandler: HandlerFunction = async (options, next) => {
         useHeaderGenerator,
     };
 
-    delete (options as unknown as Options).proxyUrl;
-    delete (options as unknown as Options).headerGeneratorOptions;
-    delete (options as unknown as Options).useHeaderGenerator;
+    delete options.proxyUrl;
+    delete options.headerGeneratorOptions;
+    delete options.useHeaderGenerator;
 
-    const finalOptions = got.mergeOptions(options, { context: newContext });
+    console.log('wat', options);
+    const finalOptions = new GotOptions({ context: newContext }, undefined, options);
+    console.log('wat', finalOptions);
 
     return next(finalOptions);
 };

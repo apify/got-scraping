@@ -1,23 +1,23 @@
 import { constants } from 'crypto';
 import type { Options } from './definitions';
 
-export const SCRAPING_DEFAULT_OPTIONS: Options = {
+export const SCRAPING_DEFAULT_OPTIONS: Partial<Options> = {
     // Most of the new browsers use HTTP2
     http2: true,
-    https: {
+    httpsOptions: {
         // We usually don't want to fail because of SSL errors.
         // We want the content.
         rejectUnauthorized: false,
+        // Node js uses different TLS ciphers by default.
+        ciphers: getCiphersBasedOnNode(),
     },
     // This would fail all of 404, 403 responses.
     // We usually don't want to consider these as errors.
     // We want to take some action after this.
     throwHttpErrors: false,
-    // Node js uses different TLS ciphers by default.
-    ciphers: getCiphersBasedOnNode(),
     // We need to have browser-like headers to blend in.
     useHeaderGenerator: true,
-    timeout: 60000,
+    timeout: { request: 60000 },
     retry: { limit: 0, maxRetryAfter: 0 },
 
 };

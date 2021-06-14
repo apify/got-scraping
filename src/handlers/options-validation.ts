@@ -1,5 +1,5 @@
 import ow from 'ow';
-import type { NormalizedOptions, HandlerFunction } from 'got';
+import type { HandlerFunction } from 'got-cjs';
 
 export const optionsValidationHandler: HandlerFunction = async (options, next) => {
     const validationSchema = {
@@ -18,7 +18,7 @@ export const optionsValidationHandler: HandlerFunction = async (options, next) =
         }
     }
 
-    return next(options as unknown as NormalizedOptions);
+    return next(options);
 };
 
 function isUnsupportedNodeVersion(): boolean {

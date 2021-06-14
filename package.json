@@ -8,23 +8,23 @@
 		"src"
 	],
 	"dependencies": {
+		"got-cjs": "^0.0.2",
 		"header-generator": "^0.0.1-beta.2",
-		"got": "^11.8.2",
 		"http-proxy-agent": "^4.0.1",
 		"http2-wrapper": "^2.0.5",
 		"https-proxy-agent": "^5.0.0",
 		"ow": "^0.23.0"
 	},
 	"devDependencies": {
-		"@types/jest": "^26.0.23",
-		"@typescript-eslint/eslint-plugin": "^4.26.0",
-		"@typescript-eslint/parser": "^4.26.0",
 		"@apify/eslint-config": "^0.1.4",
 		"@apify/eslint-config-ts": "^0.1.2",
 		"@babel/cli": "^7.14.3",
 		"@babel/core": "^7.14.3",
 		"@babel/preset-env": "^7.14.4",
 		"@babel/preset-typescript": "^7.13.0",
+		"@types/jest": "^26.0.23",
+		"@typescript-eslint/eslint-plugin": "^4.26.0",
+		"@typescript-eslint/parser": "^4.26.0",
 		"body-parser": "^1.19.0",
 		"eslint": "^7.0.0",
 		"express": "^4.17.1",
