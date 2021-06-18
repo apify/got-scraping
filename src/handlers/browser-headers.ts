@@ -1,6 +1,6 @@
 import got, { Options, HandlerFunction } from 'got-cjs';
 
-export const browserHeadersHandler: HandlerFunction = async (options, next) => {
+export const browserHeadersHandler: HandlerFunction = (options, next) => {
     const { http2, headers = {}, context } = options;
     const {
         headerGeneratorOptions,
@@ -27,15 +27,16 @@ export const browserHeadersHandler: HandlerFunction = async (options, next) => {
             headers: mergeHeaders(generatedHeaders, headers),
         };
     } else {
-        newOptions = createOptionsWithBeforeRequestHook(generatedHeaders, headers);
+        newOptions = createOptionsWithBeforeRequestHook(generatedHeaders);
     }
 
-    return next(new Options(newOptions, undefined, options));
+    options.merge(newOptions);
+    return next(options);
 };
 
 function deleteDefaultGotUserAgent(headers: Record<string, any>) {
     const gotDefaultUserAgent = got.defaults.options.headers['user-agent'];
-    if (headers['user-agent'] && headers['user-agent'] === gotDefaultUserAgent) {
+    if (headers['user-agent'] === gotDefaultUserAgent) {
         delete headers['user-agent'];
     }
 }
@@ -43,14 +44,15 @@ function deleteDefaultGotUserAgent(headers: Record<string, any>) {
 /**
  * Creates options with beforeRequestHooks in order to have case-sensitive headers.
  */
-function createOptionsWithBeforeRequestHook(generatedHeaders: any, headerOverrides: any) {
+function createOptionsWithBeforeRequestHook(generatedHeaders: any) {
     return {
         hooks: {
             beforeRequest: [
                 (gotOptions) => {
-                    const mergedOriginalHeaders = mergeHeaders(generatedHeaders, gotOptions.headers);
-
-                    gotOptions.headers = mergeHeaders(mergedOriginalHeaders, headerOverrides);
+                    // We need to set directly to the internal property of options,
+                    // because the headers setter lowercases the headers.
+                    // eslint-disable-next-line no-underscore-dangle
+                    (gotOptions as any)._internals.headers = mergeHeaders(generatedHeaders, gotOptions.headers);
                 },
             ],
         },

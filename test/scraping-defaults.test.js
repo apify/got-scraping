@@ -16,11 +16,11 @@ describe('Scraping defaults', () => {
     });
 
     test('should set correct defaults', async () => {
-        const { useHeaderGenerator, timeout, ...gotDefaults } = SCRAPING_DEFAULT_OPTIONS;
-
         const response = await gotScraping.get(`http://localhost:${port}/html`);
-        expect(response.request.options).toMatchObject({ ...gotDefaults, http2: false, timeout });
-        expect(response.request.options.context).toMatchObject({ useHeaderGenerator });
+        expect(response.request.options).toMatchObject({
+            ...SCRAPING_DEFAULT_OPTIONS,
+            http2: false // false because the testing server does not support HTTP2, default is true
+        });
     });
 
     test('should allow user to override the defaults', async () => {

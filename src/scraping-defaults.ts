@@ -11,12 +11,16 @@ export const SCRAPING_DEFAULT_OPTIONS: Partial<Options> = {
         // Node js uses different TLS ciphers by default.
         ciphers: getCiphersBasedOnNode(),
     },
+    // Got does not support custom options on the top level
+    // so we need to add our own options to context.
+    context: {
+        // We need to have browser-like headers to blend in.
+        useHeaderGenerator: true,
+    },
     // This would fail all of 404, 403 responses.
     // We usually don't want to consider these as errors.
     // We want to take some action after this.
     throwHttpErrors: false,
-    // We need to have browser-like headers to blend in.
-    useHeaderGenerator: true,
     timeout: { request: 60000 },
     retry: { limit: 0, maxRetryAfter: 0 },
 

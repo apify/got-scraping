@@ -1,4 +1,4 @@
-import { Options as GotOptions, HandlerFunction } from 'got-cjs';
+import { HandlerFunction } from 'got-cjs';
 import { Options } from '../definitions';
 
 export const customOptionsHandler: HandlerFunction = async (options: Options, next) => {
@@ -20,10 +20,7 @@ export const customOptionsHandler: HandlerFunction = async (options: Options, ne
     delete options.proxyUrl;
     delete options.headerGeneratorOptions;
     delete options.useHeaderGenerator;
+    options.context = newContext;
 
-    console.log('wat', options);
-    const finalOptions = new GotOptions({ context: newContext }, undefined, options);
-    console.log('wat', finalOptions);
-
-    return next(finalOptions);
+    return next(options);
 };

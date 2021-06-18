@@ -6,46 +6,47 @@ describe('Options validation', () => {
 
     beforeEach(() => {
         options = {
+            context: {}
         };
     });
 
-    test('should validate proxyUrl', () => {
-        expect(optionsValidationHandler(options, nextMock)).resolves.toBeUndefined();
+    test('should validate proxyUrl', async () => {
+        await expect(optionsValidationHandler(options, nextMock)).resolves.toBeUndefined();
 
-        options.proxyUrl = 'test';
+        options.context.proxyUrl = 'test';
 
-        expect(() => optionsValidationHandler(options, nextMock)).rejects.toThrow(/Expected property string/);
+        await expect(() => optionsValidationHandler(options, nextMock)).rejects.toThrow(/Expected property string/);
 
-        options.proxyUrl = 'http://user:password@localhost:8000';
+        options.context.proxyUrl = 'http://user:password@localhost:8000';
 
-        expect(optionsValidationHandler(options, nextMock)).resolves.toBeUndefined();
+        await expect(optionsValidationHandler(options, nextMock)).resolves.toBeUndefined();
     });
 
-    test('should validate useHeaderGenerator', () => {
-        expect(optionsValidationHandler(options, nextMock)).resolves.toBeUndefined();
+    test('should validate useHeaderGenerator', async () => {
+        await expect(optionsValidationHandler(options, nextMock)).resolves.toBeUndefined();
 
-        options.useHeaderGenerator = 'test';
+        options.context.useHeaderGenerator = 'test';
 
-        expect(() => optionsValidationHandler(options, nextMock))
+        await expect(() => optionsValidationHandler(options, nextMock))
             .rejects
             .toThrow(/Expected property `useHeaderGenerator` to be of type `boolean`/);
 
-        options.useHeaderGenerator = true;
+        options.context.useHeaderGenerator = true;
 
-        expect(optionsValidationHandler(options, nextMock)).resolves.toBeUndefined();
+        await expect(optionsValidationHandler(options, nextMock)).resolves.toBeUndefined();
     });
 
-    test('should validate headerGeneratorOptions', () => {
-        expect(optionsValidationHandler(options, nextMock)).resolves.toBeUndefined();
+    test('should validate headerGeneratorOptions', async () => {
+        await expect(optionsValidationHandler(options, nextMock)).resolves.toBeUndefined();
 
-        options.headerGeneratorOptions = 'test';
+        options.context.headerGeneratorOptions = 'test';
 
-        expect(() => optionsValidationHandler(options, nextMock))
+        await expect(() => optionsValidationHandler(options, nextMock))
             .rejects
             .toThrow(/Expected property `headerGeneratorOptions` to be of type `object`/);
 
-        options.headerGeneratorOptions = {};
+        options.context.headerGeneratorOptions = {};
 
-        expect(optionsValidationHandler(options, nextMock)).resolves.toBeUndefined();
+        await expect(optionsValidationHandler(options, nextMock)).resolves.toBeUndefined();
     });
 });

@@ -25,39 +25,58 @@ describe('GotScraping', () => {
     });
 
     test('should use all handlers', async () => {
-        expect(gotScraping.defaults.handlers).toHaveLength(5);
+        expect(gotScraping.defaults.handlers).toHaveLength(4);
     });
 
-    test('should allow passing custom properties', async () => {
-        const requestOptions = {
-            url: `http://localhost:${port}/html`,
-            headerGeneratorOptions: {
-                browsers: [{ name: 'firefox' }],
-            },
-        };
-
-        const response = await gotScraping(requestOptions);
-        const { request: { options } } = response;
-        expect(options.context.headerGeneratorOptions).toMatchObject(requestOptions.headerGeneratorOptions);
+    // TODO this is a sanity check for https://github.com/sindresorhus/got/issues/1753
+    // Can't keep it as a failing test because an unhandled rejection bleeds into the next one.
+    test.skip('should throw unexpected option error on invalid options', async () => {
+        await expect(() => gotScraping({ url: 'https://example.com', foo: 'bar' }))
+            .rejects.toThrow('Unexpected option: foo');
     });
+
+    // TODO skipping for now, but we should delete this later if we
+    // confirm that custom props are not the way to go
+    // test('should allow passing custom properties', async () => {
+    //     const requestOptions = {
+    //         url: `http://localhost:${port}/html`,
+    //         headerGeneratorOptions: {
+    //             browsers: [{ name: 'firefox' }],
+    //         },
+    //     };
+    //
+    //     const response = await gotScraping(requestOptions);
+    //     const { request: { options } } = response;
+    //     expect(options.context.headerGeneratorOptions).toMatchObject(requestOptions.headerGeneratorOptions);
+    // });
 
     test('should allow overriding generated options using handlers', async () => {
         const requestOptions = {
             url: `http://localhost:${port}/html`,
-        };
-        const headers = {
-            referer: 'test',
+            headers: {
+                'user-agent': 'one',
+                referer: 'one',
+            }
         };
 
         const extendedGot = gotScraping.extend({
             handlers: [
                 (options, next) => {
-                    return next(new Options({ headers }, undefined, options));
+                    options.merge({
+                        headers: {
+                            referer: 'two',
+                            'user-agent': 'two'
+                        }
+                    });
+                    return next(options);
                 },
             ],
         });
         const response = await extendedGot(requestOptions);
-        expect(response.request.options.headers).toMatchObject(headers);
+        expect(response.request.options.headers).toMatchObject({
+            'User-Agent': 'two', // capitalized because it's a "mandatory" header
+            referer: 'two', // casing is kept for non-mandatory (custom) headers
+        });
     });
 
     test('should add custom headers', async () => {
@@ -69,12 +88,9 @@ describe('GotScraping', () => {
         });
 
         expect(response.statusCode).toBe(200);
-        expect(response.request.options).toMatchObject({
-            http2: false,
-            headers: {
-                'User-Agent': 'test',
-            },
-        });
+        const { options } = response.request;
+        expect(options.http2).toBe(false);
+        expect(options.headers['User-Agent']).toBe('test');
     });
 
     test('should get json', async () => {
@@ -135,8 +151,9 @@ describe('GotScraping', () => {
             test('Should allow https target via http proxy when auto downgrading', async () => {
                 const response = await gotScraping({
                     url: 'https://eshop.coop-box.cz/',
-                    proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
-
+                    context: {
+                        proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+                    },
                 });
                 expect(response.statusCode).toBe(200);
                 expect(response.httpVersion).toBe('1.1');
@@ -154,8 +171,10 @@ describe('GotScraping', () => {
             const responseProxy = await gotScraping({
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
-                proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
                 http2: false,
+                context: {
+                    proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+                }
 
             });
             expect(response.statusCode).toBe(200);

@@ -1,18 +1,18 @@
 import ow from 'ow';
 import type { HandlerFunction } from 'got-cjs';
 
-export const optionsValidationHandler: HandlerFunction = async (options, next) => {
+export const optionsValidationHandler: HandlerFunction = (options, next) => {
     const validationSchema = {
         proxyUrl: ow.optional.string.url,
         useHeaderGenerator: ow.optional.boolean,
         headerGeneratorOptions: ow.optional.object,
     };
 
-    ow(options, ow.object.partialShape(validationSchema));
+    const { context, http2 } = options;
 
-    const { proxyUrl, http2 } = options;
+    ow(context, ow.object.partialShape(validationSchema));
 
-    if (proxyUrl && http2) {
+    if (context.proxyUrl && http2) {
         if (isUnsupportedNodeVersion()) {
             throw new Error('Proxy with HTTP2 target is supported only in node v12+. Please upgrade your node version to fix this error.');
         }
