@@ -1,11 +1,7 @@
-const got = require('got');
-
 /**
  * @param {object} options
- * @param {function} next
- * @returns {import('got').GotReturn}
  */
-function customOptionsHandler(options, next) {
+exports.customOptionsHook = function (options) {
     const {
         proxyUrl,
         headerGeneratorOptions,
@@ -14,7 +10,7 @@ function customOptionsHandler(options, next) {
     } = options;
 
     // Got expects custom properties inside the context option.
-    const newContext = {
+    options.context = {
         ...context,
         proxyUrl,
         headerGeneratorOptions,
@@ -24,12 +20,4 @@ function customOptionsHandler(options, next) {
     delete options.proxyUrl;
     delete options.headerGeneratorOptions;
     delete options.useHeaderGenerator;
-
-    const finalOptions = got.mergeOptions(options, { context: newContext });
-
-    return next(finalOptions);
-}
-
-module.exports = {
-    customOptionsHandler,
 };

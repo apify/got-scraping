@@ -2,10 +2,8 @@ const got = require('got');
 
 /**
  * @param {object} options
- * @param {function} next
- * @returns {import('got').GotReturn}
  */
-function browserHeadersHandler(options, next) {
+exports.browserHeadersHook = function (options) {
     const { http2, headers = {}, context } = options;
     const {
         headerGeneratorOptions,
@@ -13,9 +11,7 @@ function browserHeadersHandler(options, next) {
         headerGenerator,
     } = context;
 
-    if (!useHeaderGenerator) {
-        return next(options);
-    }
+    if (!useHeaderGenerator) return;
 
     deleteDefaultGotUserAgent(headers);
 
@@ -23,20 +19,10 @@ function browserHeadersHandler(options, next) {
         httpVersion: http2 ? '2' : '1',
         ...headerGeneratorOptions,
     };
+
     const generatedHeaders = headerGenerator.getHeaders(mergedHeaderGeneratorOptions);
-
-    let newOptions;
-
-    if (http2) { // generate http2 headers
-        newOptions = {
-            headers: mergeHeaders(generatedHeaders, headers),
-        };
-    } else {
-        newOptions = createOptionsWithBeforeRequestHook(generatedHeaders, headers);
-    }
-
-    return next(got.mergeOptions(options, newOptions));
-}
+    options.headers = exports.mergeHeaders(generatedHeaders, headers);
+};
 
 /**
  * @param {object} headers
@@ -59,9 +45,7 @@ function createOptionsWithBeforeRequestHook(generatedHeaders, headerOverrides) {
         hooks: {
             beforeRequest: [
                 (gotOptions) => {
-                    const mergedOriginalHeaders = mergeHeaders(generatedHeaders, gotOptions.headers);
 
-                    gotOptions.headers = mergeHeaders(mergedOriginalHeaders, headerOverrides);
                 },
             ],
         },
@@ -75,7 +59,7 @@ function createOptionsWithBeforeRequestHook(generatedHeaders, headerOverrides) {
  * @param {object} overrides
  * @returns
  */
-function mergeHeaders(original, overrides) {
+exports.mergeHeaders = function (original, overrides) {
     const mergedHeaders = new Map();
 
     Object.entries(original).forEach(([nameSensitive, value]) => mergedHeaders.set(nameSensitive.toLowerCase(), { nameSensitive, value }));
@@ -97,9 +81,4 @@ function mergeHeaders(original, overrides) {
     mergedHeaders.forEach(({ nameSensitive, value }) => { finalHeaders[nameSensitive] = value; });
 
     return finalHeaders;
-}
-
-module.exports = {
-    browserHeadersHandler,
-    mergeHeaders,
 };

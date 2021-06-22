@@ -24,10 +24,6 @@ describe('GotScraping', () => {
         expect(typeof gotScraping).toBe('function');
     });
 
-    test('should use all handlers', async () => {
-        expect(gotScraping.defaults.handlers).toHaveLength(5);
-    });
-
     test('should allow passing custom properties', async () => {
         const requestOptions = {
             url: `http://localhost:${port}/html`,

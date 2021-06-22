@@ -7,8 +7,8 @@
 		"src"
 	],
 	"dependencies": {
-		"header-generator": "^0.0.1-beta.1",
 		"got": "^11.8.1",
+		"header-generator": "^0.0.1-beta.1",
 		"http-proxy-agent": "^4.0.1",
 		"http2-wrapper": "^2.0.3",
 		"https-proxy-agent": "^5.0.0",
