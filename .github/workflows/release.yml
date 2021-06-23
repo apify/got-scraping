@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [10, 12, 14, 15]
+        node-version: [15, 16]
 
     steps:
       -
@@ -29,15 +29,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      -
-        name: Cache Node Modules
-        if: ${{ matrix.node-version == 14 }}
-        uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            build
-          key: cache-${{ github.run_id }}-v14
       -
         name: Install Dependencies
         run: npm install
@@ -49,25 +40,18 @@ jobs:
 
   lint:
     name: Lint
-    needs: [build_and_test]
     runs-on: ubuntu-latest
 
     steps:
       -
         uses: actions/checkout@v2
       -
-        name: Use Node.js 14
+        name: Use Node.js 16
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 16
       -
-        name: Load Cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            build
-          key: cache-${{ github.run_id }}-v14
+        run: npm install
       -
         run: npm run lint
 
@@ -76,7 +60,7 @@ jobs:
   # and triggering of docker image builds in the apify-actor-docker repo.
   deploy:
     name: Publish to NPM
-    needs: [lint]
+    needs: [build_and_test, lint]
     runs-on: ubuntu-latest
     steps:
       -
@@ -84,16 +68,8 @@ jobs:
       -
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 16
           registry-url: https://registry.npmjs.org/
-      -
-        name: Load Cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            build
-          key: cache-${{ github.run_id }}-v14
       -
         # Determine if this is a beta or latest release
         name: Set Release Tag

@@ -1,13 +1,12 @@
 const HeaderGenerator = require('header-generator');
 const got = require('got');
 
-const { browserHeadersHandler, mergeHeaders } = require('../src/handlers/browser-headers');
+const { browserHeadersHook, mergeHeaders } = require('../src/hooks/browser-headers');
 const gotScraping = require('../src/index');
 
 const { startDummyServer } = require('./helpers/dummy-server');
 
 describe('Browser headers', () => {
-    let nextHolder;
     let options;
     let generatorSpy;
     let server;
@@ -29,10 +28,6 @@ describe('Browser headers', () => {
             http2: true,
             context: {},
         };
-        nextHolder = {
-            next() { },
-        };
-        jest.spyOn(nextHolder, 'next');
         generatorSpy = jest.spyOn(HeaderGenerator.prototype, 'getHeaders').mockReturnValue(mockedHeaders);
     });
 
@@ -40,10 +35,15 @@ describe('Browser headers', () => {
         server.close();
     });
 
-    test('should generate headers only if header generation is on', () => {
-        browserHeadersHandler(options, nextHolder.next);
-        expect(nextHolder.next).toBeCalledWith(options);
+    test('should not generate headers without useHeaderGenerator', () => {
+        browserHeadersHook(options);
+        expect(options).toEqual(options);
+    });
 
+    test('should generate headers with useHeaderGenerator', () => {
+        options.headers = {
+            foo: 'bar',
+        };
         options.context = {
             headerGenerator,
             useHeaderGenerator: true,
@@ -54,14 +54,16 @@ describe('Browser headers', () => {
             },
         };
 
-        browserHeadersHandler(options, nextHolder.next);
+        browserHeadersHook(options);
 
         expect(generatorSpy).toHaveBeenCalled();
 
-        expect(nextHolder.next).toHaveBeenLastCalledWith(expect.objectContaining({ headers: mockedHeaders }));
+        expect(options.headers).toMatchObject(mockedHeaders);
+        expect(options.headers.foo).toBe('bar');
     });
 
-    test('should add headers by option when http2 is used', () => {
+    test('should add headers when http2 is used', () => {
+        options.http2 = true;
         options.context = {
             headerGenerator,
             useHeaderGenerator: true,
@@ -72,14 +74,13 @@ describe('Browser headers', () => {
             },
         };
 
-        browserHeadersHandler(options, nextHolder.next);
+        browserHeadersHook(options);
 
         expect(generatorSpy).toHaveBeenCalled();
-
-        expect(nextHolder.next).toHaveBeenLastCalledWith(expect.objectContaining({ headers: mockedHeaders }));
+        expect(options.headers).toEqual(mockedHeaders);
     });
 
-    test('should add headers by beforeRequestHook when http1 is used', () => {
+    test('should add headers when http1 is used', () => {
         options.http2 = false;
         options.context = {
             headerGenerator,
@@ -91,14 +92,10 @@ describe('Browser headers', () => {
             },
         };
 
-        browserHeadersHandler(options, nextHolder.next);
+        browserHeadersHook(options);
 
         expect(generatorSpy).toHaveBeenCalled();
-
-        expect(nextHolder.next).toHaveBeenLastCalledWith(expect.objectContaining({ hooks: expect.objectContaining({
-            beforeRequest: expect.toBeArrayOfSize(1),
-        }),
-        }));
+        expect(options.headers).toEqual(mockedHeaders);
     });
 
     test('should pass option to header generator', () => {
@@ -111,7 +108,7 @@ describe('Browser headers', () => {
                 ],
             },
         };
-        browserHeadersHandler(options, nextHolder.next);
+        browserHeadersHook(options);
 
         expect(generatorSpy).toHaveBeenLastCalledWith(expect.objectContaining(options.context.headerGeneratorOptions));
     });
@@ -124,16 +121,12 @@ describe('Browser headers', () => {
                 ...got.defaults.options.headers,
             },
         };
-        browserHeadersHandler(options, nextHolder.next);
+        browserHeadersHook(options);
 
-        expect(nextHolder.next).toHaveBeenLastCalledWith(expect.objectContaining({
-            headers: {
-                ...mockedHeaders,
-            },
-        }));
+        expect(options.headers).toEqual(mockedHeaders);
     });
 
-    // Just an health check - header generator should have its own tests.
+    // Just a health check - header generator should have its own tests.
     test('should have working generator', () => {
         generatorSpy.mockRestore();
 
@@ -146,13 +139,11 @@ describe('Browser headers', () => {
                 ],
             },
         };
-        browserHeadersHandler(options, nextHolder.next);
+        browserHeadersHook(options);
 
-        expect(nextHolder.next).toHaveBeenLastCalledWith(expect.objectContaining({
-            headers: expect.objectContaining({
-                'user-agent': expect.stringContaining('Chrome'),
-            }),
-        }));
+        expect(options.headers).toMatchObject({
+            'user-agent': expect.stringContaining('Chrome'),
+        });
     });
 
     test('should have capitalized headers with http1', async () => {
@@ -169,10 +160,6 @@ describe('Browser headers', () => {
         options.url = `http://localhost:${port}/html`;
         options.http2 = false;
         const response = await gotScraping(options);
-
-        expect(response.request.options.hooks).toMatchObject({
-            beforeRequest: expect.toBeArrayOfSize(1),
-        });
 
         expect(response.request.options.headers).toMatchObject({
             'User-Agent': expect.stringContaining('Chrome'),

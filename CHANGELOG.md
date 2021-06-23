@@ -1,11 +1,16 @@
+2.0.0 / 2021/06/23
+====================
+- **BREAKING**: Require Node.js >=15.10.0 because HTTP2 support on lower Node.js versions is very buggy.
+- Fix various issues by refactoring from got handlers to hooks.
+
 1.0.4 / 2021/05/17
 ====================
 - HTTP2 protocol resolving fix
- 
+
 1.0.3 / 2021/04/27
 ====================
 - HTTP2 wrapper fix
-  
+
 1.0.2 / 2021/04/18
 ====================
 - Fixed TLS

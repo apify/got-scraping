@@ -1,59 +1,36 @@
 const got = require('got');
 const HeaderGenerator = require('header-generator');
+const http2 = require('http2-wrapper');
 
 const { SCRAPING_DEFAULT_OPTIONS } = require('./scraping-defaults');
 
-const { optionsValidationHandler } = require('./handlers/options-validation');
-const { customOptionsHandler } = require('./handlers/custom-options');
-const { browserHeadersHandler } = require('./handlers/browser-headers');
-const { proxyHandler } = require('./handlers/proxy');
-const { alpnHandler } = require('./handlers/alpn');
+const { optionsValidationHandler } = require('./hooks/options-validation');
+const { customOptionsHook } = require('./hooks/custom-options');
+const { browserHeadersHook } = require('./hooks/browser-headers');
+const { proxyHook } = require('./hooks/proxy');
+const { alpnHook } = require('./hooks/alpn');
 
-const isResponseOk = (response) => {
-    const { statusCode } = response;
-    const limitStatusCode = response.request.options.followRedirect ? 299 : 399;
-
-    return (statusCode >= 200 && statusCode <= limitStatusCode) || statusCode === 304;
-};
-
-const mutableGot = got.extend({
+const gotScraping = got.extend({
     // Must be mutable in order to override the defaults
     // https://github.com/sindresorhus/got#instances
     mutableDefaults: true,
+    ...SCRAPING_DEFAULT_OPTIONS,
     context: {
-        // Custom header generator instance.
         headerGenerator: new HeaderGenerator(),
     },
-    // Got has issues with terminating requests and it can cause unhandled exceptions
     hooks: {
-        afterResponse: [
-            (response) => {
-                if (isResponseOk(response)) {
-                    response.request.destroy();
-                }
-
-                return response;
-            },
+        init: [
+            (opts) => optionsValidationHandler(opts, () => {}),
+        ],
+        beforeRequest: [
+            customOptionsHook,
+            // ALPN negotiation is handled by got (http2-wrapper) by default.
+            // However, its caching is causing problems with http proxies and https targets on http 1.1
+            alpnHook,
+            proxyHook,
+            browserHeadersHook,
         ],
     },
 });
-
-// Overriding the mutableGot defaults by merging its defaults and our scraping defaults.
-mutableGot.defaults.options = got.mergeOptions(mutableGot.defaults.options, SCRAPING_DEFAULT_OPTIONS);
-
-const gotScraping = got.extend(
-    mutableGot,
-    {
-        handlers: [
-            optionsValidationHandler,
-            customOptionsHandler,
-            // ALPN negotiation is handled by got (http2-wrapper) by default.
-            // However, its caching is causing problems with http proxies and https targets on http 1.1
-            alpnHandler,
-            proxyHandler,
-            browserHeadersHandler,
-        ],
-    },
-);
 
 module.exports = gotScraping;
