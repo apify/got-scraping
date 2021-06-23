@@ -26,15 +26,6 @@ jobs:
                 with:
                     node-version: ${{ matrix.node-version }}
             -
-                name: Cache Node Modules
-                if: ${{ matrix.node-version == 14 }}
-                uses: actions/cache@v2
-                with:
-                    path: |
-                        node_modules
-                        build
-                    key: cache-${{ github.run_id }}-v14
-            -
                 name: Install Dependencies
                 run: npm install
             -
@@ -45,24 +36,17 @@ jobs:
 
     lint:
         name: Lint
-        needs: [build_and_test]
         runs-on: ubuntu-latest
 
         steps:
             -
                 uses: actions/checkout@v2
             -
-                name: Use Node.js 14
+                name: Use Node.js 16
                 uses: actions/setup-node@v1
                 with:
-                    node-version: 14
+                    node-version: 16
             -
-                name: Load Cache
-                uses: actions/cache@v2
-                with:
-                    path: |
-                        node_modules
-                        build
-                    key: cache-${{ github.run_id }}-v14
+                run: npm install
             -
                 run: npm run lint
