@@ -1,4 +1,4 @@
-const { alpnHandler } = require('../src/handlers/alpn');
+const { alpnHook } = require('../src/handlers/alpn');
 const httpResolver = require('../src/http-resolver');
 
 describe('ALPN', () => {
@@ -22,12 +22,12 @@ describe('ALPN', () => {
         options.http2 = true;
         jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('h2');
 
-        await alpnHandler(options, next);
+        await alpnHook(options, next);
         expect(options.http2).toBe(true);
 
         jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('http/1.1');
 
-        await alpnHandler(options, next);
+        await alpnHook(options, next);
         expect(options.http2).toBe(false);
     });
 
@@ -36,7 +36,7 @@ describe('ALPN', () => {
         options.http2 = true;
         jest.spyOn(httpResolver, 'resolveHttpVersion');
 
-        await alpnHandler(options, next);
+        await alpnHook(options, next);
         expect(httpResolver.resolveHttpVersion).toBeCalledTimes(0);
         expect(options.http2).toBe(false);
     });

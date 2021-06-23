@@ -2,7 +2,7 @@ const http2 = require('http2-wrapper');
 const HttpsProxyAgent = require('https-proxy-agent');
 const HttpProxyAgent = require('http-proxy-agent');
 
-const { proxyHandler } = require('../src/handlers/proxy');
+const { proxyHook } = require('../src/handlers/proxy');
 const httpResolver = require('../src/http-resolver');
 
 const {
@@ -14,28 +14,30 @@ const {
 } = http2.proxies;
 
 describe('Proxy', () => {
-    let next;
     let options;
     beforeEach(() => {
         options = {
-            context: {},
+            context: {
+                resolvedRequestProtocol: 'https',
+            },
             https: {},
         };
-        next = () => { };
     });
 
     afterEach(() => {
         jest.clearAllMocks();
     });
 
-    test('should modify agents only if proxyUrl provided', async () => {
-        await proxyHandler(options, next);
+    test('should not add an agent if proxyUrl is not provided', async () => {
+        await proxyHook(options);
         expect(options.agent).toBeUndefined();
+    });
 
+    test('should add an agent if proxyUrl is provided', async () => {
         jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('h2');
         options.context.proxyUrl = 'http://localhost:132';
 
-        await proxyHandler(options, next);
+        await proxyHook(options);
         expect(options.agent).toBeDefined();
     });
 
@@ -43,47 +45,109 @@ describe('Proxy', () => {
         jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('h2');
         options.context.proxyUrl = 'ftp://localhost:132';
 
-        await expect(proxyHandler(options, next))
+        await expect(proxyHook(options))
             .rejects
             .toThrow(/is not supported. Please use HTTP or HTTPS./);
     });
 
     describe('agents', () => {
-        test('should support http proxy via http2, https and http', async () => {
+        test('should support http request over http proxy', async () => {
             options.context.proxyUrl = 'http://localhost:132';
+            options.context.resolvedRequestProtocol = 'http';
+            jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('http/1.1');
 
-            await proxyHandler(options, next);
+            await proxyHook(options);
 
             const { agent } = options;
-            expect(agent.http2).toBeInstanceOf(Http2OverHttp);
-            expect(agent.https).toBeInstanceOf(HttpsProxyAgent);
             expect(agent.http).toBeInstanceOf(HttpProxyAgent);
         });
 
-        test('should support https proxy via http2', async () => {
-            jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('h2');
+        test('should support https request over http proxy', async () => {
+            options.context.proxyUrl = 'http://localhost:132';
+            options.context.resolvedRequestProtocol = 'https';
+            jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('http/1.1');
 
-            options.context.proxyUrl = 'https://localhost:132';
-
-            await proxyHandler(options, next);
+            await proxyHook(options);
 
             const { agent } = options;
-            expect(agent.http2).toBeInstanceOf(Http2OverHttp2);
-            expect(agent.https).toBeInstanceOf(HttpsOverHttp2);
+            expect(agent.https).toBeInstanceOf(HttpsProxyAgent);
+        });
+
+        test('should support http2 request over http proxy', async () => {
+            options.context.proxyUrl = 'http://localhost:132';
+            options.context.resolvedRequestProtocol = 'http2';
+            jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('http/1.1');
+
+            await proxyHook(options);
+
+            const { agent } = options;
+            expect(agent).toBeInstanceOf(Http2OverHttp);
+        });
+
+        test('should support http request over https proxy', async () => {
+            options.context.proxyUrl = 'https://localhost:132';
+            options.context.resolvedRequestProtocol = 'http';
+            jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('http/1.1');
+
+            await proxyHook(options);
+
+            const { agent } = options;
+            expect(agent.http).toBeInstanceOf(HttpsProxyAgent);
+        });
+
+        test('should support https request over https proxy', async () => {
+            options.context.proxyUrl = 'https://localhost:132';
+            options.context.resolvedRequestProtocol = 'https';
+            jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('http/1.1');
+
+            await proxyHook(options);
+
+            const { agent } = options;
+            expect(agent.https).toBeInstanceOf(HttpsProxyAgent);
+        });
+
+        test('should support http2 request over https proxy', async () => {
+            options.context.proxyUrl = 'https://localhost:132';
+            options.context.resolvedRequestProtocol = 'http2';
+            jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('http/1.1');
+
+            await proxyHook(options);
+
+            const { agent } = options;
+            expect(agent).toBeInstanceOf(Http2OverHttps);
+        });
+
+        test('should support http request over http2 proxy', async () => {
+            options.context.proxyUrl = 'https://localhost:132';
+            options.context.resolvedRequestProtocol = 'http';
+            jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('h2');
+
+            await proxyHook(options);
+
+            const { agent } = options;
             expect(agent.http).toBeInstanceOf(HttpOverHttp2);
         });
 
-        test('should support https proxy via http 1.1', async () => {
-            jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('1.1');
-
+        test('should support https request over http2 proxy', async () => {
             options.context.proxyUrl = 'https://localhost:132';
+            options.context.resolvedRequestProtocol = 'https';
+            jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('h2');
 
-            await proxyHandler(options, next);
+            await proxyHook(options);
 
             const { agent } = options;
-            expect(agent.http2).toBeInstanceOf(Http2OverHttps);
-            expect(agent.https).toBeInstanceOf(HttpsProxyAgent);
-            expect(agent.http).toBeInstanceOf(HttpsProxyAgent);
+            expect(agent.https).toBeInstanceOf(HttpsOverHttp2);
+        });
+
+        test('should support http2 request over http2 proxy', async () => {
+            options.context.proxyUrl = 'https://localhost:132';
+            options.context.resolvedRequestProtocol = 'http2';
+            jest.spyOn(httpResolver, 'resolveHttpVersion').mockResolvedValue('h2');
+
+            await proxyHook(options);
+
+            const { agent } = options;
+            expect(agent).toBeInstanceOf(Http2OverHttp2);
         });
     });
 });

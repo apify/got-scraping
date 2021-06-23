@@ -1,29 +1,44 @@
+const http = require('http');
+const https = require('https');
+const http2 = require('http2-wrapper');
 const httpResolver = require('../http-resolver');
 
 /**
  * @param {object} options
- * @param {function} next
- * @returns {import('got').GotReturn}
  */
-async function alpnHandler(options, next) {
-    const { url, http2 } = options;
-
-    if (http2) {
-        const parsedUrl = new URL(url);
-
-        if (parsedUrl.protocol === 'https:') {
-            const protocol = await httpResolver.resolveHttpVersion(parsedUrl);
-
-            options.http2 = protocol === 'h2';
+exports.alpnHook = async function (options) {
+    const parsedUrl = new URL(options.url);
+    if (parsedUrl.protocol === 'https:') {
+        // HTTP2 always uses https: protocol
+        if (options.http2) {
+            const protocol = await httpResolver.resolveHttpVersion(parsedUrl, options.https.rejectUnauthorized);
+            if (protocol === 'h2') {
+                setHttp2(options);
+            } else {
+                setHttps(options);
+            }
         } else {
-            // http2 is https
-            options.http2 = false;
+            setHttps(options);
         }
+    } else {
+        setHttp(options);
     }
+};
 
-    return next(options);
+function setHttp2(options) {
+    options.http2 = true;
+    options.request = http2.request;
+    options.context.resolvedRequestProtocol = 'http2';
 }
 
-module.exports = {
-    alpnHandler,
-};
+function setHttps(options) {
+    options.http2 = false;
+    options.request = https.request;
+    options.context.resolvedRequestProtocol = 'https';
+}
+
+function setHttp(options) {
+    options.http2 = false;
+    options.request = http.request;
+    options.context.resolvedRequestProtocol = 'http';
+}

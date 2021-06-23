@@ -1,3 +1,4 @@
+const { once } = require('events');
 const got = require('got');
 const gotScraping = require('../src');
 
@@ -136,7 +137,7 @@ describe('GotScraping', () => {
             test('Should allow https target via http proxy when auto downgrading', async () => {
                 const response = await gotScraping({
                     url: 'https://eshop.coop-box.cz/',
-                    proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+                    proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
 
                 });
                 expect(response.statusCode).toBe(200);
@@ -155,7 +156,7 @@ describe('GotScraping', () => {
             const responseProxy = await gotScraping({
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
-                proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+                proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
                 http2: false,
 
             });
@@ -180,7 +181,7 @@ describe('GotScraping', () => {
             const proxyPromise = gotScraping({
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
-                proxyUrl: `http://groups-SHADER,session-123:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+                proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
             });
 
             // We need this because we run tests in CI for various node versions.
@@ -210,5 +211,258 @@ describe('GotScraping', () => {
                 expect(response.body.tls_version).toBe('TLS 1.3');
             });
         }
+    });
+
+    describe('same thing with streams', () => {
+        test('should allow passing custom properties', async () => {
+            const requestOptions = {
+                isStream: true,
+                url: `http://localhost:${port}/html`,
+                headerGeneratorOptions: {
+                    browsers: [{ name: 'firefox' }],
+                },
+            };
+
+            const stream = gotScraping(requestOptions);
+            const [response] = await once(stream, 'response');
+
+            const { request: { options } } = response;
+            expect(options.context.headerGeneratorOptions).toMatchObject(requestOptions.headerGeneratorOptions);
+        });
+
+        test('should allow overriding generated options using handlers', async () => {
+            const requestOptions = {
+                isStream: true,
+                url: `http://localhost:${port}/html`,
+            };
+            const headers = {
+                referer: 'test',
+            };
+
+            const extendedGot = gotScraping.extend({
+                handlers: [
+                    (options, next) => {
+                        return next(got.mergeOptions(
+                            options,
+                            {
+                                headers,
+                            },
+                        ));
+                    },
+                ],
+            });
+
+            const stream = extendedGot(requestOptions);
+            const [response] = await once(stream, 'response');
+            expect(response.request.options.headers).toMatchObject(headers);
+        });
+
+        test('should add custom headers', async () => {
+            const stream = gotScraping({
+                isStream: true,
+                url: `http://localhost:${port}/html`,
+                headers: {
+                    'user-agent': 'test',
+                },
+            });
+
+            const [response] = await once(stream, 'response');
+
+            expect(response.statusCode).toBe(200);
+            expect(response.request.options).toMatchObject({
+                http2: false,
+                headers: {
+                    'User-Agent': 'test',
+                },
+            });
+        });
+
+        test('should get json', async () => {
+            const stream = gotScraping({
+                isStream: true,
+                url: `http://localhost:${port}/json`,
+            });
+
+            const [response] = await once(stream, 'response');
+            expect(response.statusCode).toBe(200);
+        });
+
+        test('should post json', async () => {
+            const body = { foo: 'bar' };
+
+            const stream = gotScraping({
+                isStream: true,
+                url: `http://localhost:${port}/jsonPost`,
+                json: body,
+                method: 'POST',
+            });
+
+            const [response] = await once(stream, 'response');
+            response.setEncoding('utf-8');
+            const chunks = [];
+            for await (const chunk of stream) {
+                chunks.push(chunk);
+            }
+            const responseBody = chunks.join();
+
+            expect(response.statusCode).toBe(200);
+            expect(JSON.parse(responseBody)).toEqual(body);
+        });
+
+        test('should post body', async () => {
+            const body = { foo: 'bar' };
+
+            const stream = gotScraping({
+                isStream: true,
+                url: `http://localhost:${port}/jsonPost`,
+                body: JSON.stringify(body),
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json; charset=UTF-8',
+                },
+            });
+
+            const [response] = await once(stream, 'response');
+            response.setEncoding('utf-8');
+            const chunks = [];
+            for await (const chunk of stream) {
+                chunks.push(chunk);
+            }
+            const responseBody = chunks.join();
+
+            expect(response.statusCode).toBe(200);
+            expect(JSON.parse(responseBody)).toEqual(body);
+        });
+
+        describe('Integration', () => {
+            test('should use http2 first', async () => {
+                const stream = gotScraping.stream({ url: 'https://apify.com/' });
+                const [response] = await once(stream, 'response');
+                expect(response.statusCode).toBe(200);
+                expect(response.httpVersion).toBe('2.0');
+            });
+
+            test('Should auto downgrade protocol', async () => {
+                const stream = gotScraping.stream({ url: 'https://eshop.coop-box.cz/' });
+                const [response] = await once(stream, 'response');
+                expect(response.statusCode).toBe(200);
+                expect(response.httpVersion).toBe('1.1');
+                expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
+            });
+
+            // if (nodeVersion >= 12) {
+            test('Should allow https target via http proxy when auto downgrading', async () => {
+                const stream = gotScraping.stream({
+                    url: 'https://eshop.coop-box.cz/',
+                    proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+
+                });
+                const [response] = await once(stream, 'response');
+                expect(response.statusCode).toBe(200);
+                expect(response.httpVersion).toBe('1.1');
+                expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
+            });
+            // }
+
+            test('should work with proxyUrl and http1', async () => {
+                const stream = gotScraping.stream({
+                    url: 'https://api.apify.com/v2/browser-info',
+                    http2: false,
+                });
+                const [response] = await once(stream, 'response');
+                response.setEncoding('utf-8');
+                const chunks = [];
+                for await (const chunk of response) {
+                    chunks.push(chunk);
+                }
+                const responseBody = chunks.join();
+
+                const proxyStream = gotScraping.stream({
+                    url: 'https://api.apify.com/v2/browser-info',
+                    proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+                    http2: false,
+                });
+                const [responseProxy] = await once(proxyStream, 'response');
+                responseProxy.setEncoding('utf-8');
+                const proxyChunks = [];
+                for await (const chunk of responseProxy) {
+                    proxyChunks.push(chunk);
+                }
+                const proxyResponseBody = proxyChunks.join();
+
+                expect(response.statusCode).toBe(200);
+                expect(response.request.options).toMatchObject({ http2: false });
+
+                expect(responseProxy.statusCode).toBe(200);
+
+                expect(JSON.parse(responseBody).clientIp).not.toBe(JSON.parse(proxyResponseBody).clientIp);
+                expect(responseProxy.httpVersion).toBe('1.1');
+            });
+
+            test('should work with proxyUrl and http2', async () => {
+                const stream = gotScraping.stream({
+                    url: 'https://api.apify.com/v2/browser-info',
+                });
+                const [response] = await once(stream, 'response');
+                response.setEncoding('utf-8');
+                const chunks = [];
+                for await (const chunk of response) {
+                    chunks.push(chunk);
+                }
+                const responseBody = chunks.join();
+
+                expect(response.statusCode).toBe(200);
+                expect(response.request.options).toMatchObject({ http2: true });
+
+                const proxyStream = gotScraping.stream({
+                    url: 'https://api.apify.com/v2/browser-info',
+                    proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+                });
+
+                // We need this because we run tests in CI for various node versions.
+                if (nodeVersion < 12) {
+                    expect.assertions(1);
+                    try {
+                        await once(proxyStream, 'response');
+                    } catch (err) {
+                        await expect(err.message).toMatch(/Proxy with HTTP2 target is supported only in node v12+/);
+                    }
+                } else {
+                    const [responseProxy] = await once(proxyStream, 'response');
+                    responseProxy.setEncoding('utf-8');
+                    const proxyChunks = [];
+                    for await (const chunk of responseProxy) {
+                        proxyChunks.push(chunk);
+                    }
+                    const proxyResponseBody = proxyChunks.join();
+                    expect(responseProxy.statusCode).toBe(200);
+                    expect(JSON.parse(responseBody).clientIp).not.toBe(JSON.parse(proxyResponseBody).clientIp);
+                    expect(responseProxy.httpVersion).toBe('2.0');
+                }
+            });
+
+            test('should support tls 1.2', async () => {
+                const url = 'https://tls-v1-2.badssl.com:1012/';
+                const stream = gotScraping.stream(url);
+                const [response] = await once(stream, 'response');
+                expect(response.statusCode).toBe(200);
+            });
+
+            if (nodeVersion >= 12) {
+                test('should support tls 1.3', async () => {
+                    const url = 'https://www.howsmyssl.com/a/check';
+                    const stream = await gotScraping.stream(url);
+                    const [response] = await once(stream, 'response');
+                    response.setEncoding('utf-8');
+                    const chunks = [];
+                    for await (const chunk of response) {
+                        chunks.push(chunk);
+                    }
+                    const responseBody = chunks.join();
+                    expect(response.statusCode).toBe(200);
+                    expect(JSON.parse(responseBody).tls_version).toBe('TLS 1.3');
+                });
+            }
+        });
     });
 });
