@@ -18,7 +18,6 @@ const gotScraping = got.extend({
     context: {
         headerGenerator: new HeaderGenerator(),
     },
-    request: http2.auto,
     hooks: {
         init: [
             (opts) => optionsValidationHandler(opts, () => {}),
