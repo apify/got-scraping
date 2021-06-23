@@ -1,5 +1,5 @@
 # Got Scraping
-Got Scraping is a small but powerful `got` extension that allows you to send browser-like requests with only a little configuration seamlessly and with a single function call. [Got](https://github.com/sindresorhus/got) is a widely used and powerful client that provides extensibility and customization. Sending browser-like requests is essential in the web scraping industry to blend in with the website traffic. You can read more about the mimics [here](#simulating-browser-like-requests). To unleash its full potential, please use node 12+.
+Got Scraping is a small but powerful `got` extension that allows you to send browser-like requests with only a little configuration seamlessly and with a single function call. [Got](https://github.com/sindresorhus/got) is a widely used and powerful client that provides extensibility and customization. Sending browser-like requests is essential in the web scraping industry to blend in with the website traffic. You can read more about the mimics [here](#simulating-browser-like-requests). Because HTTP2 support in older versions of Node.js is buggy, we recommend using Node.js >=15.10.0
 
 ## Motivation
 With the increasing popularity of web scraping, it is becoming more important to blend in with the typical internet traffic. This package implements multiple mimics to make GET requests similar to browsers. Thanks to the included [`header-generator`](https://github.com/apify/header-generator) package, you can choose various browsers from different operating systems and devices. The `header-generator` package generates all the headers for you so that you can focus on the important stuff.
@@ -52,7 +52,7 @@ Got Scraping package makes using proxies with your requests ridiculously easy. I
 The proxy type and proxy HTTP version is a type of connection to a proxy. The agents are supported connections from the proxy to the target, let's say, a website.
 ## Installation
 
-We strongly recommend using Node 12+ because of the compatible TLS ciphers we use to emulate the browser. Also, HTTP2 over proxy is not supported in the Node version smaller than 12.
+We strongly recommend using Node 15.10+ because of HTTP2 and TLS cipher support we use to emulate the browser.
 
 ```bash
 $ npm install got-scraping
