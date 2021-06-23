@@ -1,4 +1,4 @@
-const { alpnHook } = require('../src/handlers/alpn');
+const { alpnHook } = require('../src/hooks/alpn');
 const httpResolver = require('../src/http-resolver');
 
 describe('ALPN', () => {

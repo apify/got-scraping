@@ -2,7 +2,7 @@ const http2 = require('http2-wrapper');
 const HttpsProxyAgent = require('https-proxy-agent');
 const HttpProxyAgent = require('http-proxy-agent');
 
-const { proxyHook } = require('../src/handlers/proxy');
+const { proxyHook } = require('../src/hooks/proxy');
 const httpResolver = require('../src/http-resolver');
 
 const {

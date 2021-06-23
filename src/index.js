@@ -4,11 +4,11 @@ const http2 = require('http2-wrapper');
 
 const { SCRAPING_DEFAULT_OPTIONS } = require('./scraping-defaults');
 
-const { optionsValidationHandler } = require('./handlers/options-validation');
-const { customOptionsHook } = require('./handlers/custom-options');
-const { browserHeadersHook } = require('./handlers/browser-headers');
-const { proxyHook } = require('./handlers/proxy');
-const { alpnHook } = require('./handlers/alpn');
+const { optionsValidationHandler } = require('./hooks/options-validation');
+const { customOptionsHook } = require('./hooks/custom-options');
+const { browserHeadersHook } = require('./hooks/browser-headers');
+const { proxyHook } = require('./hooks/proxy');
+const { alpnHook } = require('./hooks/alpn');
 
 const gotScraping = got.extend({
     // Must be mutable in order to override the defaults

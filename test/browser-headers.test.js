@@ -1,13 +1,12 @@
 const HeaderGenerator = require('header-generator');
 const got = require('got');
 
-const { browserHeadersHook, mergeHeaders } = require('../src/handlers/browser-headers');
+const { browserHeadersHook, mergeHeaders } = require('../src/hooks/browser-headers');
 const gotScraping = require('../src/index');
 
 const { startDummyServer } = require('./helpers/dummy-server');
 
 describe('Browser headers', () => {
-    let nextHolder;
     let options;
     let generatorSpy;
     let server;

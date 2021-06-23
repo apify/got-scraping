@@ -35,24 +35,6 @@ function deleteDefaultGotUserAgent(headers) {
 }
 
 /**
- * Creates options with beforeRequestHooks in order to have case-sensitive headers.
- * @param {object} generatedHeaders
- * @param {object} headerOverrides
- * @returns
- */
-function createOptionsWithBeforeRequestHook(generatedHeaders, headerOverrides) {
-    return {
-        hooks: {
-            beforeRequest: [
-                (gotOptions) => {
-
-                },
-            ],
-        },
-    };
-}
-
-/**
  * Merges original generated headers and user provided overrides.
  * All header overrides will have the original header case, because of antiscraping.
  * @param {object} original
