@@ -1,6 +1,5 @@
 const got = require('got');
 const HeaderGenerator = require('header-generator');
-const http2 = require('http2-wrapper');
 
 const { SCRAPING_DEFAULT_OPTIONS } = require('./scraping-defaults');
 
