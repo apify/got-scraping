@@ -1,3 +1,7 @@
+2.0.1 / 2021/07/22
+====================
+- pin `http2-wrapper` version as the latest was causing random CI failures
+
 2.0.0 / 2021/07/22
 ====================
 - **BREAKING**: Require Node.js >=15.10.0 because HTTP2 support on lower Node.js versions is very buggy.
