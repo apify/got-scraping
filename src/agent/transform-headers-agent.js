@@ -10,6 +10,11 @@ const { _storeHeader } = http.OutgoingMessage.prototype;
  */
 class TransformHeadersAgent extends WrappedAgent {
     // Rewritten from https://github.com/nodejs/node/blob/533cafcf7e3ab72e98a2478bc69aedfdf06d3a5e/lib/_http_outgoing.js#L442-L479
+    /**
+     * @description Transforms the request via header normalization.
+     * @see {TransformHeadersAgent.transformHeader}
+     * @param {http.ClientRequest} request
+     */
     transformRequest(request) {
         const headers = {};
         const hasConnection = request.hasHeader('connection');
