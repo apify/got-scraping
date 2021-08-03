@@ -2,6 +2,7 @@ const http2 = require('http2-wrapper');
 const HttpsProxyAgent = require('https-proxy-agent');
 const HttpProxyAgent = require('http-proxy-agent');
 const httpResolver = require('../http-resolver');
+const TransformHeadersAgent = require('../agent/transform-headers-agent');
 
 const {
     HttpOverHttp2,
@@ -83,21 +84,21 @@ async function getAgents(parsedProxyUrl, rejectUnauthorized) {
 
         if (proxyIsHttp2) {
             agent = {
-                http: new HttpOverHttp2(proxy),
-                https: new HttpsOverHttp2(proxy),
+                http: new TransformHeadersAgent(new HttpOverHttp2(proxy)),
+                https: new TransformHeadersAgent(new HttpsOverHttp2(proxy)),
                 http2: new Http2OverHttp2(proxy),
             };
         } else {
             agent = {
-                http: new HttpsProxyAgent(proxyUrl.href),
-                https: new HttpsProxyAgent(proxyUrl.href),
+                http: new TransformHeadersAgent(new HttpsProxyAgent(proxyUrl.href)),
+                https: new TransformHeadersAgent(new HttpsProxyAgent(proxyUrl.href)),
                 http2: new Http2OverHttps(proxy),
             };
         }
     } else {
         agent = {
-            http: new HttpProxyAgent(proxyUrl.href),
-            https: new HttpsProxyAgent(proxyUrl.href),
+            http: new TransformHeadersAgent(new HttpProxyAgent(proxyUrl.href)),
+            https: new TransformHeadersAgent(new HttpsProxyAgent(proxyUrl.href)),
             http2: new Http2OverHttp(proxy),
         };
     }
