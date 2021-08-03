@@ -4,7 +4,12 @@ const WrappedAgent = require('./wrapped-agent');
 
 const { _storeHeader } = http.OutgoingMessage.prototype;
 
+/**
+ * @description Transforms the casing of the headers.
+ *              The default behavior is to Pascal-Case.
+ */
 class TransformHeadersAgent extends WrappedAgent {
+    // Rewritten from https://github.com/nodejs/node/blob/533cafcf7e3ab72e98a2478bc69aedfdf06d3a5e/lib/_http_outgoing.js#L442-L479
     transformRequest(request) {
         const headers = {};
         const hasConnection = request.hasHeader('connection');
@@ -15,6 +20,8 @@ class TransformHeadersAgent extends WrappedAgent {
 
         for (const key of keys) {
             headers[key] = request.getHeader(key);
+
+            // Removal is required as we can't change the order of the properties
             request.removeHeader(key);
         }
 
@@ -28,6 +35,11 @@ class TransformHeadersAgent extends WrappedAgent {
         }
 
         if (!hasContentLength && !hasTransferEncoding) {
+            // Note: This uses private `_removedContLen` property.
+            //       This property tells us whether the content-length was explicitly removed or not.
+            //
+            // Note: This uses private `_removedTE` property.
+            //       This property tells us whether the transfer-encoding was explicitly removed or not.
             if (!hasTrailer && !request._removedContLen && typeof request._contentLength === 'number') {
                 headers[this.transformHeader('content-length')] = request._contentLength;
             } else if (!request._removedTE) {
@@ -35,6 +47,7 @@ class TransformHeadersAgent extends WrappedAgent {
             }
         }
 
+        // TODO: integration with the `header-generator` package
         const sorted = Object.keys(headers)/* .sort(this.sort) */;
 
         for (const key of sorted) {
@@ -43,6 +56,11 @@ class TransformHeadersAgent extends WrappedAgent {
     }
 
     addRequest(request, options) {
+        // See https://github.com/nodejs/node/blob/533cafcf7e3ab72e98a2478bc69aedfdf06d3a5e/lib/_http_outgoing.js#L373
+        // Note: This overrides the private `_storeHeader`.
+        //       This is required, because the function directly copies
+        //       the `connection`, `content-length` and `trasfer-encoding` headers
+        //       directly to the underlying buffer.
         request._storeHeader = (...args) => {
             this.transformRequest(request);
 
@@ -52,12 +70,23 @@ class TransformHeadersAgent extends WrappedAgent {
         return super.addRequest(request, options);
     }
 
+    /**
+     * @param {string} header - header with unknown casing
+     * @returns {string} - header in Pascal-Case
+     */
     transformHeader(header) {
         return header.split('-').map((part) => {
             return part[0].toUpperCase() + part.slice(1);
         }).join('-');
     }
 
+    /**
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+     * @param {*} a - header a
+     * @param {*} b - header b
+     * @returns header a or header b, depending which one is more important
+     */
     sort(a, b) {
         const { sortedHeaders } = this;
 

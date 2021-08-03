@@ -7,21 +7,21 @@ const startExpressAppPromise = (app, port) => {
     });
 };
 
-const parseHeaders = (headers, obj = {}) => {
-    for (let i = 0; i < headers.length; i += 2) {
+const parseHeaders = (rawHeaders, obj = {}) => {
+    for (let i = 0; i < rawHeaders.length; i += 2) {
         // We don't want to normalize them.
-        const key = headers[i].toString()/* .toLowerCase() */;
+        const key = rawHeaders[i].toString()/* .toLowerCase() */;
         let val = obj[key];
 
         if (!val) {
-            obj[key] = headers[i + 1].toString();
+            obj[key] = rawHeaders[i + 1].toString();
         } else {
             if (!Array.isArray(val)) {
                 val = [val];
                 obj[key] = val;
             }
 
-            val.push(headers[i + 1].toString());
+            val.push(rawHeaders[i + 1].toString());
         }
     }
 
