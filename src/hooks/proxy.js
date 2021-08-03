@@ -42,6 +42,13 @@ exports.proxyHook = async function (options) {
      * We're not using http2.auto, but http2.request, which expects a single agent.
      * So for HTTP2, we need a single agent and for HTTP and HTTPS we need the object
      * to allow destructuring of correct agents.
+     * ---
+     * The `if` below cannot be placed inside the `if` above.
+     * Otherwise `http2.request` would receive the entire `agent` object
+     * __when not using proxy__.
+     * ---
+     * `http2.request`, in contrary to `http2.auto`, expects an instance of `http2.Agent`.
+     * `http2.auto` expects an object with `http`, `https` and `http2` properties.
      */
     if (resolvedRequestProtocol === 'http2') {
         options.agent = options.agent[resolvedRequestProtocol];
