@@ -5,14 +5,13 @@ const WrappedAgent = require('./wrapped-agent');
 const { _storeHeader } = http.OutgoingMessage.prototype;
 
 /**
- * @description Transforms the casing of the headers.
- *              The default behavior is to Pascal-Case.
+ * @description Transforms the casing of the headers to Pascal-Case.
  */
 class TransformHeadersAgent extends WrappedAgent {
     // Rewritten from https://github.com/nodejs/node/blob/533cafcf7e3ab72e98a2478bc69aedfdf06d3a5e/lib/_http_outgoing.js#L442-L479
     /**
      * @description Transforms the request via header normalization.
-     * @see {TransformHeadersAgent.transformHeader}
+     * @see {TransformHeadersAgent.toPascalCase}
      * @param {http.ClientRequest} request
      */
     transformRequest(request) {
@@ -26,16 +25,16 @@ class TransformHeadersAgent extends WrappedAgent {
         for (const key of keys) {
             headers[key] = request.getHeader(key);
 
-            // Removal is required as we can't change the order of the properties
+            // Removal is required in order to change the order of the properties
             request.removeHeader(key);
         }
 
         if (!hasConnection) {
             const shouldSendKeepAlive = request.shouldKeepAlive && (hasContentLength || request.useChunkedEncodingByDefault || request.agent);
             if (shouldSendKeepAlive) {
-                headers[this.transformHeader('connection')] = 'keep-alive';
+                headers.Connection = 'keep-alive';
             } else {
-                headers[this.transformHeader('connection')] = 'close';
+                headers.Connection = 'close';
             }
         }
 
@@ -46,9 +45,9 @@ class TransformHeadersAgent extends WrappedAgent {
             // Note: This uses private `_removedTE` property.
             //       This property tells us whether the transfer-encoding was explicitly removed or not.
             if (!hasTrailer && !request._removedContLen && typeof request._contentLength === 'number') {
-                headers[this.transformHeader('content-length')] = request._contentLength;
+                headers[this.toPascalCase('content-length')] = request._contentLength;
             } else if (!request._removedTE) {
-                headers[this.transformHeader('transfer-encoding')] = 'chunked';
+                headers[this.toPascalCase('transfer-encoding')] = 'chunked';
             }
         }
 
@@ -56,7 +55,7 @@ class TransformHeadersAgent extends WrappedAgent {
         const sorted = Object.keys(headers)/* .sort(this.sort) */;
 
         for (const key of sorted) {
-            request.setHeader(this.transformHeader(key), headers[key]);
+            request.setHeader(this.toPascalCase(key), headers[key]);
         }
     }
 
@@ -79,9 +78,9 @@ class TransformHeadersAgent extends WrappedAgent {
      * @param {string} header - header with unknown casing
      * @returns {string} - header in Pascal-Case
      */
-    transformHeader(header) {
+    toPascalCase(header) {
         return header.split('-').map((part) => {
-            return part[0].toUpperCase() + part.slice(1);
+            return part[0].toUpperCase() + part.slice(1).toLowerCase();
         }).join('-');
     }
 
