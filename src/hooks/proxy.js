@@ -26,27 +26,25 @@ exports.proxyHook = async function (options) {
         const parsedProxy = new URL(proxyUrl);
 
         validateProxyProtocol(parsedProxy.protocol);
-        const agents = await getAgents(parsedProxy, options.https.rejectUnauthorized);
+        options.agent = await getAgents(parsedProxy, options.https.rejectUnauthorized);
+    }
 
-        /**
-         * This is needed because got expects all three agents in an object like this:
-         * {
-         *     http: httpAgent,
-         *     https: httpsAgent,
-         *     http2: http2Agent,
-         * }
-         * The confusing thing is that internally, it destructures the agents out of
-         * the object for HTTP and HTTPS, but keeps the structure for HTTP2,
-         * because it passes all the agents down to http2.auto (from http2-wrapper).
-         * We're not using http2.auto, but http2.request, which expects a single agent.
-         * So for HTTP2, we need a single agent and for HTTP and HTTPS we need the object
-         * to allow destructuring of correct agents.
-         */
-        if (resolvedRequestProtocol === 'http2') {
-            options.agent = agents[resolvedRequestProtocol];
-        } else {
-            options.agent = agents;
-        }
+    /**
+     * This is needed because got expects all three agents in an object like this:
+     * {
+     *     http: httpAgent,
+     *     https: httpsAgent,
+     *     http2: http2Agent,
+     * }
+     * The confusing thing is that internally, it destructures the agents out of
+     * the object for HTTP and HTTPS, but keeps the structure for HTTP2,
+     * because it passes all the agents down to http2.auto (from http2-wrapper).
+     * We're not using http2.auto, but http2.request, which expects a single agent.
+     * So for HTTP2, we need a single agent and for HTTP and HTTPS we need the object
+     * to allow destructuring of correct agents.
+     */
+    if (resolvedRequestProtocol === 'http2') {
+        options.agent = options.agent[resolvedRequestProtocol];
     }
 };
 
