@@ -13,8 +13,9 @@ class TransformHeadersAgent extends WrappedAgent {
      * @description Transforms the request via header normalization.
      * @see {TransformHeadersAgent.toPascalCase}
      * @param {http.ClientRequest} request
+     * @param {string[]} sortedHeaders - headers in order, optional
      */
-    transformRequest(request) {
+    transformRequest(request, sortedHeaders) {
         const headers = {};
         const hasConnection = request.hasHeader('connection');
         const hasContentLength = request.hasHeader('content-length');
@@ -23,10 +24,12 @@ class TransformHeadersAgent extends WrappedAgent {
         const keys = request.getHeaderNames();
 
         for (const key of keys) {
-            headers[key] = request.getHeader(key);
+            headers[this.toPascalCase(key)] = request.getHeader(key);
 
-            // Removal is required in order to change the order of the properties
-            request.removeHeader(key);
+            if (sortedHeaders) {
+                // Removal is required in order to change the order of the properties
+                request.removeHeader(key);
+            }
         }
 
         if (!hasConnection) {
@@ -45,17 +48,17 @@ class TransformHeadersAgent extends WrappedAgent {
             // Note: This uses private `_removedTE` property.
             //       This property tells us whether the transfer-encoding was explicitly removed or not.
             if (!hasTrailer && !request._removedContLen && typeof request._contentLength === 'number') {
-                headers[this.toPascalCase('content-length')] = request._contentLength;
+                headers['Content-Length'] = request._contentLength;
             } else if (!request._removedTE) {
-                headers[this.toPascalCase('transfer-encoding')] = 'chunked';
+                headers['Transfer-Encoding'] = 'chunked';
             }
         }
 
-        // TODO: integration with the `header-generator` package
-        const sorted = Object.keys(headers)/* .sort(this.sort) */;
+        const normalizedKeys = Object.keys(headers);
+        const sorted = sortedHeaders ? normalizedKeys.sort(this.createSort(sortedHeaders)) : normalizedKeys;
 
         for (const key of sorted) {
-            request.setHeader(this.toPascalCase(key), headers[key]);
+            request.setHeader(key, headers[key]);
         }
     }
 
@@ -66,7 +69,7 @@ class TransformHeadersAgent extends WrappedAgent {
         //       the `connection`, `content-length` and `trasfer-encoding` headers
         //       directly to the underlying buffer.
         request._storeHeader = (...args) => {
-            this.transformRequest(request);
+            this.transformRequest(request, options.sortedHeaders);
 
             return _storeHeader.call(request, ...args);
         };
@@ -87,13 +90,12 @@ class TransformHeadersAgent extends WrappedAgent {
     /**
      *
      * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-     * @param {*} a - header a
-     * @param {*} b - header b
+     * @param {string} a - header a
+     * @param {string} b - header b
+     * @param {string[]} sortedHeaders - array of headers in order
      * @returns header a or header b, depending which one is more important
      */
-    sort(a, b) {
-        const { sortedHeaders } = this;
-
+    sort(a, b, sortedHeaders) {
         const rawA = sortedHeaders.indexOf(a);
         const rawB = sortedHeaders.indexOf(b);
         const indexA = rawA === -1 ? Number.POSITIVE_INFINITY : rawA;
@@ -108,6 +110,17 @@ class TransformHeadersAgent extends WrappedAgent {
         }
 
         return 0;
+    }
+
+    /**
+     *
+     * @param {string[]} sortedHeaders - array of headers in order
+     * @returns {Function} - sort function
+     */
+    createSort(sortedHeaders) {
+        const sortWithSortedHeaders = (a, b) => this.sort(a, b, sortedHeaders);
+
+        return sortWithSortedHeaders;
     }
 }
 

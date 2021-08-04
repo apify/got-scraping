@@ -33,6 +33,10 @@ class WrappedAgent {
     get protocol() {
         return this.agent.protocol;
     }
+
+    destroy() {
+        this.agent.destroy();
+    }
 }
 
 module.exports = WrappedAgent;
