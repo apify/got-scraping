@@ -1,3 +1,7 @@
+2.0.2 / 2021/08/04
+====================
+- Use `TransfomHeadersAgent` internally to transform headers to `Pascal-Case`
+
 2.0.1 / 2021/07/22
 ====================
 - pin `http2-wrapper` version as the latest was causing random CI failures
