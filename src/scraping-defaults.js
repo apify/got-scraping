@@ -27,7 +27,7 @@ const SCRAPING_DEFAULT_OPTIONS = {
  * @returns {undefined|string} We keep the default ciphers for old node.
  */
 function getCiphersBasedOnNode() {
-    const nodeVersion = parseFloat(process.versions.node);
+    const nodeVersion = Number(process.versions.node.split('.')[0]);
 
     if (nodeVersion < 12) {
         return;

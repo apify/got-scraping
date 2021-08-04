@@ -14,8 +14,7 @@ const { proxyHook } = require('./hooks/proxy');
 const { http2Hook } = require('./hooks/http2');
 
 const gotScraping = got.extend({
-    // Must be mutable in order to override the defaults
-    // https://github.com/sindresorhus/got#instances
+    // TODO: Do we really need mutable defaults?
     mutableDefaults: true,
     ...SCRAPING_DEFAULT_OPTIONS,
     context: {
@@ -27,13 +26,11 @@ const gotScraping = got.extend({
     },
     hooks: {
         init: [
-            (opts) => optionsValidationHandler(opts, () => {}),
+            optionsValidationHandler,
         ],
         beforeRequest: [
             http2Hook,
             customOptionsHook,
-            // ALPN negotiation is handled by got (http2-wrapper) by default.
-            // However, its caching is causing problems with http proxies and https targets on http 1.1
             proxyHook,
             browserHeadersHook,
         ],
