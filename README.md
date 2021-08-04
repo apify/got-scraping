@@ -95,7 +95,7 @@ const response = await gotScraping({
 });
 ```
 
-You can check out how to override request headers using handlers in the original `got` repo under the [instances](https://github.com/sindresorhus/got#instances) section.
+You can check out how to override request headers using handlers in the original `got` repo under the [instances](https://github.com/sindresorhus/got/blob/main/documentation/10-instances.md) section.
 
 ### Customizing Header generator options
 
