@@ -29,13 +29,25 @@ exports.browserHeadersHook = async function (options) {
     };
 
     const generatedHeaders = headerGenerator.getHeaders(mergedHeaderGeneratorOptions);
+
+    options.headers = exports.mergeHeaders(generatedHeaders, options.headers);
+};
+
+/**
+ * Merges original generated headers and user provided overrides.
+ * All header overrides will have the original header case, because of antiscraping.
+ * @param {object} original
+ * @param {object} overrides
+ * @returns
+ */
+exports.mergeHeaders = function (original, overrides) {
     const fixedHeaders = new Map();
 
-    for (const entry of Object.entries(generatedHeaders)) {
+    for (const entry of Object.entries(original)) {
         fixedHeaders.set(entry[0].toLowerCase(), entry);
     }
 
-    for (const entry of Object.entries(options.headers)) {
+    for (const entry of Object.entries(overrides)) {
         fixedHeaders.set(entry[0].toLowerCase(), entry);
     }
 
@@ -44,5 +56,5 @@ exports.browserHeadersHook = async function (options) {
         headers[key] = value;
     }
 
-    options.headers = headers;
+    return headers;
 };
