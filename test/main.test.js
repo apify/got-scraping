@@ -63,7 +63,7 @@ describe('GotScraping', () => {
         expect(response.request.options.headers).toMatchObject(headers);
     });
 
-    test('should add custom headers', async () => {
+    test.only('should add custom headers', async () => {
         const response = await gotScraping({
             url: `http://localhost:${port}/html`,
             headers: {
@@ -73,7 +73,6 @@ describe('GotScraping', () => {
 
         expect(response.statusCode).toBe(200);
         expect(response.request.options).toMatchObject({
-            http2: false,
             headers: {
                 'User-Agent': 'test',
             },

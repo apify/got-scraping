@@ -11,7 +11,7 @@ const { optionsValidationHandler } = require('./hooks/options-validation');
 const { customOptionsHook } = require('./hooks/custom-options');
 const { browserHeadersHook } = require('./hooks/browser-headers');
 const { proxyHook } = require('./hooks/proxy');
-const { alpnHook } = require('./hooks/alpn');
+const { http2Hook } = require('./hooks/http2');
 
 const gotScraping = got.extend({
     // Must be mutable in order to override the defaults
@@ -30,10 +30,10 @@ const gotScraping = got.extend({
             (opts) => optionsValidationHandler(opts, () => {}),
         ],
         beforeRequest: [
+            http2Hook,
             customOptionsHook,
             // ALPN negotiation is handled by got (http2-wrapper) by default.
             // However, its caching is causing problems with http proxies and https targets on http 1.1
-            alpnHook,
             proxyHook,
             browserHeadersHook,
         ],

@@ -19,7 +19,7 @@ describe('Scraping defaults', () => {
         const { useHeaderGenerator, timeout, ...gotDefaults } = SCRAPING_DEFAULT_OPTIONS;
 
         const response = await gotScraping.get(`http://localhost:${port}/html`);
-        expect(response.request.options).toMatchObject({ ...gotDefaults, http2: false, timeout: { request: timeout } });
+        expect(response.request.options).toMatchObject({ ...gotDefaults, timeout: { request: timeout } });
         expect(response.request.options.context).toMatchObject({ useHeaderGenerator });
     });
 
