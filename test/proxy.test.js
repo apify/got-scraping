@@ -4,6 +4,7 @@ const HttpProxyAgent = require('http-proxy-agent');
 
 const { proxyHook } = require('../src/hooks/proxy');
 const httpResolver = require('../src/http-resolver');
+const TransformHeadersAgent = require('../src/agent/transform-headers-agent');
 
 const {
     HttpOverHttp2,
@@ -59,7 +60,8 @@ describe('Proxy', () => {
             await proxyHook(options);
 
             const { agent } = options;
-            expect(agent.http).toBeInstanceOf(HttpProxyAgent);
+            expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
+            expect(agent.http.agent).toBeInstanceOf(HttpProxyAgent);
         });
 
         test('should support https request over http proxy', async () => {
@@ -70,7 +72,8 @@ describe('Proxy', () => {
             await proxyHook(options);
 
             const { agent } = options;
-            expect(agent.https).toBeInstanceOf(HttpsProxyAgent);
+            expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
+            expect(agent.https.agent).toBeInstanceOf(HttpsProxyAgent);
         });
 
         test('should support http2 request over http proxy', async () => {
@@ -92,7 +95,8 @@ describe('Proxy', () => {
             await proxyHook(options);
 
             const { agent } = options;
-            expect(agent.http).toBeInstanceOf(HttpsProxyAgent);
+            expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
+            expect(agent.http.agent).toBeInstanceOf(HttpsProxyAgent);
         });
 
         test('should support https request over https proxy', async () => {
@@ -103,7 +107,8 @@ describe('Proxy', () => {
             await proxyHook(options);
 
             const { agent } = options;
-            expect(agent.https).toBeInstanceOf(HttpsProxyAgent);
+            expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
+            expect(agent.https.agent).toBeInstanceOf(HttpsProxyAgent);
         });
 
         test('should support http2 request over https proxy', async () => {
@@ -125,7 +130,8 @@ describe('Proxy', () => {
             await proxyHook(options);
 
             const { agent } = options;
-            expect(agent.http).toBeInstanceOf(HttpOverHttp2);
+            expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
+            expect(agent.http.agent).toBeInstanceOf(HttpOverHttp2);
         });
 
         test('should support https request over http2 proxy', async () => {
@@ -136,7 +142,8 @@ describe('Proxy', () => {
             await proxyHook(options);
 
             const { agent } = options;
-            expect(agent.https).toBeInstanceOf(HttpsOverHttp2);
+            expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
+            expect(agent.https.agent).toBeInstanceOf(HttpsOverHttp2);
         });
 
         test('should support http2 request over http2 proxy', async () => {

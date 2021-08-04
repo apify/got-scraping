@@ -1,5 +1,6 @@
 const { once } = require('events');
 const got = require('got');
+const getStream = require('get-stream');
 const gotScraping = require('../src');
 
 const { startDummyServer } = require('./helpers/dummy-server');
@@ -260,7 +261,7 @@ describe('GotScraping', () => {
         test('should add custom headers', async () => {
             const stream = gotScraping({
                 isStream: true,
-                url: `http://localhost:${port}/html`,
+                url: `http://localhost:${port}/headers`,
                 headers: {
                     'user-agent': 'test',
                 },
@@ -268,12 +269,13 @@ describe('GotScraping', () => {
 
             const [response] = await once(stream, 'response');
 
+            const body = await getStream(stream);
+            const headers = JSON.parse(body);
+
             expect(response.statusCode).toBe(200);
-            expect(response.request.options).toMatchObject({
-                http2: false,
-                headers: {
-                    'User-Agent': 'test',
-                },
+            expect(response.request.options.http2).toBe(false);
+            expect(headers).toMatchObject({
+                'User-Agent': 'test',
             });
         });
 
