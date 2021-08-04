@@ -24,7 +24,11 @@ class TransformHeadersAgent extends WrappedAgent {
         const keys = request.getHeaderNames();
 
         for (const key of keys) {
-            headers[this.toPascalCase(key)] = request.getHeader(key);
+            if (key.toLowerCase().startsWith('x-')) {
+                headers[key] = request.getHeader(key);
+            } else {
+                headers[this.toPascalCase(key)] = request.getHeader(key);
+            }
 
             if (sortedHeaders) {
                 // Removal is required in order to change the order of the properties

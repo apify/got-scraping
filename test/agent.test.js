@@ -53,6 +53,28 @@ describe('TransformHeadersAgent', () => {
         request.end();
     });
 
+    test('leaves x-header as it is', (done) => {
+        const request = http.request(`http://localhost:${port}/headers`, {
+            headers: {
+                'x-foo': 'bar',
+                'x-this-doesnt-exist': 'definitely',
+            },
+        }, async (response) => {
+            const body = await getStream(response);
+            const headers = JSON.parse(body);
+
+            expect(headers['x-foo']).toBe('bar');
+            expect(headers['x-this-doesnt-exist']).toBe('definitely');
+
+            done();
+        });
+
+        const transformAgent = new TransformHeadersAgent(agent);
+        transformAgent.transformRequest(request);
+
+        request.end();
+    });
+
     test('http.request with agent', (done) => {
         const transformAgent = new TransformHeadersAgent(new http.Agent({
             keepAlive: true,
