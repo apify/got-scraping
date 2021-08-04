@@ -38,6 +38,8 @@ This package can only generate all the standard attributes. There still might be
 The second colossal factor is using the same HTTP version as browsers. Most modern browsers use HTTP v2, so using it when the server supports it takes you one more step further to look like a browser. Luckily you don't have to care about the server HTTP version support since `got` automatically handles [ALPN protocol negotiation](https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation) and uses the HTTP v2 only if it is supported.
 The last step is to have a browser-like TLS suite and ciphers. According to our research, the cipher `TLS_AES_256_GCM_SHA384` is used among all modern browsers. We use this cipher as a default one. However, feel free to change it.
 
+HTTP/1.1 headers are always automatically formatted in [`Pascal-Case`](https://pl.wikipedia.org/wiki/PascalCase). There is an expection: [`x-`](https://datatracker.ietf.org/doc/html/rfc7231#section-8.3.1) headers are not modified in *any* way.
+
 This package should provide a solid start for your browser request emulation process. All websites are built differently, and some of them might require some additional special care.
 
 ## Proxies
