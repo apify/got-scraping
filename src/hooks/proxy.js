@@ -12,6 +12,10 @@ const {
     Http2OverHttp,
 } = http2.proxies;
 
+// `agent-base` package does stupid stacktrace checks
+// in order to set `agent.protocol`.
+// The keys in this object are names of functions
+// that will appear in the stacktrace.
 const isAmbiguousAgent = (agent) => {
     if (!isAmbiguousAgent.x) {
         isAmbiguousAgent.x = {
@@ -29,12 +33,22 @@ const isAmbiguousAgent = (agent) => {
  * @see https://github.com/TooTallNate/node-agent-base/issues/61
  * @param {Agent} agent
  */
-const fixAgent = (agent) => {
+const fixAgentBase = (agent) => {
     if (isAmbiguousAgent(agent)) {
         Object.defineProperty(agent, 'protocol', {
             value: undefined,
         });
     }
+
+    return agent;
+};
+
+/**
+ * @param {Agent} agent
+ */
+const fixAgent = (agent) => {
+    agent = fixAgentBase(agent);
+    agent = new TransformHeadersAgent(agent);
 
     return agent;
 };
@@ -105,21 +119,21 @@ async function getAgents(parsedProxyUrl, rejectUnauthorized) {
 
         if (proxyIsHttp2) {
             agent = {
-                http: new TransformHeadersAgent(fixAgent(new HttpOverHttp2(proxy))),
-                https: new TransformHeadersAgent(fixAgent(new HttpsOverHttp2(proxy))),
+                http: fixAgent(new HttpOverHttp2(proxy)),
+                https: fixAgent(new HttpsOverHttp2(proxy)),
                 http2: new Http2OverHttp2(proxy),
             };
         } else {
             agent = {
-                http: new TransformHeadersAgent(fixAgent(new HttpsProxyAgent(proxyUrl.href))),
-                https: new TransformHeadersAgent(fixAgent(new HttpsProxyAgent(proxyUrl.href))),
+                http: fixAgent(new HttpsProxyAgent(proxyUrl.href)),
+                https: fixAgent(new HttpsProxyAgent(proxyUrl.href)),
                 http2: new Http2OverHttps(proxy),
             };
         }
     } else {
         agent = {
-            http: new TransformHeadersAgent(fixAgent(new HttpProxyAgent(proxyUrl.href))),
-            https: new TransformHeadersAgent(fixAgent(new HttpsProxyAgent(proxyUrl.href))),
+            http: fixAgent(new HttpProxyAgent(proxyUrl.href)),
+            https: fixAgent(new HttpsProxyAgent(proxyUrl.href)),
             http2: new Http2OverHttp(proxy),
         };
     }
