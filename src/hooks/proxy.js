@@ -12,7 +12,7 @@ const {
     Http2OverHttp,
 } = http2.proxies;
 
-// `agent-base` package does stupid stacktrace checks
+// `agent-base` package does stacktrace checks
 // in order to set `agent.protocol`.
 // The keys in this object are names of functions
 // that will appear in the stacktrace.

@@ -129,7 +129,6 @@ describe('GotScraping', () => {
             const response = await gotScraping({ url: 'https://eshop.coop-box.cz/' });
             expect(response.statusCode).toBe(200);
             expect(response.httpVersion).toBe('1.1');
-            expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
         });
 
         if (nodeVersion >= 12) {
@@ -142,7 +141,6 @@ describe('GotScraping', () => {
 
                 expect(response.statusCode).toBe(200);
                 expect(response.httpVersion).toBe('1.1');
-                expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
             });
         }
 
@@ -347,7 +345,6 @@ describe('GotScraping', () => {
                 const [response] = await once(stream, 'response');
                 expect(response.statusCode).toBe(200);
                 expect(response.httpVersion).toBe('1.1');
-                expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
             });
 
             // if (nodeVersion >= 12) {
@@ -360,7 +357,6 @@ describe('GotScraping', () => {
                 const [response] = await once(stream, 'response');
                 expect(response.statusCode).toBe(200);
                 expect(response.httpVersion).toBe('1.1');
-                expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
             });
             // }
 
