@@ -132,19 +132,28 @@ describe('Browser headers', () => {
     test('should have working generator', async () => {
         generatorSpy.mockRestore();
 
-        options.context = {
-            headerGenerator,
-            useHeaderGenerator: true,
-            headerGeneratorOptions: {
-                browsers: [
-                    { name: 'chrome' },
+        const headers = await got(`http://localhost:${port}/headers`, {
+            headers: {
+                'user-agent': undefined,
+            },
+            context: {
+                useHeaderGenerator: true,
+                headerGenerator,
+                headerGeneratorOptions: {
+                    browsers: [
+                        { name: 'chrome' },
+                    ],
+                },
+            },
+            hooks: {
+                beforeRequest: [
+                    browserHeadersHook,
                 ],
             },
-        };
-        await browserHeadersHook(options);
+        }).json();
 
-        expect(options.headers).toMatchObject({
-            'user-agent': expect.stringContaining('Chrome'),
+        expect(headers).toMatchObject({
+            'User-Agent': expect.stringContaining('Chrome'),
         });
     });
 
@@ -167,21 +176,37 @@ describe('Browser headers', () => {
             'User-Agent': expect.stringContaining('Chrome'),
         });
     });
-    describe('mergeHeaders', () => {
-        test('should merge headers and respect original casing', () => {
-            const generatedHeaders = {
-                'User-Agent': 'TEST',
-            };
-            const userOverrides = {
-                'user-agent': 'TEST2',
-            };
 
-            const mergedHeaders = mergeHeaders(generatedHeaders, userOverrides);
+    test('should respect casing of unrecognized headers', async () => {
+        generatorSpy.mockRestore();
 
-            expect(mergedHeaders['User-Agent']).toEqual(userOverrides['user-agent']);
-            expect(mergedHeaders['user-agent']).toBeUndefined();
+        const headers = await got(`http://localhost:${port}/headers`, {
+            headers: {
+                'user-agent': undefined,
+                'x-test': 'foo',
+            },
+            context: {
+                useHeaderGenerator: true,
+                headerGenerator,
+                headerGeneratorOptions: {
+                    browsers: [
+                        { name: 'chrome' },
+                    ],
+                },
+            },
+            hooks: {
+                beforeRequest: [
+                    browserHeadersHook,
+                ],
+            },
+        }).json();
+
+        expect(headers).toMatchObject({
+            'x-test': 'foo',
         });
+    });
 
+    describe('mergeHeaders', () => {
         test('should merge headers', () => {
             const generatedHeaders = {
                 accept: 'TEST',
