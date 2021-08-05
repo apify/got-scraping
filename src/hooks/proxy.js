@@ -1,6 +1,7 @@
 const http2 = require('http2-wrapper');
 const HttpsProxyAgent = require('https-proxy-agent');
 const HttpProxyAgent = require('http-proxy-agent');
+const QuickLRU = require('quick-lru');
 const TransformHeadersAgent = require('../agent/transform-headers-agent');
 
 const {
@@ -66,7 +67,7 @@ function validateProxyProtocol(protocol) {
     }
 }
 
-exports.agentCache = new Map();
+exports.agentCache = new QuickLRU({ maxSize: 1000 });
 
 /**
  * @param {URL} parsedProxyUrl parsed proxyUrl
