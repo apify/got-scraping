@@ -1,7 +1,7 @@
 const http2 = require('http2-wrapper');
 const HttpsProxyAgent = require('https-proxy-agent');
 const HttpProxyAgent = require('http-proxy-agent');
-const httpResolver = require('../http-resolver');
+const QuickLRU = require('quick-lru');
 const TransformHeadersAgent = require('../agent/transform-headers-agent');
 
 const {
@@ -12,46 +12,61 @@ const {
     Http2OverHttp,
 } = http2.proxies;
 
+// `agent-base` package does stacktrace checks
+// in order to set `agent.protocol`.
+// The keys in this object are names of functions
+// that will appear in the stacktrace.
+const isAmbiguousAgent = (agent) => {
+    if (!isAmbiguousAgent.x) {
+        isAmbiguousAgent.x = {
+            '(https.js:': (a) => a.protocol,
+            '(http.js:': (a) => a.protocol,
+        };
+    }
+
+    const { x } = isAmbiguousAgent;
+
+    return x['(https.js:'](agent) !== x['(http.js:'](agent);
+};
+
+/**
+ * @see https://github.com/TooTallNate/node-agent-base/issues/61
+ * @param {Agent} agent
+ */
+const fixAgentBase = (agent) => {
+    if (isAmbiguousAgent(agent)) {
+        Object.defineProperty(agent, 'protocol', {
+            value: undefined,
+        });
+    }
+
+    return agent;
+};
+
+/**
+ * @param {Agent} agent
+ */
+const fixAgent = (agent) => {
+    agent = fixAgentBase(agent);
+    agent = new TransformHeadersAgent(agent);
+
+    return agent;
+};
+
 /**
  * @param {object} options
  */
 exports.proxyHook = async function (options) {
-    const { context: { proxyUrl, resolvedRequestProtocol } } = options;
-
-    if (!/http[s2]?/.test(resolvedRequestProtocol)) {
-        throw new Error(`Internal error: Invalid resolved request protocol passed to proxy hook: ${resolvedRequestProtocol}`);
-    }
+    const { context: { proxyUrl } } = options;
 
     if (proxyUrl) {
         const parsedProxy = new URL(proxyUrl);
 
         validateProxyProtocol(parsedProxy.protocol);
         options.agent = await getAgents(parsedProxy, options.https.rejectUnauthorized);
-    }
 
-    /**
-     * This is needed because got expects all three agents in an object like this:
-     * {
-     *     http: httpAgent,
-     *     https: httpsAgent,
-     *     http2: http2Agent,
-     * }
-     * The confusing thing is that internally, it destructures the agents out of
-     * the object for HTTP and HTTPS, but keeps the structure for HTTP2,
-     * because it passes all the agents down to http2.auto (from http2-wrapper).
-     * We're not using http2.auto, but http2.request, which expects a single agent.
-     * So for HTTP2, we need a single agent and for HTTP and HTTPS we need the object
-     * to allow destructuring of correct agents.
-     * ---
-     * The `if` below cannot be placed inside the `if` above.
-     * Otherwise `http2.request` would receive the entire `agent` object
-     * __when not using proxy__.
-     * ---
-     * `http2.request`, in contrary to `http2.auto`, expects an instance of `http2.Agent`.
-     * `http2.auto` expects an object with `http`, `https` and `http2` properties.
-     */
-    if (resolvedRequestProtocol === 'http2') {
-        options.agent = options.agent[resolvedRequestProtocol];
+        // `agent-base` isn't even able to detect the protocol correctly lol
+        options.secureEndpoint = options.url.protocol === 'https:';
     }
 };
 
@@ -66,12 +81,21 @@ function validateProxyProtocol(protocol) {
     }
 }
 
+exports.agentCache = new QuickLRU({ maxSize: 1000 });
+
 /**
  * @param {URL} parsedProxyUrl parsed proxyUrl
  * @param {boolean} rejectUnauthorized
  * @returns {object}
  */
 async function getAgents(parsedProxyUrl, rejectUnauthorized) {
+    const key = `${rejectUnauthorized}:${parsedProxyUrl.href}`;
+
+    let agent = exports.agentCache.get(key);
+    if (agent) {
+        return agent;
+    }
+
     const proxy = {
         proxyOptions: {
             url: parsedProxyUrl,
@@ -81,32 +105,40 @@ async function getAgents(parsedProxyUrl, rejectUnauthorized) {
     };
 
     const proxyUrl = proxy.proxyOptions.url;
-    let agent;
 
     if (proxyUrl.protocol === 'https:') {
-        const protocol = await httpResolver.resolveHttpVersion(proxyUrl, rejectUnauthorized);
-        const proxyIsHttp2 = protocol === 'h2';
+        const { alpnProtocol } = await http2.auto.resolveProtocol({
+            host: parsedProxyUrl.hostname,
+            port: parsedProxyUrl.port,
+            rejectUnauthorized,
+            ALPNProtocols: ['h2', 'http/1.1'],
+            servername: parsedProxyUrl.hostname,
+        });
+
+        const proxyIsHttp2 = alpnProtocol === 'h2';
 
         if (proxyIsHttp2) {
             agent = {
-                http: new TransformHeadersAgent(new HttpOverHttp2(proxy)),
-                https: new TransformHeadersAgent(new HttpsOverHttp2(proxy)),
+                http: fixAgent(new HttpOverHttp2(proxy)),
+                https: fixAgent(new HttpsOverHttp2(proxy)),
                 http2: new Http2OverHttp2(proxy),
             };
         } else {
             agent = {
-                http: new TransformHeadersAgent(new HttpsProxyAgent(proxyUrl.href)),
-                https: new TransformHeadersAgent(new HttpsProxyAgent(proxyUrl.href)),
+                http: fixAgent(new HttpsProxyAgent(proxyUrl.href)),
+                https: fixAgent(new HttpsProxyAgent(proxyUrl.href)),
                 http2: new Http2OverHttps(proxy),
             };
         }
     } else {
         agent = {
-            http: new TransformHeadersAgent(new HttpProxyAgent(proxyUrl.href)),
-            https: new TransformHeadersAgent(new HttpsProxyAgent(proxyUrl.href)),
+            http: fixAgent(new HttpProxyAgent(proxyUrl.href)),
+            https: fixAgent(new HttpsProxyAgent(proxyUrl.href)),
             http2: new Http2OverHttp(proxy),
         };
     }
+
+    exports.agentCache.set(key, agent);
 
     return agent;
 }

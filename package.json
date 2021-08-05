@@ -13,9 +13,10 @@
         "got": "^11.8.2",
         "header-generator": "^0.0.1-beta.1",
         "http-proxy-agent": "^4.0.1",
-        "http2-wrapper": "2.0.9",
+        "http2-wrapper": "^2.1.1",
         "https-proxy-agent": "^5.0.0",
-        "ow": "^0.23.0"
+        "ow": "^0.23.0",
+        "quick-lru": "^5.1.1"
     },
     "devDependencies": {
         "@apify/eslint-config": "^0.1.3",

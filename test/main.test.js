@@ -65,18 +65,16 @@ describe('GotScraping', () => {
 
     test('should add custom headers', async () => {
         const response = await gotScraping({
-            url: `http://localhost:${port}/html`,
+            url: `http://localhost:${port}/headers`,
             headers: {
                 'user-agent': 'test',
             },
+            responseType: 'json',
         });
 
         expect(response.statusCode).toBe(200);
-        expect(response.request.options).toMatchObject({
-            http2: false,
-            headers: {
-                'User-Agent': 'test',
-            },
+        expect(response.body).toMatchObject({
+            'User-Agent': 'test',
         });
     });
 
@@ -131,7 +129,6 @@ describe('GotScraping', () => {
             const response = await gotScraping({ url: 'https://eshop.coop-box.cz/' });
             expect(response.statusCode).toBe(200);
             expect(response.httpVersion).toBe('1.1');
-            expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
         });
 
         if (nodeVersion >= 12) {
@@ -141,9 +138,9 @@ describe('GotScraping', () => {
                     proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
 
                 });
+
                 expect(response.statusCode).toBe(200);
                 expect(response.httpVersion).toBe('1.1');
-                expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
             });
         }
 
@@ -273,7 +270,6 @@ describe('GotScraping', () => {
             const headers = JSON.parse(body);
 
             expect(response.statusCode).toBe(200);
-            expect(response.request.options.http2).toBe(false);
             expect(headers).toMatchObject({
                 'User-Agent': 'test',
             });
@@ -349,7 +345,6 @@ describe('GotScraping', () => {
                 const [response] = await once(stream, 'response');
                 expect(response.statusCode).toBe(200);
                 expect(response.httpVersion).toBe('1.1');
-                expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
             });
 
             // if (nodeVersion >= 12) {
@@ -362,7 +357,6 @@ describe('GotScraping', () => {
                 const [response] = await once(stream, 'response');
                 expect(response.statusCode).toBe(200);
                 expect(response.httpVersion).toBe('1.1');
-                expect(response.request.options.headers.Accept).toBeDefined(); // capitalized headers are proof
             });
             // }
 

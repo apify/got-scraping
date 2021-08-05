@@ -1,10 +1,10 @@
-const got = require('got');
+const http2 = require('http2-wrapper');
 
 /**
  * @param {object} options
  */
-exports.browserHeadersHook = function (options) {
-    const { http2, headers = {}, context } = options;
+exports.browserHeadersHook = async function (options) {
+    const { context } = options;
     const {
         headerGeneratorOptions,
         useHeaderGenerator,
@@ -13,26 +13,27 @@ exports.browserHeadersHook = function (options) {
 
     if (!useHeaderGenerator) return;
 
-    deleteDefaultGotUserAgent(headers);
+    let alpnProtocol;
+    if (options.url.protocol === 'https:') {
+        alpnProtocol = (await http2.auto.resolveProtocol({
+            host: options.url.hostname,
+            port: options.url.port || 443,
+            rejectUnauthorized: false,
+            ALPNProtocols: ['h2', 'http/1.1'],
+            servername: options.url.hostname,
+        })).alpnProtocol;
+    }
 
     const mergedHeaderGeneratorOptions = {
-        httpVersion: http2 ? '2' : '1',
+        httpVersion: alpnProtocol === 'h2' ? '2' : '1',
         ...headerGeneratorOptions,
     };
 
     const generatedHeaders = headerGenerator.getHeaders(mergedHeaderGeneratorOptions);
-    options.headers = exports.mergeHeaders(generatedHeaders, headers);
-};
 
-/**
- * @param {object} headers
- */
-function deleteDefaultGotUserAgent(headers) {
-    const gotDefaultUserAgent = got.defaults.options.headers['user-agent'];
-    if (headers['user-agent'] && headers['user-agent'] === gotDefaultUserAgent) {
-        delete headers['user-agent'];
-    }
-}
+    // TODO: Remove this when Got supports Headers class.
+    options.headers = exports.mergeHeaders(generatedHeaders, options.headers);
+};
 
 /**
  * Merges original generated headers and user provided overrides.
@@ -42,25 +43,20 @@ function deleteDefaultGotUserAgent(headers) {
  * @returns
  */
 exports.mergeHeaders = function (original, overrides) {
-    const mergedHeaders = new Map();
+    const fixedHeaders = new Map();
 
-    Object.entries(original).forEach(([nameSensitive, value]) => mergedHeaders.set(nameSensitive.toLowerCase(), { nameSensitive, value }));
+    for (const entry of Object.entries(original)) {
+        fixedHeaders.set(entry[0].toLowerCase(), entry);
+    }
 
-    Object.entries(overrides).forEach(([nameSensitive, value]) => {
-        const headerRecord = mergedHeaders.get(nameSensitive.toLowerCase());
+    for (const entry of Object.entries(overrides)) {
+        fixedHeaders.set(entry[0].toLowerCase(), entry);
+    }
 
-        if (headerRecord) {
-            const { nameSensitive: oldNameSensitive } = headerRecord;
+    const headers = {};
+    for (const [key, value] of fixedHeaders.values()) {
+        headers[key] = value;
+    }
 
-            mergedHeaders.set(nameSensitive.toLowerCase(), { nameSensitive: oldNameSensitive, value });
-        } else {
-            mergedHeaders.set(nameSensitive.toLowerCase(), { nameSensitive, value });
-        }
-    });
-
-    const finalHeaders = {};
-
-    mergedHeaders.forEach(({ nameSensitive, value }) => { finalHeaders[nameSensitive] = value; });
-
-    return finalHeaders;
+    return headers;
 };

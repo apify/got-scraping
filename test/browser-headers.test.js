@@ -27,6 +27,8 @@ describe('Browser headers', () => {
         options = {
             http2: true,
             context: {},
+            url: new URL('http://example.com'),
+            headers: {},
         };
         generatorSpy = jest.spyOn(HeaderGenerator.prototype, 'getHeaders').mockReturnValue(mockedHeaders);
     });
@@ -35,12 +37,12 @@ describe('Browser headers', () => {
         server.close();
     });
 
-    test('should not generate headers without useHeaderGenerator', () => {
-        browserHeadersHook(options);
+    test('should not generate headers without useHeaderGenerator', async () => {
+        await browserHeadersHook(options);
         expect(options).toEqual(options);
     });
 
-    test('should generate headers with useHeaderGenerator', () => {
+    test('should generate headers with useHeaderGenerator', async () => {
         options.headers = {
             foo: 'bar',
         };
@@ -54,7 +56,7 @@ describe('Browser headers', () => {
             },
         };
 
-        browserHeadersHook(options);
+        await browserHeadersHook(options);
 
         expect(generatorSpy).toHaveBeenCalled();
 
@@ -62,7 +64,7 @@ describe('Browser headers', () => {
         expect(options.headers.foo).toBe('bar');
     });
 
-    test('should add headers when http2 is used', () => {
+    test('should add headers when http2 is used', async () => {
         options.http2 = true;
         options.context = {
             headerGenerator,
@@ -74,13 +76,13 @@ describe('Browser headers', () => {
             },
         };
 
-        browserHeadersHook(options);
+        await browserHeadersHook(options);
 
         expect(generatorSpy).toHaveBeenCalled();
         expect(options.headers).toEqual(mockedHeaders);
     });
 
-    test('should add headers when http1 is used', () => {
+    test('should add headers when http1 is used', async () => {
         options.http2 = false;
         options.context = {
             headerGenerator,
@@ -92,13 +94,13 @@ describe('Browser headers', () => {
             },
         };
 
-        browserHeadersHook(options);
+        await browserHeadersHook(options);
 
         expect(generatorSpy).toHaveBeenCalled();
         expect(options.headers).toEqual(mockedHeaders);
     });
 
-    test('should pass option to header generator', () => {
+    test('should pass option to header generator', async () => {
         options.context = {
             headerGenerator,
             useHeaderGenerator: true,
@@ -108,12 +110,12 @@ describe('Browser headers', () => {
                 ],
             },
         };
-        browserHeadersHook(options);
+        await browserHeadersHook(options);
 
         expect(generatorSpy).toHaveBeenLastCalledWith(expect.objectContaining(options.context.headerGeneratorOptions));
     });
 
-    test('should override default ua header', () => {
+    test('should override default ua header', async () => {
         options.context = {
             headerGenerator,
             useHeaderGenerator: true,
@@ -121,28 +123,37 @@ describe('Browser headers', () => {
                 ...got.defaults.options.headers,
             },
         };
-        browserHeadersHook(options);
+        await browserHeadersHook(options);
 
         expect(options.headers).toEqual(mockedHeaders);
     });
 
     // Just a health check - header generator should have its own tests.
-    test('should have working generator', () => {
+    test('should have working generator', async () => {
         generatorSpy.mockRestore();
 
-        options.context = {
-            headerGenerator,
-            useHeaderGenerator: true,
-            headerGeneratorOptions: {
-                browsers: [
-                    { name: 'chrome' },
+        const headers = await got(`http://localhost:${port}/headers`, {
+            headers: {
+                'user-agent': undefined,
+            },
+            context: {
+                useHeaderGenerator: true,
+                headerGenerator,
+                headerGeneratorOptions: {
+                    browsers: [
+                        { name: 'chrome' },
+                    ],
+                },
+            },
+            hooks: {
+                beforeRequest: [
+                    browserHeadersHook,
                 ],
             },
-        };
-        browserHeadersHook(options);
+        }).json();
 
-        expect(options.headers).toMatchObject({
-            'user-agent': expect.stringContaining('Chrome'),
+        expect(headers).toMatchObject({
+            'User-Agent': expect.stringContaining('Chrome'),
         });
     });
 
@@ -165,21 +176,37 @@ describe('Browser headers', () => {
             'User-Agent': expect.stringContaining('Chrome'),
         });
     });
-    describe('mergeHeaders', () => {
-        test('should merge headers and respect original casing', () => {
-            const generatedHeaders = {
-                'User-Agent': 'TEST',
-            };
-            const userOverrides = {
-                'user-agent': 'TEST2',
-            };
 
-            const mergedHeaders = mergeHeaders(generatedHeaders, userOverrides);
+    test('should respect casing of unrecognized headers', async () => {
+        generatorSpy.mockRestore();
 
-            expect(mergedHeaders['User-Agent']).toEqual(userOverrides['user-agent']);
-            expect(mergedHeaders['user-agent']).toBeUndefined();
+        const headers = await got(`http://localhost:${port}/headers`, {
+            headers: {
+                'user-agent': undefined,
+                'x-test': 'foo',
+            },
+            context: {
+                useHeaderGenerator: true,
+                headerGenerator,
+                headerGeneratorOptions: {
+                    browsers: [
+                        { name: 'chrome' },
+                    ],
+                },
+            },
+            hooks: {
+                beforeRequest: [
+                    browserHeadersHook,
+                ],
+            },
+        }).json();
+
+        expect(headers).toMatchObject({
+            'x-test': 'foo',
         });
+    });
 
+    describe('mergeHeaders', () => {
         test('should merge headers', () => {
             const generatedHeaders = {
                 accept: 'TEST',

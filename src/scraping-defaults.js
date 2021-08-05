@@ -4,7 +4,7 @@ const SCRAPING_DEFAULT_OPTIONS = {
     // Most of the new browsers use HTTP2
     http2: true,
     https: {
-        // We usually don't want to fail because of SSL errors.
+        // In contrast to browsers, we don't usually do login operations.
         // We want the content.
         rejectUnauthorized: false,
     },
@@ -17,15 +17,17 @@ const SCRAPING_DEFAULT_OPTIONS = {
     // We need to have browser-like headers to blend in.
     useHeaderGenerator: true,
     timeout: 60000,
-    retry: { limit: 0, maxRetryAfter: 0 },
-
+    retry: { limit: 0 },
+    headers: {
+        'user-agent': undefined,
+    },
 };
 
 /**
  * @returns {undefined|string} We keep the default ciphers for old node.
  */
 function getCiphersBasedOnNode() {
-    const nodeVersion = parseFloat(process.versions.node);
+    const nodeVersion = Number(process.versions.node.split('.')[0]);
 
     if (nodeVersion < 12) {
         return;
