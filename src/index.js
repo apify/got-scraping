@@ -14,7 +14,6 @@ const { proxyHook } = require('./hooks/proxy');
 const { http2Hook } = require('./hooks/http2');
 
 const gotScraping = got.extend({
-    // TODO: Do we really need mutable defaults?
     mutableDefaults: true,
     ...SCRAPING_DEFAULT_OPTIONS,
     context: {

@@ -20,6 +20,7 @@ exports.browserHeadersHook = async function (options) {
             port: options.url.port || 443,
             rejectUnauthorized: false,
             ALPNProtocols: ['h2', 'http/1.1'],
+            servername: options.url.hostname,
         })).alpnProtocol;
     }
 
@@ -30,6 +31,7 @@ exports.browserHeadersHook = async function (options) {
 
     const generatedHeaders = headerGenerator.getHeaders(mergedHeaderGeneratorOptions);
 
+    // TODO: Remove this when Got supports Headers class.
     options.headers = exports.mergeHeaders(generatedHeaders, options.headers);
 };
 

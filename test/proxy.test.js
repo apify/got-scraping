@@ -2,7 +2,7 @@ const http2 = require('http2-wrapper');
 const HttpsProxyAgent = require('https-proxy-agent');
 const HttpProxyAgent = require('http-proxy-agent');
 
-const { proxyHook } = require('../src/hooks/proxy');
+const { proxyHook, agentCache } = require('../src/hooks/proxy');
 const TransformHeadersAgent = require('../src/agent/transform-headers-agent');
 
 const {
@@ -17,16 +17,17 @@ describe('Proxy', () => {
     let options;
     beforeEach(() => {
         options = {
-            context: {
-                resolvedRequestProtocol: 'https',
-            },
+            context: {},
             https: {},
+            url: new URL('https://example.com'),
         };
     });
 
     afterEach(() => {
         // Do not use clearAllMocks: https://github.com/facebook/jest/issues/7136
         jest.restoreAllMocks();
+
+        agentCache.clear();
     });
 
     test('should not add an agent if proxyUrl is not provided', async () => {
@@ -123,7 +124,11 @@ describe('Proxy', () => {
             options.context.proxyUrl = 'https://localhost:132';
             jest.spyOn(http2.auto, 'resolveProtocol').mockResolvedValueOnce({ alpnProtocol: 'h2' });
 
+            const { url } = options;
+
+            options.url = new URL('http://example.com');
             await proxyHook(options);
+            options.url = url;
 
             const { agent } = options;
             expect(agent.http).toBeInstanceOf(TransformHeadersAgent);

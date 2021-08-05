@@ -11,6 +11,33 @@ const {
     Http2OverHttp,
 } = http2.proxies;
 
+const isAmbiguousAgent = (agent) => {
+    if (!isAmbiguousAgent.x) {
+        isAmbiguousAgent.x = {
+            '(https.js:': (a) => a.protocol,
+            '(http.js:': (a) => a.protocol,
+        };
+    }
+
+    const { x } = isAmbiguousAgent;
+
+    return x['(https.js:'](agent) !== x['(http.js:'](agent);
+};
+
+/**
+ * @see https://github.com/TooTallNate/node-agent-base/issues/61
+ * @param {Agent} agent
+ */
+const fixAgent = (agent) => {
+    if (isAmbiguousAgent(agent)) {
+        Object.defineProperty(agent, 'protocol', {
+            value: undefined,
+        });
+    }
+
+    return agent;
+};
+
 /**
  * @param {object} options
  */
@@ -22,6 +49,9 @@ exports.proxyHook = async function (options) {
 
         validateProxyProtocol(parsedProxy.protocol);
         options.agent = await getAgents(parsedProxy, options.https.rejectUnauthorized);
+
+        // `agent-base` isn't even able to detect the protocol correctly lol
+        options.secureEndpoint = options.url.protocol === 'https:';
     }
 };
 
@@ -36,12 +66,21 @@ function validateProxyProtocol(protocol) {
     }
 }
 
+exports.agentCache = new Map();
+
 /**
  * @param {URL} parsedProxyUrl parsed proxyUrl
  * @param {boolean} rejectUnauthorized
  * @returns {object}
  */
 async function getAgents(parsedProxyUrl, rejectUnauthorized) {
+    const key = `${rejectUnauthorized}:${parsedProxyUrl.href}`;
+
+    let agent = exports.agentCache.get(key);
+    if (agent) {
+        return agent;
+    }
+
     const proxy = {
         proxyOptions: {
             url: parsedProxyUrl,
@@ -51,32 +90,40 @@ async function getAgents(parsedProxyUrl, rejectUnauthorized) {
     };
 
     const proxyUrl = proxy.proxyOptions.url;
-    let agent;
 
     if (proxyUrl.protocol === 'https:') {
-        const { alpnProtocol } = await http2.auto.resolveProtocol({ host: parsedProxyUrl.hostname, port: parsedProxyUrl.port, rejectUnauthorized });
+        const { alpnProtocol } = await http2.auto.resolveProtocol({
+            host: parsedProxyUrl.hostname,
+            port: parsedProxyUrl.port,
+            rejectUnauthorized,
+            ALPNProtocols: ['h2', 'http/1.1'],
+            servername: parsedProxyUrl.hostname,
+        });
+
         const proxyIsHttp2 = alpnProtocol === 'h2';
 
         if (proxyIsHttp2) {
             agent = {
-                http: new TransformHeadersAgent(new HttpOverHttp2(proxy)),
-                https: new TransformHeadersAgent(new HttpsOverHttp2(proxy)),
+                http: new TransformHeadersAgent(fixAgent(new HttpOverHttp2(proxy))),
+                https: new TransformHeadersAgent(fixAgent(new HttpsOverHttp2(proxy))),
                 http2: new Http2OverHttp2(proxy),
             };
         } else {
             agent = {
-                http: new TransformHeadersAgent(new HttpsProxyAgent(proxyUrl.href)),
-                https: new TransformHeadersAgent(new HttpsProxyAgent(proxyUrl.href)),
+                http: new TransformHeadersAgent(fixAgent(new HttpsProxyAgent(proxyUrl.href))),
+                https: new TransformHeadersAgent(fixAgent(new HttpsProxyAgent(proxyUrl.href))),
                 http2: new Http2OverHttps(proxy),
             };
         }
     } else {
         agent = {
-            http: new TransformHeadersAgent(new HttpProxyAgent(proxyUrl.href)),
-            https: new TransformHeadersAgent(new HttpsProxyAgent(proxyUrl.href)),
+            http: new TransformHeadersAgent(fixAgent(new HttpProxyAgent(proxyUrl.href))),
+            https: new TransformHeadersAgent(fixAgent(new HttpsProxyAgent(proxyUrl.href))),
             http2: new Http2OverHttp(proxy),
         };
     }
+
+    exports.agentCache.set(key, agent);
 
     return agent;
 }
