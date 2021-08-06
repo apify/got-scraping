@@ -12,6 +12,7 @@ const { customOptionsHook } = require('./hooks/custom-options');
 const { browserHeadersHook } = require('./hooks/browser-headers');
 const { proxyHook } = require('./hooks/proxy');
 const { http2Hook } = require('./hooks/http2');
+const { insecureParserHook } = require('./hooks/insecure-parser');
 
 const gotScraping = got.extend({
     mutableDefaults: true,
@@ -19,6 +20,7 @@ const gotScraping = got.extend({
     context: {
         headerGenerator: new HeaderGenerator(),
         useHeaderGenerator: true,
+        insecureParser: true,
     },
     agent: {
         http: new TransformHeadersAgent(http.globalAgent),
@@ -33,6 +35,7 @@ const gotScraping = got.extend({
             http2Hook,
             proxyHook,
             browserHeadersHook,
+            insecureParserHook,
         ],
     },
 });
