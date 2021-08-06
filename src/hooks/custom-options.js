@@ -1,22 +1,19 @@
 /**
  * @param {object} options
  */
-exports.customOptionsHook = function (options) {
-    // Got expects custom properties inside the context option.
-    options.context = { ...options.context };
-
-    if ('proxyUrl' in options) {
-        options.context.proxyUrl = options.proxyUrl;
-        delete options.proxyUrl;
+exports.customOptionsHook = function (raw, options) {
+    if ('proxyUrl' in raw) {
+        options.context.proxyUrl = raw.proxyUrl;
+        delete raw.proxyUrl;
     }
 
-    if ('headerGeneratorOptions' in options) {
-        options.context.headerGeneratorOptions = options.headerGeneratorOptions;
-        delete options.headerGeneratorOptions;
+    if ('headerGeneratorOptions' in raw) {
+        options.context.headerGeneratorOptions = raw.headerGeneratorOptions;
+        delete raw.headerGeneratorOptions;
     }
 
-    if ('useHeaderGenerator' in options) {
-        options.context.useHeaderGenerator = options.useHeaderGenerator;
-        delete options.useHeaderGenerator;
+    if ('useHeaderGenerator' in raw) {
+        options.context.useHeaderGenerator = raw.useHeaderGenerator;
+        delete raw.useHeaderGenerator;
     }
 };

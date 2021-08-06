@@ -7,13 +7,13 @@ const SCRAPING_DEFAULT_OPTIONS = {
         // In contrast to browsers, we don't usually do login operations.
         // We want the content.
         rejectUnauthorized: false,
+        // Node js uses different TLS ciphers by default.
+        ciphers: ensureModernTlsFirst(),
     },
     // This would fail all of 404, 403 responses.
     // We usually don't want to consider these as errors.
     // We want to take some action after this.
     throwHttpErrors: false,
-    // Node js uses different TLS ciphers by default.
-    ciphers: ensureModernTlsFirst(),
     timeout: { request: 60000 },
     retry: { limit: 0 },
     headers: {

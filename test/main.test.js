@@ -1,5 +1,4 @@
 const { once } = require('events');
-const got = require('got');
 const getStream = require('get-stream');
 const gotScraping = require('../src');
 
@@ -8,7 +7,6 @@ const { startDummyServer } = require('./helpers/dummy-server');
 describe('GotScraping', () => {
     let server;
     let port;
-    const nodeVersion = parseFloat(process.versions.node);
 
     beforeAll(async () => {
         server = await startDummyServer();
@@ -52,12 +50,9 @@ describe('GotScraping', () => {
         const extendedGot = gotScraping.extend({
             handlers: [
                 (options, next) => {
-                    return next(got.mergeOptions(
-                        options,
-                        {
-                            headers,
-                        },
-                    ));
+                    options.merge({ headers });
+
+                    return next(options);
                 },
             ],
         });
@@ -133,17 +128,15 @@ describe('GotScraping', () => {
             expect(response.httpVersion).toBe('1.1');
         });
 
-        if (nodeVersion >= 12) {
-            test('Should allow https target via http proxy when auto downgrading', async () => {
-                const response = await gotScraping({
-                    url: 'https://eshop.coop-box.cz/',
-                    proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
-                });
-
-                expect(response.statusCode).toBe(200);
-                expect(response.httpVersion).toBe('1.1');
+        test.only('Should allow https target via http proxy when auto downgrading', async () => {
+            const response = await gotScraping({
+                url: 'https://eshop.coop-box.cz/',
+                proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
             });
-        }
+
+            expect(response.statusCode).toBe(200);
+            expect(response.httpVersion).toBe('1.1');
+        });
 
         test('should work with proxyUrl and http1', async () => {
             const response = await gotScraping({
@@ -183,15 +176,10 @@ describe('GotScraping', () => {
                 proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
             });
 
-            // We need this because we run tests in CI for various node versions.
-            if (nodeVersion < 12) {
-                await expect(proxyPromise).rejects.toThrow(/Proxy with HTTP2 target is supported only in node v12+/);
-            } else {
-                const responseProxy = await proxyPromise;
-                expect(responseProxy.statusCode).toBe(200);
-                expect(response.body.clientIp).not.toBe(responseProxy.body.clientIp);
-                expect(responseProxy.httpVersion).toBe('2.0');
-            }
+            const responseProxy = await proxyPromise;
+            expect(responseProxy.statusCode).toBe(200);
+            expect(response.body.clientIp).not.toBe(responseProxy.body.clientIp);
+            expect(responseProxy.httpVersion).toBe('2.0');
         });
 
         test('should support tls 1.2', async () => {
@@ -201,15 +189,13 @@ describe('GotScraping', () => {
             expect(response.statusCode).toBe(200);
         });
 
-        if (nodeVersion >= 12) {
-            test('should support tls 1.3', async () => {
-                const url = 'https://www.howsmyssl.com/a/check';
+        test('should support tls 1.3', async () => {
+            const url = 'https://www.howsmyssl.com/a/check';
 
-                const response = await gotScraping.get(url, { responseType: 'json' });
-                expect(response.statusCode).toBe(200);
-                expect(response.body.tls_version).toBe('TLS 1.3');
-            });
-        }
+            const response = await gotScraping.get(url, { responseType: 'json' });
+            expect(response.statusCode).toBe(200);
+            expect(response.body.tls_version).toBe('TLS 1.3');
+        });
     });
 
     describe('same thing with streams', () => {
@@ -241,12 +227,9 @@ describe('GotScraping', () => {
             const extendedGot = gotScraping.extend({
                 handlers: [
                     (options, next) => {
-                        return next(got.mergeOptions(
-                            options,
-                            {
-                                headers,
-                            },
-                        ));
+                        options.merge({ headers });
+
+                        return next(options);
                     },
                 ],
             });
@@ -350,7 +333,6 @@ describe('GotScraping', () => {
                 expect(response.httpVersion).toBe('1.1');
             });
 
-            // if (nodeVersion >= 12) {
             test('Should allow https target via http proxy when auto downgrading', async () => {
                 const stream = gotScraping.stream({
                     url: 'https://eshop.coop-box.cz/',
@@ -361,7 +343,6 @@ describe('GotScraping', () => {
                 expect(response.statusCode).toBe(200);
                 expect(response.httpVersion).toBe('1.1');
             });
-            // }
 
             test('should work with proxyUrl and http1', async () => {
                 const stream = gotScraping.stream({
@@ -418,26 +399,16 @@ describe('GotScraping', () => {
                     proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
                 });
 
-                // We need this because we run tests in CI for various node versions.
-                if (nodeVersion < 12) {
-                    expect.assertions(1);
-                    try {
-                        await once(proxyStream, 'response');
-                    } catch (err) {
-                        await expect(err.message).toMatch(/Proxy with HTTP2 target is supported only in node v12+/);
-                    }
-                } else {
-                    const [responseProxy] = await once(proxyStream, 'response');
-                    responseProxy.setEncoding('utf-8');
-                    const proxyChunks = [];
-                    for await (const chunk of responseProxy) {
-                        proxyChunks.push(chunk);
-                    }
-                    const proxyResponseBody = proxyChunks.join();
-                    expect(responseProxy.statusCode).toBe(200);
-                    expect(JSON.parse(responseBody).clientIp).not.toBe(JSON.parse(proxyResponseBody).clientIp);
-                    expect(responseProxy.httpVersion).toBe('2.0');
+                const [responseProxy] = await once(proxyStream, 'response');
+                responseProxy.setEncoding('utf-8');
+                const proxyChunks = [];
+                for await (const chunk of responseProxy) {
+                    proxyChunks.push(chunk);
                 }
+                const proxyResponseBody = proxyChunks.join();
+                expect(responseProxy.statusCode).toBe(200);
+                expect(JSON.parse(responseBody).clientIp).not.toBe(JSON.parse(proxyResponseBody).clientIp);
+                expect(responseProxy.httpVersion).toBe('2.0');
             });
 
             test('should support tls 1.2', async () => {
@@ -447,21 +418,19 @@ describe('GotScraping', () => {
                 expect(response.statusCode).toBe(200);
             });
 
-            if (nodeVersion >= 12) {
-                test('should support tls 1.3', async () => {
-                    const url = 'https://www.howsmyssl.com/a/check';
-                    const stream = await gotScraping.stream(url);
-                    const [response] = await once(stream, 'response');
-                    response.setEncoding('utf-8');
-                    const chunks = [];
-                    for await (const chunk of response) {
-                        chunks.push(chunk);
-                    }
-                    const responseBody = chunks.join();
-                    expect(response.statusCode).toBe(200);
-                    expect(JSON.parse(responseBody).tls_version).toBe('TLS 1.3');
-                });
-            }
+            test('should support tls 1.3', async () => {
+                const url = 'https://www.howsmyssl.com/a/check';
+                const stream = await gotScraping.stream(url);
+                const [response] = await once(stream, 'response');
+                response.setEncoding('utf-8');
+                const chunks = [];
+                for await (const chunk of response) {
+                    chunks.push(chunk);
+                }
+                const responseBody = chunks.join();
+                expect(response.statusCode).toBe(200);
+                expect(JSON.parse(responseBody).tls_version).toBe('TLS 1.3');
+            });
         });
     });
 });
