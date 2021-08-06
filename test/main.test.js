@@ -128,7 +128,7 @@ describe('GotScraping', () => {
             expect(response.httpVersion).toBe('1.1');
         });
 
-        test.only('Should allow https target via http proxy when auto downgrading', async () => {
+        test('Should allow https target via http proxy when auto downgrading', async () => {
             const response = await gotScraping({
                 url: 'https://eshop.coop-box.cz/',
                 proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
