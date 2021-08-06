@@ -1,6 +1,6 @@
 {
     "name": "got-scraping",
-    "version": "2.0.2",
+    "version": "2.1.1",
     "description": "HTTP client made for scraping based on got.",
     "main": "src/index.js",
     "engines": {
@@ -11,7 +11,7 @@
     ],
     "dependencies": {
         "got-cjs": "12.0.0-beta.3",
-        "header-generator": "^0.0.1-beta.1",
+        "header-generator": "^1.0.0",
         "http-proxy-agent": "^4.0.1",
         "http2-wrapper": "^2.1.2",
         "https-proxy-agent": "^5.0.0",
