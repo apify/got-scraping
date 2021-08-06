@@ -1,4 +1,11 @@
-2.0.2 / 2021/08/04
+2.1.0 / 2021/08/06
+====================
+- Add `TransfomHeadersAgent`
+- Optimizations
+- Use Got 12
+- docs: fix instances anchor
+
+2.0.2-beta / 2021/08/04
 ====================
 - Use `TransfomHeadersAgent` internally to transform headers to `Pascal-Case`
 
