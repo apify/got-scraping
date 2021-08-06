@@ -1,4 +1,5 @@
 const { once } = require('events');
+const gotExports = require('got-cjs');
 const getStream = require('get-stream');
 const gotScraping = require('../src');
 
@@ -22,6 +23,18 @@ describe('GotScraping', () => {
         expect(typeof gotScraping.get).toBe('function');
         expect(typeof gotScraping.extend).toBe('function');
         expect(typeof gotScraping).toBe('function');
+
+        for (const key of Object.keys(gotExports)) {
+            expect(key in gotScraping).toBe(true);
+
+            if (key !== 'got' && key !== 'default') {
+                expect(gotScraping[key]).toBe(gotExports[key]);
+            }
+        }
+
+        // Compatibility
+        expect(gotScraping.default).toBe(gotScraping);
+        expect(gotScraping.got).toBe(gotScraping);
     });
 
     test('should allow passing custom properties', async () => {
