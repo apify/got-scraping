@@ -16,26 +16,16 @@ describe('Scraping defaults', () => {
     });
 
     test('should set correct defaults', async () => {
-        const { useHeaderGenerator, timeout, ...gotDefaults } = SCRAPING_DEFAULT_OPTIONS;
-
         const response = await gotScraping.get(`http://localhost:${port}/html`);
 
-        const toMatch = {
-            ...gotDefaults,
-            timeout: {
-                request: timeout,
-            },
-        };
+        const defaults = { ...SCRAPING_DEFAULT_OPTIONS };
+        delete defaults.headers;
 
-        delete toMatch.headers;
-
-        expect(response.request.options).toMatchObject(toMatch);
-
-        expect(response.request.options.context).toMatchObject({ useHeaderGenerator });
+        expect(response.request.options).toMatchObject(defaults);
     });
 
     test('should allow user to override the defaults', async () => {
-        const customOptions = { ciphers: undefined, http2: false, throwHttpErrors: false };
+        const customOptions = { https: { ciphers: undefined }, http2: false, throwHttpErrors: false };
         const response = await gotScraping.get(`http://localhost:${port}/html`, customOptions);
 
         expect(response.request.options).toMatchObject(customOptions);
@@ -45,9 +35,10 @@ describe('Scraping defaults', () => {
         const nodeVersion = parseFloat(process.versions.node);
 
         if (nodeVersion < 12) {
-            expect(SCRAPING_DEFAULT_OPTIONS.ciphers).toBe(undefined);
+            expect(SCRAPING_DEFAULT_OPTIONS.https.ciphers).toBe(undefined);
         } else {
-            expect(SCRAPING_DEFAULT_OPTIONS.ciphers.startsWith('TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256'))
+            expect(SCRAPING_DEFAULT_OPTIONS.https.ciphers
+                .startsWith('TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256'))
                 .toBe(true);
         }
     });

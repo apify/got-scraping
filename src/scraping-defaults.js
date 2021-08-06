@@ -7,33 +7,19 @@ const SCRAPING_DEFAULT_OPTIONS = {
         // In contrast to browsers, we don't usually do login operations.
         // We want the content.
         rejectUnauthorized: false,
+        // Node js uses different TLS ciphers by default.
+        ciphers: ensureModernTlsFirst(),
     },
     // This would fail all of 404, 403 responses.
     // We usually don't want to consider these as errors.
     // We want to take some action after this.
     throwHttpErrors: false,
-    // Node js uses different TLS ciphers by default.
-    ciphers: getCiphersBasedOnNode(),
-    // We need to have browser-like headers to blend in.
-    useHeaderGenerator: true,
-    timeout: 60000,
+    timeout: { request: 60000 },
     retry: { limit: 0 },
     headers: {
         'user-agent': undefined,
     },
 };
-
-/**
- * @returns {undefined|string} We keep the default ciphers for old node.
- */
-function getCiphersBasedOnNode() {
-    const nodeVersion = Number(process.versions.node.split('.')[0]);
-
-    if (nodeVersion < 12) {
-        return;
-    }
-    return ensureModernTlsFirst();
-}
 
 /**
  * Reorders the default NodeJs ciphers so the request tries to negotiate the modern TLS version first, same as browsers do.

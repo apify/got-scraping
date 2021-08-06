@@ -1,7 +1,7 @@
 const http = require('http');
 const https = require('https');
 
-const got = require('got');
+const { got } = require('got-cjs');
 const HeaderGenerator = require('header-generator');
 
 const TransformHeadersAgent = require('./agent/transform-headers-agent');
@@ -18,6 +18,7 @@ const gotScraping = got.extend({
     ...SCRAPING_DEFAULT_OPTIONS,
     context: {
         headerGenerator: new HeaderGenerator(),
+        useHeaderGenerator: true,
     },
     agent: {
         http: new TransformHeadersAgent(http.globalAgent),
@@ -26,10 +27,10 @@ const gotScraping = got.extend({
     hooks: {
         init: [
             optionsValidationHandler,
+            customOptionsHook,
         ],
         beforeRequest: [
             http2Hook,
-            customOptionsHook,
             proxyHook,
             browserHeadersHook,
         ],

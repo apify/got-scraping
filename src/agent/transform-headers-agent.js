@@ -78,6 +78,9 @@ class TransformHeadersAgent extends WrappedAgent {
             return _storeHeader.call(request, ...args);
         };
 
+        // `agent-base` isn't able to detect the protocol correctly
+        options.secureEndpoint = options.protocol === 'https:';
+
         return super.addRequest(request, options);
     }
 
