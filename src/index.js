@@ -1,20 +1,38 @@
-const http = require('http');
-const https = require('https');
+import http from 'http';
+import https from 'https';
 
-const gotExports = require('got-cjs');
-const HeaderGenerator = require('header-generator');
+import {
+    Options,
+    calculateRetryDelay,
+    create,
+    parseLinkHeader,
+    isResponseOk,
+    ParseError,
+    parseBody,
+    RequestError,
+    MaxRedirectsError,
+    HTTPError,
+    CacheError,
+    UploadError,
+    TimeoutError,
+    ReadError,
+    RetryError,
+    CancelError,
+    got as gotCjs,
+} from 'got-cjs';
+import HeaderGenerator from 'header-generator';
 
-const TransformHeadersAgent = require('./agent/transform-headers-agent');
-const { SCRAPING_DEFAULT_OPTIONS } = require('./scraping-defaults');
+import TransformHeadersAgent from './agent/transform-headers-agent';
+import { SCRAPING_DEFAULT_OPTIONS } from './scraping-defaults';
 
-const { optionsValidationHandler } = require('./hooks/options-validation');
-const { customOptionsHook } = require('./hooks/custom-options');
-const { browserHeadersHook } = require('./hooks/browser-headers');
-const { proxyHook } = require('./hooks/proxy');
-const { http2Hook } = require('./hooks/http2');
-const { insecureParserHook } = require('./hooks/insecure-parser');
+import { optionsValidationHandler } from './hooks/options-validation';
+import { customOptionsHook } from './hooks/custom-options';
+import { browserHeadersHook } from './hooks/browser-headers';
+import { proxyHook } from './hooks/proxy';
+import { http2Hook } from './hooks/http2';
+import { insecureParserHook } from './hooks/insecure-parser';
 
-const gotScraping = gotExports.got.extend({
+const got = gotCjs.extend({
     mutableDefaults: true,
     ...SCRAPING_DEFAULT_OPTIONS,
     context: {
@@ -40,6 +58,23 @@ const gotScraping = gotExports.got.extend({
     },
 });
 
-module.exports = gotScraping;
-
-Object.assign(module.exports, { ...gotExports, got: gotScraping, default: gotScraping });
+export default got;
+export {
+    Options,
+    calculateRetryDelay,
+    create,
+    parseLinkHeader,
+    isResponseOk,
+    ParseError,
+    parseBody,
+    RequestError,
+    MaxRedirectsError,
+    HTTPError,
+    CacheError,
+    UploadError,
+    TimeoutError,
+    ReadError,
+    RetryError,
+    CancelError,
+    got,
+};

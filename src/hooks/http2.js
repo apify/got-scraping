@@ -1,7 +1,7 @@
-const http2 = require('http2-wrapper');
+import http2 from 'http2-wrapper';
 
-exports.http2Hook = (options) => {
+export function http2Hook(options) {
     if (options.http2 && options.url.protocol !== 'http:') {
         options.request = http2.auto;
     }
-};
+}

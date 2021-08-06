@@ -1,7 +1,7 @@
 /**
  * @param {object} options
  */
-exports.customOptionsHook = function (raw, options) {
+export function customOptionsHook(raw, options) {
     if ('proxyUrl' in raw) {
         options.context.proxyUrl = raw.proxyUrl;
         delete raw.proxyUrl;
@@ -21,4 +21,4 @@ exports.customOptionsHook = function (raw, options) {
         options.context.insecureHTTPParser = raw.insecureHTTPParser;
         delete raw.insecureHTTPParser;
     }
-};
+}

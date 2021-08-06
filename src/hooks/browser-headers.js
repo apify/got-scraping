@@ -1,4 +1,4 @@
-const http2 = require('http2-wrapper');
+import http2 from 'http2-wrapper';
 
 /**
  * @param {object} options

@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
-const HeaderGenerator = require('header-generator');
-const http = require('http');
-const WrappedAgent = require('./wrapped-agent');
+import HeaderGenerator from 'header-generator';
+import http from 'http';
+import WrappedAgent from './wrapped-agent';
 
 const { _storeHeader } = http.OutgoingMessage.prototype;
 
@@ -98,4 +98,4 @@ class TransformHeadersAgent extends WrappedAgent {
     }
 }
 
-module.exports = TransformHeadersAgent;
+export default TransformHeadersAgent;
