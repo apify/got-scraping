@@ -1,9 +1,9 @@
-const { default: ow } = require('ow');
+import ow from 'ow';
 
 /**
  * @param {object} options
  */
-function optionsValidationHandler(options) {
+export function optionsValidationHandler(options: unknown) {
     const validationSchema = {
         proxyUrl: ow.optional.string.url,
         useHeaderGenerator: ow.optional.boolean,
@@ -13,7 +13,3 @@ function optionsValidationHandler(options) {
 
     ow(options, ow.object.partialShape(validationSchema));
 }
-
-module.exports = {
-    optionsValidationHandler,
-};

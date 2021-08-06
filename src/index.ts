@@ -20,6 +20,8 @@ import {
     CancelError,
     got as gotCjs,
 } from 'got-cjs';
+
+// @ts-expect-error Missing types
 import HeaderGenerator from 'header-generator';
 
 import TransformHeadersAgent from './agent/transform-headers-agent';
@@ -41,8 +43,8 @@ const got = gotCjs.extend({
         insecureHTTPParser: true,
     },
     agent: {
-        http: new TransformHeadersAgent(http.globalAgent),
-        https: new TransformHeadersAgent(https.globalAgent),
+        http: new TransformHeadersAgent(http.globalAgent) as unknown as http.Agent,
+        https: new TransformHeadersAgent(https.globalAgent) as unknown as https.Agent,
     },
     hooks: {
         init: [

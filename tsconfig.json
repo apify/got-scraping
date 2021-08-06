@@ -1,0 +1,34 @@
+
+{
+	"compilerOptions": {
+        // Forked from https://github.com/sindresorhus/tsconfig/blob/640e4bfe1172e27d59bf4d73a2c5df517cc01e1d/tsconfig.json
+
+		"outDir": "dist",
+		"module": "commonjs",
+		"target": "ES2020", // Node.js 14
+		"lib": [
+			"ES2019",
+			"ES2020.String"
+		],
+		"moduleResolution": "node",
+		"allowSyntheticDefaultImports": true, // To provide backwards compatibility, Node.js allows you to import most CommonJS packages with a default import. This flag tells TypeScript that it's okay to use import on CommonJS modules.
+		"resolveJsonModule": false, // ESM doesn't yet support JSON modules.
+		"jsx": "react",
+		"declaration": true,
+		"pretty": true,
+		"newLine": "lf",
+		"stripInternal": true,
+		"strict": true,
+		"noImplicitReturns": true,
+		"noImplicitOverride": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedIndexedAccess": true,
+		"noPropertyAccessFromIndexSignature": true,
+		"noEmitOnError": true,
+		"useDefineForClassFields": true,
+		"forceConsistentCasingInFileNames": true,
+		"skipLibCheck": true
+	}
+}

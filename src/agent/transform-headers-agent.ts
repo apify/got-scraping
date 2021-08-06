@@ -3,6 +3,7 @@ import HeaderGenerator from 'header-generator';
 import http from 'http';
 import WrappedAgent from './wrapped-agent';
 
+// @ts-expect-error Private property
 const { _storeHeader } = http.OutgoingMessage.prototype;
 
 const generator = new HeaderGenerator();

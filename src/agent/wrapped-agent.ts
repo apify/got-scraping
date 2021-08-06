@@ -1,3 +1,6 @@
+import http, { ClientRequest, ClientRequestArgs } from 'http';
+import https from 'https';
+
 /**
  * @see https://github.com/nodejs/node/blob/533cafcf7e3ab72e98a2478bc69aedfdf06d3a5e/lib/_http_client.js#L129-L162
  * @see https://github.com/nodejs/node/blob/533cafcf7e3ab72e98a2478bc69aedfdf06d3a5e/lib/_http_client.js#L234-L246
@@ -6,15 +9,19 @@
  *              so there's no need to replace `agent.addRequest`.
  */
 class WrappedAgent {
-    constructor(agent) {
+    agent: http.Agent | https.Agent;
+
+    constructor(agent: http.Agent | https.Agent) {
         this.agent = agent;
     }
 
-    addRequest(request, options) {
+    addRequest(request: ClientRequest, options: ClientRequestArgs) {
+        // @ts-expect-error @types/node has incorrect types
         return this.agent.addRequest(request, options);
     }
 
     get keepAlive() {
+        // @ts-expect-error @types/node has incorrect types
         return this.agent.keepAlive;
     }
 
@@ -23,14 +30,17 @@ class WrappedAgent {
     }
 
     get options() {
+        // @ts-expect-error @types/node has incorrect types
         return this.agent.options;
     }
 
     get defaultPort() {
+        // @ts-expect-error @types/node has incorrect types
         return this.agent.defaultPort;
     }
 
     get protocol() {
+        // @ts-expect-error @types/node has incorrect types
         return this.agent.protocol;
     }
 
