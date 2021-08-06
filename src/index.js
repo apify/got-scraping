@@ -1,7 +1,7 @@
 const http = require('http');
 const https = require('https');
 
-const { got } = require('got-cjs');
+const gotExports = require('got-cjs');
 const HeaderGenerator = require('header-generator');
 
 const TransformHeadersAgent = require('./agent/transform-headers-agent');
@@ -13,7 +13,7 @@ const { browserHeadersHook } = require('./hooks/browser-headers');
 const { proxyHook } = require('./hooks/proxy');
 const { http2Hook } = require('./hooks/http2');
 
-const gotScraping = got.extend({
+const gotScraping = gotExports.got.extend({
     mutableDefaults: true,
     ...SCRAPING_DEFAULT_OPTIONS,
     context: {
@@ -38,3 +38,5 @@ const gotScraping = got.extend({
 });
 
 module.exports = gotScraping;
+
+Object.assign(module.exports, { ...gotExports, got: gotScraping, default: gotScraping });
