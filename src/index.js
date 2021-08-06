@@ -18,6 +18,7 @@ const gotScraping = got.extend({
     ...SCRAPING_DEFAULT_OPTIONS,
     context: {
         headerGenerator: new HeaderGenerator(),
+        useHeaderGenerator: true,
     },
     agent: {
         http: new TransformHeadersAgent(http.globalAgent),

@@ -65,7 +65,7 @@ exports.proxyHook = async function (options) {
         validateProxyProtocol(parsedProxy.protocol);
         options.agent = await getAgents(parsedProxy, options.https.rejectUnauthorized);
 
-        // `agent-base` isn't even able to detect the protocol correctly lol
+        // `agent-base` isn't able to detect the protocol correctly
         options.secureEndpoint = options.url.protocol === 'https:';
     }
 };

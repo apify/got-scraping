@@ -16,22 +16,12 @@ describe('Scraping defaults', () => {
     });
 
     test('should set correct defaults', async () => {
-        const { useHeaderGenerator, timeout, ...gotDefaults } = SCRAPING_DEFAULT_OPTIONS;
-
         const response = await gotScraping.get(`http://localhost:${port}/html`);
 
-        const toMatch = {
-            ...gotDefaults,
-            timeout: {
-                request: timeout,
-            },
-        };
+        const defaults = { ...SCRAPING_DEFAULT_OPTIONS };
+        delete defaults.headers;
 
-        delete toMatch.headers;
-
-        expect(response.request.options).toMatchObject(toMatch);
-
-        expect(response.request.options.context).toMatchObject({ useHeaderGenerator });
+        expect(response.request.options).toMatchObject(defaults);
     });
 
     test('should allow user to override the defaults', async () => {

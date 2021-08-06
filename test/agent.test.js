@@ -156,7 +156,7 @@ describe('TransformHeadersAgent', () => {
     });
 
     describe('respects native behavior', () => {
-        test('transfer-encoding removal', (done) => {
+        test('content-length removal', (done) => {
             const transformAgent = new TransformHeadersAgent(new http.Agent({
                 keepAlive: true,
             }));
@@ -175,6 +175,31 @@ describe('TransformHeadersAgent', () => {
             });
 
             request.removeHeader('content-length');
+
+            request.end();
+        });
+
+        test('transfer-encoding removal', (done) => {
+            const transformAgent = new TransformHeadersAgent(new http.Agent({
+                keepAlive: true,
+            }));
+
+            const request = http.request(`http://localhost:${port}/headers`, {
+                agent: transformAgent,
+            }, async (response) => {
+                const body = await getStream(response);
+                const headers = JSON.parse(body);
+
+                expect(headers['Transfer-Encoding']).toBe(undefined);
+                expect(headers['Content-Length']).toBe(undefined);
+
+                transformAgent.destroy();
+
+                done();
+            });
+
+            request.removeHeader('content-length');
+            request.removeHeader('transfer-encoding');
 
             request.end();
         });

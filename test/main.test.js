@@ -28,7 +28,7 @@ describe('GotScraping', () => {
 
     test('should allow passing custom properties', async () => {
         const requestOptions = {
-            url: `http://localhost:${port}/html`,
+            url: `http://localhost:${port}/headers`,
             headerGeneratorOptions: {
                 browsers: [{ name: 'firefox' }],
             },
@@ -37,6 +37,8 @@ describe('GotScraping', () => {
         const response = await gotScraping(requestOptions);
         const { request: { options } } = response;
         expect(options.context.headerGeneratorOptions).toMatchObject(requestOptions.headerGeneratorOptions);
+
+        expect('User-Agent' in JSON.parse(response.body)).toBe(true);
     });
 
     test('should allow overriding generated options using handlers', async () => {
@@ -136,7 +138,6 @@ describe('GotScraping', () => {
                 const response = await gotScraping({
                     url: 'https://eshop.coop-box.cz/',
                     proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
-
                 });
 
                 expect(response.statusCode).toBe(200);
@@ -156,8 +157,8 @@ describe('GotScraping', () => {
                 url: 'https://api.apify.com/v2/browser-info',
                 proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
                 http2: false,
-
             });
+
             expect(response.statusCode).toBe(200);
             expect(response.request.options).toMatchObject({ http2: false });
 
@@ -297,10 +298,12 @@ describe('GotScraping', () => {
 
             const [response] = await once(stream, 'response');
             response.setEncoding('utf-8');
+
             const chunks = [];
             for await (const chunk of stream) {
                 chunks.push(chunk);
             }
+
             const responseBody = chunks.join();
 
             expect(response.statusCode).toBe(200);
