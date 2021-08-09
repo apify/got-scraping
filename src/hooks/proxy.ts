@@ -2,10 +2,8 @@ import http from 'http';
 import https from 'https';
 import { URL } from 'url';
 import http2 from 'http2-wrapper';
-import {
-    HttpsProxyAgent,
-    HttpProxyAgent,
-} from 'hpagent';
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import { HttpProxyAgent } from 'http-proxy-agent';
 import QuickLRU from 'quick-lru';
 import { Options } from 'got-cjs';
 import TransformHeadersAgent from '../agent/transform-headers-agent';
