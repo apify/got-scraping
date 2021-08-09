@@ -1,14 +1,14 @@
-import http from 'http';
-import https from 'https';
+import { Agent as HttpAgent } from 'http';
+import { Agent as HttpsAgent } from 'https';
 import { URL } from 'url';
-import http2 from 'http2-wrapper';
+import { proxies, auto } from 'http2-wrapper';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { HttpProxyAgent } from 'http-proxy-agent';
-import QuickLRU from 'quick-lru';
+import QuickLRU = require('quick-lru');
 import { Options } from 'got-cjs';
 import TransformHeadersAgent from '../agent/transform-headers-agent';
 
-type Agent = http.Agent | https.Agent;
+type Agent = HttpAgent | HttpsAgent;
 
 const {
     HttpOverHttp2,
@@ -16,7 +16,7 @@ const {
     Http2OverHttp2,
     Http2OverHttps,
     Http2OverHttp,
-} = http2.proxies;
+} = proxies;
 
 const x = {
     '(https.js:': (a: Agent) => (a as {protocol?: string}).protocol,
@@ -108,7 +108,7 @@ async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
     const proxyUrl = proxy.proxyOptions.url;
 
     if (proxyUrl.protocol === 'https:') {
-        const { alpnProtocol } = await http2.auto.resolveProtocol({
+        const { alpnProtocol } = await auto.resolveProtocol({
             host: parsedProxyUrl.hostname,
             port: parsedProxyUrl.port,
             rejectUnauthorized,

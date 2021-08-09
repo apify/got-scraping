@@ -1,6 +1,6 @@
 import { URL } from 'url';
 import { Options } from 'got-cjs';
-import http2 from 'http2-wrapper';
+import http2 = require('http2-wrapper');
 
 /**
  * Merges original generated headers and user provided overrides.

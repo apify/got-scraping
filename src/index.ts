@@ -1,5 +1,5 @@
-import http from 'http';
-import https from 'https';
+import http = require('http');
+import https = require('https');
 
 import {
     Options,
@@ -22,7 +22,7 @@ import {
 } from 'got-cjs';
 
 // @ts-expect-error Missing types
-import HeaderGenerator from 'header-generator';
+import HeaderGenerator = require('header-generator');
 
 import TransformHeadersAgent from './agent/transform-headers-agent';
 import { SCRAPING_DEFAULT_OPTIONS } from './scraping-defaults';
