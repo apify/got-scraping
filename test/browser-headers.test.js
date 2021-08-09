@@ -2,9 +2,9 @@ const http = require('http');
 const HeaderGenerator = require('header-generator');
 const { got } = require('got-cjs');
 
-const { browserHeadersHook, mergeHeaders } = require('../src/hooks/browser-headers');
-const TransformHeadersAgent = require('../src/agent/transform-headers-agent');
-const gotScraping = require('../src/index');
+const { browserHeadersHook, mergeHeaders } = require('../dist/hooks/browser-headers');
+const TransformHeadersAgent = require('../dist/agent/transform-headers-agent');
+const gotScraping = require('../dist/index');
 
 const { startDummyServer } = require('./helpers/dummy-server');
 

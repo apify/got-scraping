@@ -1,6 +1,6 @@
 const {
     optionsValidationHandler,
-} = require('../src/hooks/options-validation');
+} = require('../dist/hooks/options-validation');
 
 describe('Options validation', () => {
     const nextMock = () => {};

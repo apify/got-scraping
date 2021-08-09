@@ -1,5 +1,5 @@
-const { SCRAPING_DEFAULT_OPTIONS } = require('../src/scraping-defaults');
-const gotScraping = require('../src/index');
+const { SCRAPING_DEFAULT_OPTIONS } = require('../dist/scraping-defaults');
+const gotScraping = require('../dist/index');
 const { startDummyServer } = require('./helpers/dummy-server');
 
 describe('Scraping defaults', () => {

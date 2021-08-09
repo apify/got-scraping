@@ -2,7 +2,7 @@ const net = require('net');
 const { once } = require('events');
 const gotExports = require('got-cjs');
 const getStream = require('get-stream');
-const gotScraping = require('../src');
+const gotScraping = require('../dist');
 
 const { startDummyServer } = require('./helpers/dummy-server');
 

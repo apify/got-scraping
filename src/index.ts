@@ -61,6 +61,7 @@ const got = gotCjs.extend({
 });
 
 export default got;
+
 export {
     Options,
     calculateRetryDelay,
@@ -80,3 +81,28 @@ export {
     CancelError,
     got,
 };
+
+// CommonJS compatibility
+module.exports = got;
+module.exports.default = got;
+module.exports.__esModule = true;
+
+Object.assign(got, {
+    Options,
+    calculateRetryDelay,
+    create,
+    parseLinkHeader,
+    isResponseOk,
+    ParseError,
+    parseBody,
+    RequestError,
+    MaxRedirectsError,
+    HTTPError,
+    CacheError,
+    UploadError,
+    TimeoutError,
+    ReadError,
+    RetryError,
+    CancelError,
+    got,
+});

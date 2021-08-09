@@ -1,4 +1,4 @@
-const gotScraping = require('../src');
+const gotScraping = require('../dist');
 const { startDummyServer } = require('./helpers/dummy-server');
 
 describe('Custom options', () => {
