@@ -1,6 +1,6 @@
 const http = require('http');
 const getStream = require('get-stream');
-const TransformHeadersAgent = require('../dist/agent/transform-headers-agent');
+const TransformHeadersAgent = require('../dist/agent/transform-headers-agent').default;
 
 const agent = new http.Agent({
     keepAlive: true,

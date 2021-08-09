@@ -5,7 +5,7 @@ const {
 } = require('hpagent');
 
 const { proxyHook, agentCache } = require('../dist/hooks/proxy');
-const TransformHeadersAgent = require('../dist/agent/transform-headers-agent');
+const TransformHeadersAgent = require('../dist/agent/transform-headers-agent').default;
 
 const {
     HttpOverHttp2,
