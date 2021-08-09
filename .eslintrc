@@ -1,3 +1,3 @@
 {
-    "extends": "@apify"
-}
+    "extends": "@apify/eslint-config-ts"
+  }

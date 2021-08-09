@@ -3,10 +3,10 @@ import { Options, OptionsInit } from 'got-cjs';
 /**
  * @param {object} options
  */
-export function customOptionsHook(raw: OptionsInit, options: Options) {
+export function customOptionsHook(raw: OptionsInit, options: Options): void {
     if ('proxyUrl' in raw) {
         // @ts-expect-error FIXME
-        options.context['proxyUrl'] = raw.proxyUrl;
+        options.context['proxyUrl'] = raw.proxyUrl; // eslint-disable-line dot-notation
 
         // @ts-expect-error FIXME
         delete raw.proxyUrl;
@@ -14,7 +14,7 @@ export function customOptionsHook(raw: OptionsInit, options: Options) {
 
     if ('headerGeneratorOptions' in raw) {
         // @ts-expect-error FIXME
-        options.context['headerGeneratorOptions'] = raw.headerGeneratorOptions;
+        options.context['headerGeneratorOptions'] = raw.headerGeneratorOptions; // eslint-disable-line dot-notation
 
         // @ts-expect-error FIXME
         delete raw.headerGeneratorOptions;
@@ -22,7 +22,7 @@ export function customOptionsHook(raw: OptionsInit, options: Options) {
 
     if ('useHeaderGenerator' in raw) {
         // @ts-expect-error FIXME
-        options.context['useHeaderGenerator'] = raw.useHeaderGenerator;
+        options.context['useHeaderGenerator'] = raw.useHeaderGenerator; // eslint-disable-line dot-notation
 
         // @ts-expect-error FIXME
         delete raw.useHeaderGenerator;

@@ -3,7 +3,7 @@ import ow from 'ow';
 /**
  * @param {object} options
  */
-export function optionsValidationHandler(options: unknown) {
+export function optionsValidationHandler(options: unknown): void {
     const validationSchema = {
         proxyUrl: ow.optional.string.url,
         useHeaderGenerator: ow.optional.boolean,

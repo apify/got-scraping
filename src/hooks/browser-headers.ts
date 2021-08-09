@@ -9,7 +9,7 @@ import http2 = require('http2-wrapper');
  * @param {object} overrides
  * @returns
  */
- export function mergeHeaders(original: Record<string, string>, overrides: Record<string, string>) {
+export function mergeHeaders(original: Record<string, string>, overrides: Record<string, string>) {
     const fixedHeaders = new Map();
 
     for (const entry of Object.entries(original)) {
