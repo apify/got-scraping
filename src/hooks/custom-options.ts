@@ -1,31 +1,25 @@
-import { Options, OptionsInit } from 'got-cjs';
+import { Options, OptionsInit as GotOptionsInit } from 'got-cjs';
+import { OptionsInit } from '../context';
 
 /**
  * @param {object} options
  */
-export function customOptionsHook(raw: OptionsInit, options: Options): void {
-    if ('proxyUrl' in raw) {
-        // @ts-expect-error FIXME
-        options.context['proxyUrl'] = raw.proxyUrl; // eslint-disable-line dot-notation
+export function customOptionsHook(raw: GotOptionsInit, options: Options): void {
+    const typedRaw = raw as OptionsInit;
 
-        // @ts-expect-error FIXME
-        delete raw.proxyUrl;
+    if ('proxyUrl' in typedRaw) {
+        options.context['proxyUrl'] = typedRaw.proxyUrl; // eslint-disable-line dot-notation
+        delete typedRaw.proxyUrl;
     }
 
-    if ('headerGeneratorOptions' in raw) {
-        // @ts-expect-error FIXME
-        options.context['headerGeneratorOptions'] = raw.headerGeneratorOptions; // eslint-disable-line dot-notation
-
-        // @ts-expect-error FIXME
-        delete raw.headerGeneratorOptions;
+    if ('headerGeneratorOptions' in typedRaw) {
+        options.context['headerGeneratorOptions'] = typedRaw.headerGeneratorOptions; // eslint-disable-line dot-notation
+        delete typedRaw.headerGeneratorOptions;
     }
 
-    if ('useHeaderGenerator' in raw) {
-        // @ts-expect-error FIXME
-        options.context['useHeaderGenerator'] = raw.useHeaderGenerator; // eslint-disable-line dot-notation
-
-        // @ts-expect-error FIXME
-        delete raw.useHeaderGenerator;
+    if ('useHeaderGenerator' in typedRaw) {
+        options.context['useHeaderGenerator'] = typedRaw.useHeaderGenerator; // eslint-disable-line dot-notation
+        delete typedRaw.useHeaderGenerator;
     }
 
     if ('insecureHTTPParser' in raw) {

@@ -84,6 +84,8 @@ export {
     got,
 };
 
+export * from './context';
+
 // CommonJS compatibility
 module.exports = got;
 module.exports.default = got;
