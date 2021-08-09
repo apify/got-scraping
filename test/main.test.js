@@ -62,7 +62,7 @@ describe('GotScraping', () => {
         plain.listen(0, async () => {
             try {
                 await gotScraping(`http://localhost:${plain.address().port}`, {
-                    insecureParser: false,
+                    insecureHTTPParser: false,
                 });
 
                 plain.close();

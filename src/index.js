@@ -20,7 +20,7 @@ const gotScraping = got.extend({
     context: {
         headerGenerator: new HeaderGenerator(),
         useHeaderGenerator: true,
-        insecureParser: true,
+        insecureHTTPParser: true,
     },
     agent: {
         http: new TransformHeadersAgent(http.globalAgent),
