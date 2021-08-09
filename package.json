@@ -8,7 +8,7 @@
 	],
 	"dependencies": {
 		"got": "^11.8.1",
-		"header-generator": "^0.0.1-beta.1",
+		"header-generator": "^1.0.0",
 		"http-proxy-agent": "^4.0.1",
 		"http2-wrapper": "^2.1.2",
 		"https-proxy-agent": "^5.0.0",
