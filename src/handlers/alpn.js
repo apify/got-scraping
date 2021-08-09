@@ -1,4 +1,4 @@
-const http2 = require('http2-wrapper');
+const auto = require('../http2auto');
 const httpResolver = require('../http-resolver');
 
 /**
@@ -16,7 +16,7 @@ async function alpnHandler(options, next) {
             options.http2 = protocol === 'h2';
 
             if (options.http2) {
-                options.request = http2.auto;
+                options.request = auto;
             }
         } else {
             // http2 is https
