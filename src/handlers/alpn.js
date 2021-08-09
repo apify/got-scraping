@@ -1,3 +1,4 @@
+const http2 = require('http2-wrapper');
 const httpResolver = require('../http-resolver');
 
 /**
@@ -6,15 +7,17 @@ const httpResolver = require('../http-resolver');
  * @returns {import('got').GotReturn}
  */
 async function alpnHandler(options, next) {
-    const { url, http2 } = options;
-
-    if (http2) {
-        const parsedUrl = new URL(url);
+    if (options.http2) {
+        const parsedUrl = new URL(options.url);
 
         if (parsedUrl.protocol === 'https:') {
             const protocol = await httpResolver.resolveHttpVersion(parsedUrl);
 
             options.http2 = protocol === 'h2';
+
+            if (options.http2) {
+                options.request = http2.auto;
+            }
         } else {
             // http2 is https
             options.http2 = false;
