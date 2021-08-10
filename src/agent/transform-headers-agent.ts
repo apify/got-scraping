@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
-import HeaderGenerator from 'header-generator';
+// @ts-expect-error Missing types
+import HeaderGenerator = require('header-generator');
 import { OutgoingMessage, Agent, ClientRequest, ClientRequestArgs } from 'http';
 import { WrappedAgent } from './wrapped-agent';
 
@@ -16,7 +17,7 @@ class TransformHeadersAgent extends WrappedAgent {
     /**
      * Transforms the request via header normalization.
      */
-    transformRequest(request, sortHeaders) {
+    transformRequest(request: ClientRequest, sortHeaders: boolean) {
         const headers: Record<string, string | number | string[]> = {};
         const hasConnection = request.hasHeader('connection');
         const hasContentLength = request.hasHeader('content-length');
