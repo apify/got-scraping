@@ -49,4 +49,4 @@ class WrappedAgent {
     }
 }
 
-export default WrappedAgent;
+export { WrappedAgent };

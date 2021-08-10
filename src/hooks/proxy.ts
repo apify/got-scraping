@@ -6,7 +6,7 @@ import { HttpsProxyAgent } from 'https-proxy-agent';
 import { HttpProxyAgent } from 'http-proxy-agent';
 import QuickLRU = require('quick-lru');
 import { Options } from 'got-cjs';
-import TransformHeadersAgent from '../agent/transform-headers-agent';
+import { TransformHeadersAgent } from '../agent/transform-headers-agent';
 
 type Agent = HttpAgent | HttpsAgent;
 

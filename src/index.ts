@@ -1,5 +1,3 @@
-// FIXME
-/* eslint-disable no-underscore-dangle */
 import http = require('http');
 import https = require('https');
 
@@ -26,7 +24,7 @@ import {
 // @ts-expect-error Missing types
 import HeaderGenerator = require('header-generator');
 
-import TransformHeadersAgent from './agent/transform-headers-agent';
+import { TransformHeadersAgent } from './agent/transform-headers-agent';
 import { SCRAPING_DEFAULT_OPTIONS } from './scraping-defaults';
 
 import { optionsValidationHandler } from './hooks/options-validation';

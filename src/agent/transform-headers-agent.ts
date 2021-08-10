@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import HeaderGenerator from 'header-generator';
 import { OutgoingMessage, Agent, ClientRequest, ClientRequestArgs } from 'http';
-import WrappedAgent from './wrapped-agent';
+import { WrappedAgent } from './wrapped-agent';
 
 // @ts-expect-error Private property
 const { _storeHeader } = OutgoingMessage.prototype;
@@ -110,4 +110,4 @@ class TransformHeadersAgent extends WrappedAgent {
     }
 }
 
-export default TransformHeadersAgent;
+export { TransformHeadersAgent };
