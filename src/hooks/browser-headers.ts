@@ -1,6 +1,7 @@
 import { URL } from 'url';
 import { Options } from 'got-cjs';
 import http2 = require('http2-wrapper');
+import { Context } from '../context';
 
 /**
  * Merges original generated headers and user provided overrides.
@@ -37,7 +38,7 @@ export async function browserHeadersHook(options: Options) {
         headerGeneratorOptions,
         useHeaderGenerator,
         headerGenerator,
-    } = context;
+    } = context as unknown as Context;
 
     if (!useHeaderGenerator) return;
 
@@ -55,9 +56,9 @@ export async function browserHeadersHook(options: Options) {
         })).alpnProtocol;
     }
 
-    const mergedHeaderGeneratorOptions: Record<string, string> = {
+    const mergedHeaderGeneratorOptions = {
         httpVersion: alpnProtocol === 'h2' ? '2' : '1',
-        ...(headerGeneratorOptions as {[key: string]: unknown}),
+        ...headerGeneratorOptions,
     };
 
     const generatedHeaders = (headerGenerator as any).getHeaders(mergedHeaderGeneratorOptions);
