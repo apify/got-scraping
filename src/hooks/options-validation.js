@@ -8,6 +8,7 @@ function optionsValidationHandler(options) {
         proxyUrl: ow.optional.string.url,
         useHeaderGenerator: ow.optional.boolean,
         headerGeneratorOptions: ow.optional.object,
+        insecureHTTPParser: ow.optional.boolean,
     };
 
     ow(options, ow.object.partialShape(validationSchema));

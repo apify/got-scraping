@@ -16,4 +16,9 @@ exports.customOptionsHook = function (raw, options) {
         options.context.useHeaderGenerator = raw.useHeaderGenerator;
         delete raw.useHeaderGenerator;
     }
+
+    if ('insecureHTTPParser' in raw) {
+        options.context.insecureHTTPParser = raw.insecureHTTPParser;
+        delete raw.insecureHTTPParser;
+    }
 };

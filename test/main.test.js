@@ -1,3 +1,4 @@
+const net = require('net');
 const { once } = require('events');
 const gotExports = require('got-cjs');
 const getStream = require('get-stream');
@@ -16,6 +17,62 @@ describe('GotScraping', () => {
 
     afterAll(() => {
         server.close();
+    });
+
+    test('insecure parser by default', (done) => {
+        const plain = net.createServer((socket) => {
+            socket.end([
+                'HTTP/1.1 200 OK',
+                'connection: close',
+                'content-length: 0',
+                `host: localhost:${plain.address().port}`,
+                `invalid: \x00`,
+                ``,
+                ``,
+            ].join('\r\n'));
+        });
+
+        plain.listen(0, async () => {
+            try {
+                const { headers } = await gotScraping(`http://localhost:${plain.address().port}`);
+
+                expect(headers.invalid).toBe('\x00');
+            } catch (error) {
+                plain.close();
+                done(error);
+            }
+
+            plain.close();
+            done();
+        });
+    });
+
+    test('insecure parser can be disabled', (done) => {
+        const plain = net.createServer((socket) => {
+            socket.end([
+                'HTTP/1.1 200 OK',
+                'connection: close',
+                'content-length: 0',
+                `host: localhost:${plain.address().port}`,
+                `invalid: \x00`,
+                ``,
+                ``,
+            ].join('\r\n'));
+        });
+
+        plain.listen(0, async () => {
+            try {
+                await gotScraping(`http://localhost:${plain.address().port}`, {
+                    insecureHTTPParser: false,
+                });
+
+                plain.close();
+                done(new Error('The request went through :('));
+            } catch (error) {
+                plain.close();
+                done();
+            }
+        });
     });
 
     test('should have got interface', () => {
