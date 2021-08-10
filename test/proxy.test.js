@@ -1,7 +1,7 @@
 const http2 = require('http2-wrapper');
 const {
     HttpsProxyAgent,
-    HttpProxyAgent
+    HttpProxyAgent,
 } = require('hpagent');
 
 const { proxyHook, agentCache } = require('../dist/hooks/proxy');
