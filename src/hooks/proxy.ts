@@ -33,7 +33,6 @@ const isAmbiguousAgent = (agent: Agent): boolean => {
 
 /**
  * @see https://github.com/TooTallNate/node-agent-base/issues/61
- * @param {Agent} agent
  */
 const fixAgentBase = (agent: Agent) => {
     if (isAmbiguousAgent(agent)) {
@@ -45,9 +44,6 @@ const fixAgentBase = (agent: Agent) => {
     return agent;
 };
 
-/**
- * @param {Agent} agent
- */
 const fixAgent = (agent: Agent) => {
     agent = fixAgentBase(agent);
     agent = new TransformHeadersAgent(agent) as unknown as Agent;
@@ -55,9 +51,6 @@ const fixAgent = (agent: Agent) => {
     return agent;
 };
 
-/**
- * @param {object} options
- */
 export async function proxyHook(options: Options) {
     const { context: { proxyUrl } } = options;
 
@@ -70,9 +63,6 @@ export async function proxyHook(options: Options) {
     }
 }
 
-/**
- * @param {string} protocol
- */
 function validateProxyProtocol(protocol: string) {
     const isSupported = protocol === 'http:' || protocol === 'https:';
 
@@ -83,11 +73,6 @@ function validateProxyProtocol(protocol: string) {
 
 export const agentCache = new QuickLRU({ maxSize: 1000 });
 
-/**
- * @param {URL} parsedProxyUrl parsed proxyUrl
- * @param {boolean} rejectUnauthorized
- * @returns {object}
- */
 async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
     const key = `${rejectUnauthorized}:${parsedProxyUrl.href}`;
 

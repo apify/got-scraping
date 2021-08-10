@@ -6,9 +6,6 @@ import { Context } from '../context';
 /**
  * Merges original generated headers and user provided overrides.
  * All header overrides will have the original header case, because of antiscraping.
- * @param {object} original
- * @param {object} overrides
- * @returns
  */
 export function mergeHeaders(original: Record<string, string>, overrides: Record<string, string>) {
     const fixedHeaders = new Map();
@@ -29,9 +26,6 @@ export function mergeHeaders(original: Record<string, string>, overrides: Record
     return headers;
 }
 
-/**
- * @param {object} options
- */
 export async function browserHeadersHook(options: Options) {
     const { context } = options;
     const {

@@ -23,7 +23,6 @@ const SCRAPING_DEFAULT_OPTIONS = {
 
 /**
  * Reorders the default NodeJs ciphers so the request tries to negotiate the modern TLS version first, same as browsers do.
- * @returns {string} ciphers list
  */
 function ensureModernTlsFirst() {
     const modernTlsCiphers = ['TLS_AES_256_GCM_SHA384', 'TLS_AES_128_GCM_SHA256', 'TLS_CHACHA20_POLY1305_SHA256'];

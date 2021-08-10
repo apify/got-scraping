@@ -1,8 +1,5 @@
 import ow from 'ow';
 
-/**
- * @param {object} options
- */
 export function optionsValidationHandler(options: unknown): void {
     const validationSchema = {
         proxyUrl: ow.optional.string.url,

@@ -9,15 +9,12 @@ const { _storeHeader } = OutgoingMessage.prototype;
 const generator = new HeaderGenerator();
 
 /**
- * @description Transforms the casing of the headers to Pascal-Case.
+ * Transforms the casing of the headers to Pascal-Case.
  */
 class TransformHeadersAgent extends WrappedAgent {
     // Rewritten from https://github.com/nodejs/node/blob/533cafcf7e3ab72e98a2478bc69aedfdf06d3a5e/lib/_http_outgoing.js#L442-L479
     /**
-     * @description Transforms the request via header normalization.
-     * @see {TransformHeadersAgent.toPascalCase}
-     * @param {ClientRequest} request
-     * @param {boolean} sortHeaders - if the headers should be sorted or not
+     * Transforms the request via header normalization.
      */
     transformRequest(request, sortHeaders) {
         const headers: Record<string, string | number | string[]> = {};
@@ -99,10 +96,6 @@ class TransformHeadersAgent extends WrappedAgent {
         return super.addRequest(request, options);
     }
 
-    /**
-     * @param {string} header - header with unknown casing
-     * @returns {string} - header in Pascal-Case
-     */
     toPascalCase(header: string) {
         return header.split('-').map((part) => {
             return part[0]!.toUpperCase() + part.slice(1).toLowerCase();

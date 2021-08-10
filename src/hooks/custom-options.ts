@@ -1,9 +1,6 @@
 import { Options, OptionsInit as GotOptionsInit } from 'got-cjs';
 import { OptionsInit } from '../context';
 
-/**
- * @param {object} options
- */
 export function customOptionsHook(raw: GotOptionsInit, options: Options): void {
     const typedRaw = raw as OptionsInit;
 
