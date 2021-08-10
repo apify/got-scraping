@@ -186,6 +186,11 @@ describe('GotScraping', () => {
     });
 
     describe('Integration', () => {
+        test('should order headers', async () => {
+            const { rawHeaders } = await gotScraping({ url: 'https://api.apify.com/v2/browser-info?rawHeaders=1' }).json();
+            expect(rawHeaders[0].toLowerCase()).toBe('connection');
+        });
+
         test('should use http2 first', async () => {
             const response = await gotScraping({ url: 'https://apify.com/' });
             expect(response.statusCode).toBe(200);
@@ -231,6 +236,16 @@ describe('GotScraping', () => {
             expect(responseProxy.httpVersion).toBe('1.1');
         });
 
+        test('should order headers with proxyUrl and http1', async () => {
+            const { rawHeaders } = await gotScraping({
+                url: 'https://api.apify.com/v2/browser-info?rawHeaders=1',
+                proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+                http2: false,
+            }).json();
+
+            expect(rawHeaders[0].toLowerCase()).toBe('connection');
+        });
+
         test('should work with proxyUrl and http2', async () => {
             const response = await gotScraping({
                 responseType: 'json',
@@ -269,6 +284,13 @@ describe('GotScraping', () => {
     });
 
     describe('same thing with streams', () => {
+        test('should order headers', async () => {
+            const body = await getStream(gotScraping.stream({ url: 'https://api.apify.com/v2/browser-info?rawHeaders=1' }));
+            const { rawHeaders } = JSON.parse(body);
+
+            expect(rawHeaders[0].toLowerCase()).toBe('connection');
+        });
+
         test('should allow passing custom properties', async () => {
             const requestOptions = {
                 isStream: true,
@@ -386,6 +408,17 @@ describe('GotScraping', () => {
 
             expect(response.statusCode).toBe(200);
             expect(JSON.parse(responseBody)).toEqual(body);
+        });
+
+        test('should order headers with proxyUrl and http1', async () => {
+            const body = await getStream(gotScraping.stream({
+                url: 'https://api.apify.com/v2/browser-info?rawHeaders=1',
+                proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+                http2: false,
+            }));
+            const { rawHeaders } = JSON.parse(body);
+
+            expect(rawHeaders[0].toLowerCase()).toBe('connection');
         });
 
         describe('Integration', () => {

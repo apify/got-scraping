@@ -1,8 +1,11 @@
 /* eslint-disable no-underscore-dangle */
+const HeaderGenerator = require('header-generator');
 const http = require('http');
 const WrappedAgent = require('./wrapped-agent');
 
 const { _storeHeader } = http.OutgoingMessage.prototype;
+
+const generator = new HeaderGenerator();
 
 /**
  * @description Transforms the casing of the headers to Pascal-Case.
@@ -13,9 +16,9 @@ class TransformHeadersAgent extends WrappedAgent {
      * @description Transforms the request via header normalization.
      * @see {TransformHeadersAgent.toPascalCase}
      * @param {http.ClientRequest} request
-     * @param {string[]} sortedHeaders - headers in order, optional
+     * @param {boolean} sortHeaders - if the headers should be sorted or not
      */
-    transformRequest(request, sortedHeaders) {
+    transformRequest(request, sortHeaders) {
         const headers = {};
         const hasConnection = request.hasHeader('connection');
         const hasContentLength = request.hasHeader('content-length');
@@ -30,7 +33,7 @@ class TransformHeadersAgent extends WrappedAgent {
                 headers[this.toPascalCase(key)] = request.getHeader(key);
             }
 
-            if (sortedHeaders) {
+            if (sortHeaders) {
                 // Removal is required in order to change the order of the properties
                 request.removeHeader(key);
             }
@@ -58,22 +61,22 @@ class TransformHeadersAgent extends WrappedAgent {
             }
         }
 
-        const normalizedKeys = Object.keys(headers);
-        const sorted = sortedHeaders ? normalizedKeys.sort(this.createSort(sortedHeaders)) : normalizedKeys;
+        const transformedHeaders = sortHeaders ? generator.orderHeaders(headers) : headers;
 
-        for (const key of sorted) {
-            request.setHeader(key, headers[key]);
+        // eslint-disable-next-line no-restricted-syntax, guard-for-in
+        for (const key in transformedHeaders) {
+            request.setHeader(key, transformedHeaders[key]);
         }
     }
 
     addRequest(request, options) {
         // See https://github.com/nodejs/node/blob/533cafcf7e3ab72e98a2478bc69aedfdf06d3a5e/lib/_http_outgoing.js#L373
         // Note: This overrides the private `_storeHeader`.
-        //       This is required, because the function directly copies
+        //       This is required, because the function copies
         //       the `connection`, `content-length` and `trasfer-encoding` headers
         //       directly to the underlying buffer.
         request._storeHeader = (...args) => {
-            this.transformRequest(request, options.sortedHeaders);
+            this.transformRequest(request, true);
 
             return _storeHeader.call(request, ...args);
         };
@@ -92,42 +95,6 @@ class TransformHeadersAgent extends WrappedAgent {
         return header.split('-').map((part) => {
             return part[0].toUpperCase() + part.slice(1).toLowerCase();
         }).join('-');
-    }
-
-    /**
-     *
-     * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-     * @param {string} a - header a
-     * @param {string} b - header b
-     * @param {string[]} sortedHeaders - array of headers in order
-     * @returns header a or header b, depending which one is more important
-     */
-    sort(a, b, sortedHeaders) {
-        const rawA = sortedHeaders.indexOf(a);
-        const rawB = sortedHeaders.indexOf(b);
-        const indexA = rawA === -1 ? Number.POSITIVE_INFINITY : rawA;
-        const indexB = rawB === -1 ? Number.POSITIVE_INFINITY : rawB;
-
-        if (indexA < indexB) {
-            return -1;
-        }
-
-        if (indexA > indexB) {
-            return 1;
-        }
-
-        return 0;
-    }
-
-    /**
-     *
-     * @param {string[]} sortedHeaders - array of headers in order
-     * @returns {Function} - sort function
-     */
-    createSort(sortedHeaders) {
-        const sortWithSortedHeaders = (a, b) => this.sort(a, b, sortedHeaders);
-
-        return sortWithSortedHeaders;
     }
 }
 
