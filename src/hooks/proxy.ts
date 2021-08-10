@@ -66,7 +66,6 @@ export async function proxyHook(options: Options) {
 
         validateProxyProtocol(parsedProxy.protocol);
 
-        // TODO: The `!` shouldn't be necessary. Open an issue in Got.
         options.agent = await getAgents(parsedProxy, options.https.rejectUnauthorized!);
     }
 }
