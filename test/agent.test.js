@@ -119,42 +119,6 @@ describe('TransformHeadersAgent', () => {
         request.end();
     });
 
-    test('sorted headers', (done) => {
-        const transformAgent = new TransformHeadersAgent(new http.Agent({
-            keepAlive: true,
-        }));
-
-        const request = http.request(`http://localhost:${port}/headers`, {
-            agent: transformAgent,
-            sortedHeaders: ['Host', 'Connection', 'Foo', 'Bar'],
-            headers: {
-                bar: 'foo',
-                foo: 'bar',
-            },
-        }, async (response) => {
-            const body = await getStream(response);
-            const headers = JSON.parse(body);
-
-            const keys = Object.keys(headers);
-
-            expect(keys[0]).toBe('Host');
-            expect(keys[1]).toBe('Connection');
-            expect(keys[2]).toBe('Foo');
-            expect(keys[3]).toBe('Bar');
-
-            expect(headers.Host).toBe(`localhost:${port}`);
-            expect(headers.Connection).toBe('keep-alive');
-            expect(headers.Foo).toBe('bar');
-            expect(headers.Bar).toBe('foo');
-
-            transformAgent.destroy();
-
-            done();
-        });
-
-        request.end();
-    });
-
     describe('respects native behavior', () => {
         test('content-length removal', (done) => {
             const transformAgent = new TransformHeadersAgent(new http.Agent({
