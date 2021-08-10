@@ -4,9 +4,10 @@ export { GotOptionsInit };
 
 export interface Context {
     proxyUrl?: string;
-    headerGeneratorOptions: Record<string, unknown>;
+    headerGeneratorOptions?: Record<string, unknown>;
     useHeaderGenerator?: boolean;
-    headerGenerator: unknown;
+    headerGenerator?: unknown;
+    insecureHTTPParser?: boolean;
 }
 
 export interface OptionsInit extends Context, GotOptionsInit {}

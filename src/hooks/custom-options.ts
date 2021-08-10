@@ -23,7 +23,7 @@ export function customOptionsHook(raw: GotOptionsInit, options: Options): void {
     }
 
     if ('insecureHTTPParser' in raw) {
-        options.context.insecureHTTPParser = raw.insecureHTTPParser;
-        delete raw.insecureHTTPParser;
+        options.context['insecureHTTPParser'] = typedRaw.insecureHTTPParser; // eslint-disable-line dot-notation
+        delete typedRaw.insecureHTTPParser;
     }
 }
