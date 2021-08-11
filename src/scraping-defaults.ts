@@ -1,6 +1,6 @@
 import { constants } from 'crypto';
 
-const SCRAPING_DEFAULT_OPTIONS = {
+export const SCRAPING_DEFAULT_OPTIONS = {
     // Most of the new browsers use HTTP2
     http2: true,
     https: {
@@ -20,8 +20,6 @@ const SCRAPING_DEFAULT_OPTIONS = {
         'user-agent': undefined,
     },
 };
-
-export { SCRAPING_DEFAULT_OPTIONS };
 
 /**
  * Reorders the default NodeJs ciphers so the request tries to negotiate the modern TLS version first, same as browsers do.
