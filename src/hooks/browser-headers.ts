@@ -18,12 +18,7 @@ export function mergeHeaders(original: Record<string, string>, overrides: Record
         fixedHeaders.set(entry[0].toLowerCase(), entry);
     }
 
-    const headers: Record<string, string> = {};
-    for (const [key, value] of fixedHeaders.values()) {
-        headers[key] = value;
-    }
-
-    return headers;
+    return Object.fromEntries(fixedHeaders.values());
 }
 
 export async function browserHeadersHook(options: Options) {
