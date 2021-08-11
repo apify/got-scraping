@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-// @ts-expect-error Missing types
+// @ts-expect-error TODO: Type `header-generator`
 import HeaderGenerator = require('header-generator');
 import { OutgoingMessage, Agent, ClientRequest, ClientRequestArgs } from 'http';
 import { WrappedAgent } from './wrapped-agent';
