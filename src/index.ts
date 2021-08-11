@@ -3,25 +3,7 @@
 import http = require('http');
 import https = require('https');
 
-import {
-    Options,
-    calculateRetryDelay,
-    create,
-    parseLinkHeader,
-    isResponseOk,
-    ParseError,
-    parseBody,
-    RequestError,
-    MaxRedirectsError,
-    HTTPError,
-    CacheError,
-    UploadError,
-    TimeoutError,
-    ReadError,
-    RetryError,
-    CancelError,
-    got as gotCjs,
-} from 'got-cjs';
+import { got as gotCjs } from 'got-cjs';
 
 // @ts-expect-error Missing types
 import HeaderGenerator = require('header-generator');
@@ -62,51 +44,19 @@ const got = gotCjs.extend({
     },
 });
 
+export * from 'got-cjs';
 export default got;
 
-export {
-    Options,
-    calculateRetryDelay,
-    create,
-    parseLinkHeader,
-    isResponseOk,
-    ParseError,
-    parseBody,
-    RequestError,
-    MaxRedirectsError,
-    HTTPError,
-    CacheError,
-    UploadError,
-    TimeoutError,
-    ReadError,
-    RetryError,
-    CancelError,
-    got,
-};
+export { got };
 
-export * from './context';
+export {
+    GotOptionsInit,
+    OptionsInit,
+    Context,
+} from './context';
 
 // CommonJS compatibility
-module.exports = got;
-module.exports.default = got;
-module.exports.__esModule = true;
+Object.assign(got, module.exports);
 
-Object.assign(got, {
-    Options,
-    calculateRetryDelay,
-    create,
-    parseLinkHeader,
-    isResponseOk,
-    ParseError,
-    parseBody,
-    RequestError,
-    MaxRedirectsError,
-    HTTPError,
-    CacheError,
-    UploadError,
-    TimeoutError,
-    ReadError,
-    RetryError,
-    CancelError,
-    got,
-});
+module.exports = got;
+module.exports.__esModule = true;
