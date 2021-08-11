@@ -21,6 +21,8 @@ const SCRAPING_DEFAULT_OPTIONS = {
     },
 };
 
+export { SCRAPING_DEFAULT_OPTIONS };
+
 /**
  * Reorders the default NodeJs ciphers so the request tries to negotiate the modern TLS version first, same as browsers do.
  */
@@ -32,5 +34,3 @@ function ensureModernTlsFirst() {
     // Then we will add the modern ciphers at the beginning
     return modernTlsCiphers.concat(Array.from(defaultCiphers)).join(':');
 }
-
-export { SCRAPING_DEFAULT_OPTIONS };
