@@ -36,7 +36,7 @@ const startDummyServer = async (port = 0): Promise<Server> => {
     }));
     app.use(bodyParser.json());
 
-    app.get('/json', (req, res) => {
+    app.get('/json', (_req, res) => {
         res.json({ test: 123 });
     });
 
@@ -44,7 +44,7 @@ const startDummyServer = async (port = 0): Promise<Server> => {
         res.json(req.body);
     });
 
-    app.get('/html', (req, res) => {
+    app.get('/html', (_req, res) => {
         res.setHeader('content-type', 'text/html');
         res.send('<html></html>');
     });

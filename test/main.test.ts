@@ -89,7 +89,7 @@ describe('GotScraping', () => {
 
             if (key !== 'got' && key !== 'default') {
                 // @ts-expect-error FIXME
-                expect(gotScraping[key]).toBe(gotExports[key]);
+                expect(String(gotScraping[key])).toBe(String(gotExports[key]));
             }
         }
 
