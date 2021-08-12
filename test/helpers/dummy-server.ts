@@ -1,5 +1,5 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+import express from 'express';
+import bodyParser from 'body-parser';
 
 const startExpressAppPromise = (app, port) => {
     return new Promise((resolve) => {
@@ -55,6 +55,6 @@ const startDummyServer = async (port) => {
     return startExpressAppPromise(app, port);
 };
 
-module.exports = {
+export {
     startDummyServer,
 };

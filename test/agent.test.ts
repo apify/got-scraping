@@ -1,12 +1,11 @@
 import http from 'http';
 import getStream from 'get-stream';
 import { TransformHeadersAgent } from '../dist/agent/transform-headers-agent';
+import { startDummyServer } from './helpers/dummy-server';
 
 const agent = new http.Agent({
     keepAlive: true,
 });
-
-import { startDummyServer } from './helpers/dummy-server';
 
 describe('TransformHeadersAgent', () => {
     let server;

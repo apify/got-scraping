@@ -1,4 +1,5 @@
 import http from'http';
+// @ts-expect-error Missing types
 import HeaderGenerator from 'header-generator';
 import { got } from 'got-cjs';
 

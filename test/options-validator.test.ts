@@ -3,6 +3,7 @@ import {
 } from '../dist/hooks/options-validation';
 
 describe('Options validation', () => {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     const nextMock = () => {};
     let options;
 
