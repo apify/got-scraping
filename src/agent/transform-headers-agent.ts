@@ -48,9 +48,9 @@ class TransformHeadersAgent extends WrappedAgent {
         if (!hasConnection) {
             const shouldSendKeepAlive = request.shouldKeepAlive && (hasContentLength || request.useChunkedEncodingByDefault || typedRequest.agent);
             if (shouldSendKeepAlive) {
-                headers['Connection'] = 'keep-alive'; // eslint-disable-line dot-notation
+                headers.Connection = 'keep-alive';
             } else {
-                headers['Connection'] = 'close'; // eslint-disable-line dot-notation
+                headers.Connection = 'close';
             }
         }
 
