@@ -1,7 +1,7 @@
 
 {
 	"compilerOptions": {
-        // Forked from https://github.com/sindresorhus/tsconfig/blob/640e4bfe1172e27d59bf4d73a2c5df517cc01e1d/tsconfig.json
+		// Forked from https://github.com/sindresorhus/tsconfig/blob/640e4bfe1172e27d59bf4d73a2c5df517cc01e1d/tsconfig.json
 
 		"outDir": "dist",
 		"module": "commonjs",
@@ -11,7 +11,8 @@
 			"ES2020.String"
 		],
 		"moduleResolution": "node",
-		"allowSyntheticDefaultImports": false,
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
 		"resolveJsonModule": false,
 		"jsx": "react",
 		"declaration": true,
@@ -31,7 +32,7 @@
 		"forceConsistentCasingInFileNames": true,
 		"skipLibCheck": true
 	},
-    "include": [
-        "src"
-    ]
+	"include": [
+		"src"
+	]
 }

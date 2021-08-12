@@ -1,12 +1,12 @@
 // FIXME: lint fails
 /* eslint-disable no-underscore-dangle */
-import http = require('http');
-import https = require('https');
+import http from 'http';
+import https from 'https';
 
 import { got as gotCjs } from 'got-cjs';
 
 // @ts-expect-error Missing types
-import HeaderGenerator = require('header-generator');
+import HeaderGenerator from 'header-generator';
 
 import { TransformHeadersAgent } from './agent/transform-headers-agent';
 import { SCRAPING_DEFAULT_OPTIONS } from './scraping-defaults';

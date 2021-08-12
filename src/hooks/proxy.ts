@@ -3,7 +3,7 @@ import { Agent as HttpsAgent } from 'https';
 import { URL } from 'url';
 import { proxies, auto } from 'http2-wrapper';
 import { HttpsProxyAgent, HttpProxyAgent } from 'hpagent';
-import QuickLRU = require('quick-lru');
+import QuickLRU from 'quick-lru';
 import { Options } from 'got-cjs';
 import { TransformHeadersAgent } from '../agent/transform-headers-agent';
 
