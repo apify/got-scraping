@@ -67,11 +67,10 @@ class TransformHeadersAgent extends WrappedAgent {
             }
         }
 
-        const transformedHeaders = sortHeaders ? generator.orderHeaders(headers) : headers;
+        const transformedHeaders: Record<string, string | number | string[]> = sortHeaders ? generator.orderHeaders(headers) : headers;
 
-        // eslint-disable-next-line no-restricted-syntax, guard-for-in
-        for (const key in transformedHeaders) {
-            request.setHeader(key, transformedHeaders[key]);
+        for (const [key, value] of Object.entries(transformedHeaders)) {
+            request.setHeader(key, value);
         }
     }
 
