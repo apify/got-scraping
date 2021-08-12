@@ -1,19 +1,21 @@
-import http from'http';
+import { URL } from 'url';
+import { AddressInfo } from 'net';
+import http, { Agent, Server } from 'http';
 // @ts-expect-error Missing types
 import HeaderGenerator from 'header-generator';
-import { got } from 'got-cjs';
+import { got, Options } from 'got-cjs';
 
 import { browserHeadersHook, mergeHeaders } from '../dist/hooks/browser-headers';
 import { TransformHeadersAgent } from '../dist/agent/transform-headers-agent';
-import gotScraping from '../dist/index';
+import gotScraping, { OptionsInit } from '../dist/index';
 
 import { startDummyServer } from './helpers/dummy-server';
 
 describe('Browser headers', () => {
-    let options;
-    let generatorSpy;
-    let server;
-    let port;
+    let options: OptionsInit;
+    let generatorSpy: any; // Missing types for jest.spy
+    let server: Server;
+    let port: number;
 
     const mockedHeaders = {
         'user-agent': 'test',
@@ -23,7 +25,7 @@ describe('Browser headers', () => {
 
     beforeAll(async () => {
         server = await startDummyServer();
-        port = server.address().port; //eslint-disable-line
+        port = (server.address() as AddressInfo).port; //eslint-disable-line
     });
 
     beforeEach(() => {
@@ -32,7 +34,7 @@ describe('Browser headers', () => {
             context: {},
             url: new URL('http://example.com'),
             headers: {},
-        };
+        } as Options;
         generatorSpy = jest.spyOn(HeaderGenerator.prototype, 'getHeaders').mockReturnValue(mockedHeaders);
     });
 
@@ -41,7 +43,7 @@ describe('Browser headers', () => {
     });
 
     test('should not generate headers without useHeaderGenerator', async () => {
-        await browserHeadersHook(options);
+        await browserHeadersHook(options as Options);
         expect(options).toEqual(options);
     });
 
@@ -59,7 +61,7 @@ describe('Browser headers', () => {
             },
         };
 
-        await browserHeadersHook(options);
+        await browserHeadersHook(options as Options);
 
         expect(generatorSpy).toHaveBeenCalled();
 
@@ -79,7 +81,7 @@ describe('Browser headers', () => {
             },
         };
 
-        await browserHeadersHook(options);
+        await browserHeadersHook(options as Options);
 
         expect(generatorSpy).toHaveBeenCalled();
         expect(options.headers).toEqual(mockedHeaders);
@@ -97,7 +99,7 @@ describe('Browser headers', () => {
             },
         };
 
-        await browserHeadersHook(options);
+        await browserHeadersHook(options as Options);
 
         expect(generatorSpy).toHaveBeenCalled();
         expect(options.headers).toEqual(mockedHeaders);
@@ -113,7 +115,7 @@ describe('Browser headers', () => {
                 ],
             },
         };
-        await browserHeadersHook(options);
+        await browserHeadersHook(options as Options);
 
         expect(generatorSpy).toHaveBeenLastCalledWith(expect.objectContaining(options.context.headerGeneratorOptions));
     });
@@ -126,7 +128,7 @@ describe('Browser headers', () => {
                 ...got.defaults.options.headers,
             },
         };
-        await browserHeadersHook(options);
+        await browserHeadersHook(options as Options);
 
         expect(options.headers).toEqual(mockedHeaders);
     });
@@ -137,7 +139,7 @@ describe('Browser headers', () => {
 
         const headers = await got(`http://localhost:${port}/headers`, {
             agent: {
-                http: new TransformHeadersAgent(http.globalAgent),
+                http: new TransformHeadersAgent(http.globalAgent) as unknown as Agent,
             },
             headers: {
                 'user-agent': undefined,
@@ -166,17 +168,19 @@ describe('Browser headers', () => {
     test('should have capitalized headers with http1', async () => {
         generatorSpy.mockRestore();
 
-        options = {
+        const o: OptionsInit = {
             useHeaderGenerator: true,
             headerGeneratorOptions: {
                 browsers: [
                     { name: 'chrome' },
                 ],
             },
+            url: `http://localhost:${port}/headers`,
+            http2: false,
         };
-        options.url = `http://localhost:${port}/headers`;
-        options.http2 = false;
-        const headers = await gotScraping(options).json();
+
+        // @ts-expect-error FIXME
+        const headers = await gotScraping(o).json();
 
         expect(headers).toMatchObject({
             'User-Agent': expect.stringContaining('Chrome'),

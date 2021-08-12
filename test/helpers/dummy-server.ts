@@ -1,13 +1,14 @@
-import express from 'express';
+import { Server } from 'http';
+import express, { Express } from 'express';
 import bodyParser from 'body-parser';
 
-const startExpressAppPromise = (app, port) => {
+const startExpressAppPromise = (app: Express, port: number): Promise<Server> => {
     return new Promise((resolve) => {
         const server = app.listen(port, () => resolve(server));
     });
 };
 
-const parseHeaders = (rawHeaders, obj = {}) => {
+const parseHeaders = (rawHeaders: string[], obj: any = {}) => {
     for (let i = 0; i < rawHeaders.length; i += 2) {
         // We don't want to normalize them.
         const key = rawHeaders[i].toString()/* .toLowerCase() */;
@@ -28,7 +29,7 @@ const parseHeaders = (rawHeaders, obj = {}) => {
     return obj;
 };
 
-const startDummyServer = async (port) => {
+const startDummyServer = async (port = 0): Promise<Server> => {
     const app = express();
     app.use(bodyParser.urlencoded({
         extended: true,
