@@ -1,6 +1,6 @@
 import { Server } from 'http';
 import { AddressInfo } from 'net';
-import gotScraping, { OptionsInit } from '../dist';
+import gotScraping, { OptionsInit } from '../src';
 import { startDummyServer } from './helpers/dummy-server';
 
 describe('Custom options', () => {

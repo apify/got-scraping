@@ -5,9 +5,9 @@ import http, { Agent, Server } from 'http';
 import HeaderGenerator from 'header-generator';
 import { got, Options } from 'got-cjs';
 
-import { browserHeadersHook, mergeHeaders } from '../dist/hooks/browser-headers';
-import { TransformHeadersAgent } from '../dist/agent/transform-headers-agent';
-import gotScraping, { OptionsInit } from '../dist/index';
+import { browserHeadersHook, mergeHeaders } from '../src/hooks/browser-headers';
+import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
+import gotScraping, { OptionsInit } from '../src/index';
 
 import { startDummyServer } from './helpers/dummy-server';
 

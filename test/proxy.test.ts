@@ -5,8 +5,8 @@ import {
     HttpProxyAgent,
 } from 'hpagent';
 
-import { proxyHook, agentCache } from '../dist/hooks/proxy';
-import { TransformHeadersAgent } from '../dist/agent/transform-headers-agent';
+import { proxyHook, agentCache } from '../src/hooks/proxy';
+import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
 import { Options } from '../src';
 
 const {

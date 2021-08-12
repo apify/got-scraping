@@ -1,7 +1,7 @@
 import { AddressInfo } from 'net';
 import { Server } from 'http';
-import { SCRAPING_DEFAULT_OPTIONS } from '../dist/scraping-defaults';
-import gotScraping from '../dist/index';
+import { SCRAPING_DEFAULT_OPTIONS } from '../src/scraping-defaults';
+import gotScraping from '../src/index';
 import { startDummyServer } from './helpers/dummy-server';
 
 describe('Scraping defaults', () => {

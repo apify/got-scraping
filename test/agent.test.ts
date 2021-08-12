@@ -1,7 +1,7 @@
 import { AddressInfo } from 'net';
 import http, { Agent, Server } from 'http';
 import getStream from 'get-stream';
-import { TransformHeadersAgent } from '../dist/agent/transform-headers-agent';
+import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
 import { startDummyServer } from './helpers/dummy-server';
 
 const agent = new http.Agent({
