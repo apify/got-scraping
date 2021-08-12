@@ -1,10 +1,10 @@
-const net = require('net');
-const { once } = require('events');
-const gotExports = require('got-cjs');
-const getStream = require('get-stream');
-const gotScraping = require('../dist');
+import net from 'net';
+import { once } from 'events';
+import gotExports from 'got-cjs';
+import getStream from 'get-stream';
+import gotScraping from '../dist';
 
-const { startDummyServer } = require('./helpers/dummy-server');
+import { startDummyServer } from './helpers/dummy-server';
 
 describe('GotScraping', () => {
     let server;

@@ -1,3 +1,26 @@
 {
-    "extends": "@apify/eslint-config-ts"
-}
+    "extends": [
+      "@apify/ts"
+    ],
+    "parserOptions": {
+      "project": "tsconfig.eslint.json"
+    },
+    "overrides": [
+      {
+        "files": [
+          "src/**/*.ts"
+        ],
+        "rules": {
+          "import/extensions": 0
+        }
+      },
+      {
+        "files": [
+          "test/**/*.js"
+        ],
+        "env": {
+          "jest": true
+        }
+      }
+    ]
+  }

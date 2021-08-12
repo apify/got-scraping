@@ -1,12 +1,12 @@
-const http = require('http');
-const HeaderGenerator = require('header-generator');
-const { got } = require('got-cjs');
+import http from'http';
+import HeaderGenerator from 'header-generator';
+import { got } from 'got-cjs';
 
-const { browserHeadersHook, mergeHeaders } = require('../dist/hooks/browser-headers');
-const { TransformHeadersAgent } = require('../dist/agent/transform-headers-agent');
-const gotScraping = require('../dist/index');
+import { browserHeadersHook, mergeHeaders } from '../dist/hooks/browser-headers';
+import { TransformHeadersAgent } from '../dist/agent/transform-headers-agent';
+import gotScraping from '../dist/index';
 
-const { startDummyServer } = require('./helpers/dummy-server');
+import { startDummyServer } from './helpers/dummy-server';
 
 describe('Browser headers', () => {
     let options;

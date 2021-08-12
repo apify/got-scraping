@@ -1,11 +1,11 @@
-const http2 = require('http2-wrapper');
-const {
+import http2 from 'http2-wrapper';
+import {
     HttpsProxyAgent,
     HttpProxyAgent,
-} = require('hpagent');
+} from 'hpagent';
 
-const { proxyHook, agentCache } = require('../dist/hooks/proxy');
-const { TransformHeadersAgent } = require('../dist/agent/transform-headers-agent');
+import { proxyHook, agentCache } from '../dist/hooks/proxy';
+import { TransformHeadersAgent } from '../dist/agent/transform-headers-agent';
 
 const {
     HttpOverHttp2,

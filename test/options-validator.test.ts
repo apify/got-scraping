@@ -1,6 +1,6 @@
-const {
+import {
     optionsValidationHandler,
-} = require('../dist/hooks/options-validation');
+} from '../dist/hooks/options-validation';
 
 describe('Options validation', () => {
     const nextMock = () => {};

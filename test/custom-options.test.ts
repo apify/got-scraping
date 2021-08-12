@@ -1,5 +1,5 @@
-const gotScraping = require('../dist');
-const { startDummyServer } = require('./helpers/dummy-server');
+import gotScraping from '../dist';
+import { startDummyServer } from './helpers/dummy-server';
 
 describe('Custom options', () => {
     let server;

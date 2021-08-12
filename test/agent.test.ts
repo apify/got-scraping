@@ -1,12 +1,12 @@
-const http = require('http');
-const getStream = require('get-stream');
-const { TransformHeadersAgent } = require('../dist/agent/transform-headers-agent');
+import http from 'http';
+import getStream from 'get-stream';
+import { TransformHeadersAgent } from '../dist/agent/transform-headers-agent';
 
 const agent = new http.Agent({
     keepAlive: true,
 });
 
-const { startDummyServer } = require('./helpers/dummy-server');
+import { startDummyServer } from './helpers/dummy-server';
 
 describe('TransformHeadersAgent', () => {
     let server;
