@@ -7,7 +7,7 @@ import { Context } from '../context';
  * Merges original generated headers and user provided overrides.
  * All header overrides will have the original header case, because of antiscraping.
  */
-export function mergeHeaders(original: Record<string, string>, overrides: Record<string, string>) {
+export function mergeHeaders(original: Record<string, string>, overrides: Record<string, string | undefined>) {
     const fixedHeaders = new Map();
 
     for (const entry of Object.entries(original)) {

@@ -1,14 +1,16 @@
-const { SCRAPING_DEFAULT_OPTIONS } = require('../dist/scraping-defaults');
-const gotScraping = require('../dist/index');
-const { startDummyServer } = require('./helpers/dummy-server');
+import { AddressInfo } from 'net';
+import { Server } from 'http';
+import { SCRAPING_DEFAULT_OPTIONS } from '../src/scraping-defaults';
+import gotScraping from '../src/index';
+import { startDummyServer } from './helpers/dummy-server';
 
 describe('Scraping defaults', () => {
-    let server;
-    let port;
+    let server: Server;
+    let port: number;
 
     beforeAll(async () => {
         server = await startDummyServer();
-        port = server.address().port; //eslint-disable-line
+        port = (server.address() as AddressInfo).port; //eslint-disable-line
     });
 
     afterAll(() => {
@@ -19,6 +21,7 @@ describe('Scraping defaults', () => {
         const response = await gotScraping.get(`http://localhost:${port}/html`);
 
         const defaults = { ...SCRAPING_DEFAULT_OPTIONS };
+        // @ts-expect-error We delete a defined type on purpose.
         delete defaults.headers;
 
         expect(response.request.options).toMatchObject(defaults);

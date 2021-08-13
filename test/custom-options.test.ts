@@ -1,13 +1,15 @@
-const gotScraping = require('../dist');
-const { startDummyServer } = require('./helpers/dummy-server');
+import { Server } from 'http';
+import { AddressInfo } from 'net';
+import gotScraping, { OptionsInit } from '../src';
+import { startDummyServer } from './helpers/dummy-server';
 
 describe('Custom options', () => {
-    let server;
-    let port;
+    let server: Server;
+    let port: number;
 
     beforeAll(async () => {
         server = await startDummyServer();
-        port = server.address().port; //eslint-disable-line
+        port = (server.address() as AddressInfo).port; //eslint-disable-line
     });
 
     afterAll(() => {
@@ -17,7 +19,7 @@ describe('Custom options', () => {
     test('should move custom options to context', async () => {
         expect.assertions(2);
 
-        const options = {
+        const options: OptionsInit = {
             url: `http://localhost:${port}/html`,
             proxyUrl: 'http://localhost:8080',
             http2: false,
