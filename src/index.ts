@@ -27,8 +27,8 @@ const gotScraping = gotCjs.extend({
         insecureHTTPParser: true,
     },
     agent: {
-        http: new TransformHeadersAgent(http.globalAgent) as unknown as http.Agent,
-        https: new TransformHeadersAgent(https.globalAgent) as unknown as https.Agent,
+        http: new TransformHeadersAgent(http.globalAgent),
+        https: new TransformHeadersAgent(https.globalAgent),
     },
     hooks: {
         init: [

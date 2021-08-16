@@ -7,7 +7,7 @@ import { Agent as HttpAgent, ClientRequest, ClientRequestArgs } from 'http';
  * Wraps an existing Agent instance,
  * so there's no need to replace `agent.addRequest`.
  */
-class WrappedAgent<T extends HttpAgent> {
+class WrappedAgent<T extends HttpAgent> implements HttpAgent {
     agent: T;
 
     constructor(agent: T) {
@@ -45,6 +45,28 @@ class WrappedAgent<T extends HttpAgent> {
 
     destroy() {
         this.agent.destroy();
+    }
+
+    // Let's implement `HttpAgent` so we don't have to
+    // type `WrappedAgent as unknown as HttpAgent`
+    get maxFreeSockets() {
+        return this.agent.maxFreeSockets;
+    }
+
+    get maxTotalSockets() {
+        return this.agent.maxTotalSockets;
+    }
+
+    get freeSockets() {
+        return this.agent.freeSockets;
+    }
+
+    get sockets() {
+        return this.agent.sockets;
+    }
+
+    get requests() {
+        return this.agent.requests;
     }
 }
 

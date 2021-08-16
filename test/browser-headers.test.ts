@@ -139,7 +139,7 @@ describe('Browser headers', () => {
 
         const headers = await got(`http://localhost:${port}/headers`, {
             agent: {
-                http: new TransformHeadersAgent(http.globalAgent) as unknown as Agent,
+                http: new TransformHeadersAgent(http.globalAgent),
             },
             headers: {
                 'user-agent': undefined,

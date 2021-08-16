@@ -1,5 +1,5 @@
 import { AddressInfo } from 'net';
-import http, { Agent, Server } from 'http';
+import http, { Server } from 'http';
 import getStream from 'get-stream';
 import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
 import { startDummyServer } from './helpers/dummy-server';
@@ -81,7 +81,7 @@ describe('TransformHeadersAgent', () => {
         }));
 
         const request = http.request(`http://localhost:${port}/headers`, {
-            agent: transformAgent as unknown as Agent,
+            agent: transformAgent,
         }, async (response) => {
             const body = await getStream(response);
             const headers = JSON.parse(body);
@@ -102,7 +102,7 @@ describe('TransformHeadersAgent', () => {
         }));
 
         const request = http.request(`http://localhost:${port}/headers`, {
-            agent: transformAgent as unknown as Agent,
+            agent: transformAgent,
         }, async (response) => {
             const body = await getStream(response);
             const headers = JSON.parse(body);
@@ -125,7 +125,7 @@ describe('TransformHeadersAgent', () => {
             }));
 
             const request = http.request(`http://localhost:${port}/headers`, {
-                agent: transformAgent as unknown as Agent,
+                agent: transformAgent,
             }, async (response) => {
                 const body = await getStream(response);
                 const headers = JSON.parse(body);
@@ -148,7 +148,7 @@ describe('TransformHeadersAgent', () => {
             }));
 
             const request = http.request(`http://localhost:${port}/headers`, {
-                agent: transformAgent as unknown as Agent,
+                agent: transformAgent,
             }, async (response) => {
                 const body = await getStream(response);
                 const headers = JSON.parse(body);
@@ -173,7 +173,7 @@ describe('TransformHeadersAgent', () => {
             }));
 
             const request = http.request(`http://localhost:${port}/headers`, {
-                agent: transformAgent as unknown as Agent,
+                agent: transformAgent,
                 headers: {
                     'content-length': 5,
                 },
@@ -198,7 +198,7 @@ describe('TransformHeadersAgent', () => {
             }));
 
             const request = http.request(`http://localhost:${port}/headers`, {
-                agent: transformAgent as unknown as Agent,
+                agent: transformAgent,
                 headers: {
                     connection: 'close',
                 },
