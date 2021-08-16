@@ -1,4 +1,4 @@
-import { Agent as HttpAgent, ClientRequest, ClientRequestArgs } from 'http';
+import { Agent as HttpAgent, AgentOptions, ClientRequest, ClientRequestArgs } from 'http';
 
 /**
  * @see https://github.com/nodejs/node/blob/533cafcf7e3ab72e98a2478bc69aedfdf06d3a5e/lib/_http_client.js#L129-L162
@@ -14,58 +14,58 @@ class WrappedAgent<T extends HttpAgent> implements HttpAgent {
         this.agent = agent;
     }
 
-    addRequest(request: ClientRequest, options: ClientRequestArgs) {
+    addRequest(request: ClientRequest, options: ClientRequestArgs): void {
         // @ts-expect-error @types/node has incorrect types
-        return this.agent.addRequest(request, options);
+        this.agent.addRequest(request, options);
     }
 
-    get keepAlive() {
+    get keepAlive(): boolean {
         // @ts-expect-error @types/node has incorrect types
         return this.agent.keepAlive;
     }
 
-    get maxSockets() {
+    get maxSockets(): HttpAgent['maxSockets'] {
         return this.agent.maxSockets;
     }
 
-    get options() {
+    get options(): AgentOptions {
         // @ts-expect-error @types/node has incorrect types
         return this.agent.options;
     }
 
-    get defaultPort() {
+    get defaultPort(): number {
         // @ts-expect-error @types/node has incorrect types
         return this.agent.defaultPort;
     }
 
-    get protocol() {
+    get protocol(): string {
         // @ts-expect-error @types/node has incorrect types
         return this.agent.protocol;
     }
 
-    destroy() {
+    destroy(): void {
         this.agent.destroy();
     }
 
     // Let's implement `HttpAgent` so we don't have to
     // type `WrappedAgent as unknown as HttpAgent`
-    get maxFreeSockets() {
+    get maxFreeSockets(): HttpAgent['maxFreeSockets'] {
         return this.agent.maxFreeSockets;
     }
 
-    get maxTotalSockets() {
+    get maxTotalSockets(): HttpAgent['maxTotalSockets'] {
         return this.agent.maxTotalSockets;
     }
 
-    get freeSockets() {
+    get freeSockets(): HttpAgent['freeSockets'] {
         return this.agent.freeSockets;
     }
 
-    get sockets() {
+    get sockets(): HttpAgent['sockets'] {
         return this.agent.sockets;
     }
 
-    get requests() {
+    get requests(): HttpAgent['requests'] {
         return this.agent.requests;
     }
 }

@@ -17,7 +17,7 @@ class TransformHeadersAgent<T extends Agent> extends WrappedAgent<T> {
     /**
      * Transforms the request via header normalization.
      */
-    transformRequest(request: ClientRequest, sortHeaders: boolean) {
+    transformRequest(request: ClientRequest, sortHeaders: boolean): void {
         const headers: Record<string, string | number | string[]> = {};
         const hasConnection = request.hasHeader('connection');
         const hasContentLength = request.hasHeader('content-length');
@@ -74,7 +74,7 @@ class TransformHeadersAgent<T extends Agent> extends WrappedAgent<T> {
         }
     }
 
-    override addRequest(request: ClientRequest, options: ClientRequestArgs) {
+    override addRequest(request: ClientRequest, options: ClientRequestArgs): void {
         const typedRequest = request as ClientRequest & {
             _storeHeader: (firstLine: string, headers: Record<string, string>) => void;
         };
@@ -96,7 +96,7 @@ class TransformHeadersAgent<T extends Agent> extends WrappedAgent<T> {
         return super.addRequest(request, options);
     }
 
-    toPascalCase(header: string) {
+    toPascalCase(header: string): string {
         return header.split('-').map((part) => {
             return part[0]!.toUpperCase() + part.slice(1).toLowerCase();
         }).join('-');

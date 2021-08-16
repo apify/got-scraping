@@ -50,7 +50,7 @@ const fixAgent = (agent: Agent) => {
     return agent;
 };
 
-export async function proxyHook(options: Options) {
+export async function proxyHook(options: Options): Promise<void> {
     const { context: { proxyUrl } } = options;
 
     if (proxyUrl) {
