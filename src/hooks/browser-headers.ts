@@ -27,7 +27,7 @@ export async function browserHeadersHook(options: Options) {
         headerGeneratorOptions,
         useHeaderGenerator,
         headerGenerator,
-    } = context as unknown as Context;
+    } = context as Context;
 
     if (!useHeaderGenerator) return;
 
