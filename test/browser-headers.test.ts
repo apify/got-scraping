@@ -1,6 +1,6 @@
 import { URL } from 'url';
 import { AddressInfo } from 'net';
-import http, { Agent, Server } from 'http';
+import http, { Server } from 'http';
 // @ts-expect-error Missing types
 import HeaderGenerator from 'header-generator';
 import { got } from 'got-cjs';
