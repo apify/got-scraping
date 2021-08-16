@@ -29,7 +29,7 @@ export async function browserHeadersHook(options: Options): Promise<void> {
         headerGenerator,
     } = context as Context;
 
-    if (!useHeaderGenerator) return;
+    if (!useHeaderGenerator || !headerGenerator) return;
 
     const url = options.url as URL;
 
@@ -50,7 +50,7 @@ export async function browserHeadersHook(options: Options): Promise<void> {
         ...headerGeneratorOptions,
     };
 
-    const generatedHeaders = (headerGenerator as any).getHeaders(mergedHeaderGeneratorOptions);
+    const generatedHeaders = headerGenerator.getHeaders(mergedHeaderGeneratorOptions);
 
     // TODO: Remove this when Got supports Headers class.
     options.headers = mergeHeaders(generatedHeaders, options.headers as Record<string, string>);

@@ -6,7 +6,7 @@ export interface Context extends Record<string, unknown> {
     proxyUrl?: string;
     headerGeneratorOptions?: Record<string, unknown>;
     useHeaderGenerator?: boolean;
-    headerGenerator?: unknown;
+    headerGenerator?: { getHeaders: (options: Record<string, unknown>) => Record<string, string> };
     insecureHTTPParser?: boolean;
 }
 
