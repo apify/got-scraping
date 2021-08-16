@@ -9,7 +9,7 @@ describe('Custom options', () => {
 
     beforeAll(async () => {
         server = await startDummyServer();
-        port = (server.address() as AddressInfo).port; //eslint-disable-line
+        port = (server.address() as AddressInfo).port;
     });
 
     afterAll(() => {
