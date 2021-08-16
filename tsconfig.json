@@ -1,0 +1,10 @@
+{
+	"extends": "@apify/tsconfig",
+	"compilerOptions": {
+		"outDir": "dist",
+		"lib": ["ESNext"]
+	},
+	"include": [
+		"src"
+	]
+}
