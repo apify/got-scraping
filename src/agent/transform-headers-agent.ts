@@ -17,7 +17,7 @@ export class TransformHeadersAgent<T extends Agent> extends WrappedAgent<T> {
     /**
      * Transforms the request via header normalization.
      */
-    transformRequest(request: ClientRequest, sortHeaders: boolean): void {
+    transformRequest(request: ClientRequest, { sortHeaders }: {sortHeaders: boolean}): void {
         const headers: Record<string, string | number | string[]> = {};
         const hasConnection = request.hasHeader('connection');
         const hasContentLength = request.hasHeader('content-length');
@@ -85,7 +85,7 @@ export class TransformHeadersAgent<T extends Agent> extends WrappedAgent<T> {
         //       the `connection`, `content-length` and `trasfer-encoding` headers
         //       directly to the underlying buffer.
         typedRequest._storeHeader = (...args) => {
-            this.transformRequest(request, true);
+            this.transformRequest(request, { sortHeaders: true });
 
             return _storeHeader.call(request, ...args);
         };

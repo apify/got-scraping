@@ -48,7 +48,7 @@ describe('TransformHeadersAgent', () => {
         });
 
         const transformAgent = new TransformHeadersAgent(agent);
-        transformAgent.transformRequest(request, true);
+        transformAgent.transformRequest(request, { sortHeaders: true });
 
         request.end();
     });
@@ -70,7 +70,7 @@ describe('TransformHeadersAgent', () => {
         });
 
         const transformAgent = new TransformHeadersAgent(agent);
-        transformAgent.transformRequest(request, true);
+        transformAgent.transformRequest(request, { sortHeaders: true });
 
         request.end();
     });
