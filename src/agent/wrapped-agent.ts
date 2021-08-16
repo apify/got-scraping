@@ -1,5 +1,4 @@
 import { Agent as HttpAgent, ClientRequest, ClientRequestArgs } from 'http';
-import { Agent as HttpsAgent } from 'https';
 
 /**
  * @see https://github.com/nodejs/node/blob/533cafcf7e3ab72e98a2478bc69aedfdf06d3a5e/lib/_http_client.js#L129-L162
@@ -8,10 +7,10 @@ import { Agent as HttpsAgent } from 'https';
  * Wraps an existing Agent instance,
  * so there's no need to replace `agent.addRequest`.
  */
-class WrappedAgent {
-    agent: HttpAgent | HttpsAgent;
+class WrappedAgent<T extends HttpAgent> {
+    agent: T;
 
-    constructor(agent: HttpAgent | HttpsAgent) {
+    constructor(agent: T) {
         this.agent = agent;
     }
 
