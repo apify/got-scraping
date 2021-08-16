@@ -7,7 +7,7 @@ import { got } from 'got-cjs';
 
 import { browserHeadersHook, mergeHeaders } from '../src/hooks/browser-headers';
 import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
-import { gotScraping, Options, OptionsInit } from '../src/index';
+import { gotScraping, Options } from '../src/index';
 
 import { startDummyServer } from './helpers/dummy-server';
 
@@ -168,7 +168,7 @@ describe('Browser headers', () => {
     test('should have capitalized headers with http1', async () => {
         generatorSpy.mockRestore();
 
-        const o: OptionsInit = {
+        const o = {
             useHeaderGenerator: true,
             headerGeneratorOptions: {
                 browsers: [
@@ -179,7 +179,6 @@ describe('Browser headers', () => {
             http2: false,
         };
 
-        // @ts-expect-error FIXME
         const headers = await gotScraping(o).json();
 
         expect(headers).toMatchObject({

@@ -9,6 +9,8 @@ import { startDummyServer } from './helpers/dummy-server';
 
 const getPort = (server: TCPServer) => (server.address() as AddressInfo).port;
 
+// All `fixme`s here are related with https://github.com/sindresorhus/got/issues/1117
+
 describe('GotScraping', () => {
     let server: Server;
     let port: number;
@@ -88,8 +90,10 @@ describe('GotScraping', () => {
             expect(key in gotScraping).toBe(true);
 
             if (key !== 'got' && key !== 'default') {
-                // @ts-expect-error FIXME
-                expect(String(gotScraping[key])).toBe(String(gotExports[key]));
+                const gotScrapingValue = gotScraping[key as keyof typeof gotScraping];
+                const gotExprotsValue = gotExports[key as keyof typeof gotExports];
+
+                expect(String(gotScrapingValue)).toBe(String(gotExprotsValue));
             }
         }
 
