@@ -12,7 +12,7 @@ const generator = new HeaderGenerator();
 /**
  * Transforms the casing of the headers to Pascal-Case.
  */
-class TransformHeadersAgent<T extends Agent> extends WrappedAgent<T> {
+export class TransformHeadersAgent<T extends Agent> extends WrappedAgent<T> {
     // Rewritten from https://github.com/nodejs/node/blob/533cafcf7e3ab72e98a2478bc69aedfdf06d3a5e/lib/_http_outgoing.js#L442-L479
     /**
      * Transforms the request via header normalization.
@@ -102,5 +102,3 @@ class TransformHeadersAgent<T extends Agent> extends WrappedAgent<T> {
         }).join('-');
     }
 }
-
-export { TransformHeadersAgent };

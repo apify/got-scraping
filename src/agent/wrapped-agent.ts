@@ -7,7 +7,7 @@ import { Agent as HttpAgent, AgentOptions, ClientRequest, ClientRequestArgs } fr
  * Wraps an existing Agent instance,
  * so there's no need to replace `agent.addRequest`.
  */
-class WrappedAgent<T extends HttpAgent> implements HttpAgent {
+export class WrappedAgent<T extends HttpAgent> implements HttpAgent {
     agent: T;
 
     constructor(agent: T) {
@@ -69,5 +69,3 @@ class WrappedAgent<T extends HttpAgent> implements HttpAgent {
         return this.agent.requests;
     }
 }
-
-export { WrappedAgent };
