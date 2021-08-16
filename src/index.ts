@@ -45,8 +45,8 @@ const gotScraping = gotCjs.extend({
 });
 
 export * from 'got-cjs';
-
 export { gotScraping };
+export default undefined as never;
 
 export {
     GotOptionsInit,
