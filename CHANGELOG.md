@@ -4,6 +4,7 @@
 - Enable insecure parser by default
 - Use `header-generator` to order headers
 - Migrate to `hpagent`
+- Remove `default` export in favor of `import { gotScraping }`
 
 2.1.2 / 2021/08/06
 ====================

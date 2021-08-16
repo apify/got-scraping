@@ -13,7 +13,7 @@ import { startDummyServer } from './helpers/dummy-server';
 
 describe('Browser headers', () => {
     let options: Options;
-    let generatorSpy: any; // Missing types for jest.spy
+    let generatorSpy: jest.SpyInstance;
     let server: Server;
     let port: number;
 
