@@ -7,7 +7,7 @@ import { got, Options } from 'got-cjs';
 
 import { browserHeadersHook, mergeHeaders } from '../src/hooks/browser-headers';
 import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
-import gotScraping, { OptionsInit } from '../src/index';
+import { gotScraping, OptionsInit } from '../src/index';
 
 import { startDummyServer } from './helpers/dummy-server';
 
@@ -34,7 +34,7 @@ describe('Browser headers', () => {
             context: {},
             url: new URL('http://example.com'),
             headers: {},
-        } as Options;
+        };
         generatorSpy = jest.spyOn(HeaderGenerator.prototype, 'getHeaders').mockReturnValue(mockedHeaders);
     });
 
@@ -43,7 +43,7 @@ describe('Browser headers', () => {
     });
 
     test('should not generate headers without useHeaderGenerator', async () => {
-        await browserHeadersHook(options as Options);
+        await browserHeadersHook(options as unknown as Options);
         expect(options).toEqual(options);
     });
 
@@ -61,7 +61,7 @@ describe('Browser headers', () => {
             },
         };
 
-        await browserHeadersHook(options as Options);
+        await browserHeadersHook(options as unknown as Options);
 
         expect(generatorSpy).toHaveBeenCalled();
 
@@ -81,7 +81,7 @@ describe('Browser headers', () => {
             },
         };
 
-        await browserHeadersHook(options as Options);
+        await browserHeadersHook(options as unknown as Options);
 
         expect(generatorSpy).toHaveBeenCalled();
         expect(options.headers).toEqual(mockedHeaders);
@@ -99,7 +99,7 @@ describe('Browser headers', () => {
             },
         };
 
-        await browserHeadersHook(options as Options);
+        await browserHeadersHook(options as unknown as Options);
 
         expect(generatorSpy).toHaveBeenCalled();
         expect(options.headers).toEqual(mockedHeaders);
@@ -115,7 +115,7 @@ describe('Browser headers', () => {
                 ],
             },
         };
-        await browserHeadersHook(options as Options);
+        await browserHeadersHook(options as unknown as Options);
 
         expect(generatorSpy).toHaveBeenLastCalledWith(expect.objectContaining(options.context.headerGeneratorOptions));
     });
@@ -128,7 +128,7 @@ describe('Browser headers', () => {
                 ...got.defaults.options.headers,
             },
         };
-        await browserHeadersHook(options as Options);
+        await browserHeadersHook(options as unknown as Options);
 
         expect(options.headers).toEqual(mockedHeaders);
     });

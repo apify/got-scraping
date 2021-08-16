@@ -18,7 +18,7 @@ import { proxyHook } from './hooks/proxy';
 import { http2Hook } from './hooks/http2';
 import { insecureParserHook } from './hooks/insecure-parser';
 
-const got = gotCjs.extend({
+const gotScraping = gotCjs.extend({
     mutableDefaults: true,
     ...SCRAPING_DEFAULT_OPTIONS,
     context: {
@@ -45,18 +45,11 @@ const got = gotCjs.extend({
 });
 
 export * from 'got-cjs';
-export default got;
 
-export { got };
+export { gotScraping };
 
 export {
     GotOptionsInit,
     OptionsInit,
     Context,
 } from './context';
-
-// CommonJS compatibility
-Object.assign(got, module.exports);
-
-module.exports = got;
-module.exports.__esModule = true;

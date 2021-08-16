@@ -3,7 +3,7 @@ import net, { AddressInfo, Server as TCPServer } from 'net';
 import { once } from 'events';
 import gotExports from 'got-cjs';
 import getStream from 'get-stream';
-import gotScraping, { OptionsInit } from '../src';
+import { gotScraping, OptionsInit } from '../src';
 
 import { startDummyServer } from './helpers/dummy-server';
 
