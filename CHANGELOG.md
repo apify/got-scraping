@@ -1,6 +1,13 @@
 3.0.0 / TBD
 ====================
 - Switch to TypeScript
+- Enable insecure parser by default
+- Use `header-generator` to order headers
+- Migrate to `hpagent`
+
+2.1.2 / 2021/08/06
+====================
+- Mimic `got` interface
 
 2.1.1 / 2021/08/06
 ====================
