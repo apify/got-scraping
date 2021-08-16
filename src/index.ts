@@ -1,5 +1,3 @@
-// FIXME: lint fails
-/* eslint-disable no-underscore-dangle */
 import http from 'http';
 import https from 'https';
 
