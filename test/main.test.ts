@@ -93,11 +93,7 @@ describe('GotScraping', () => {
             }
         }
 
-        // Compatibility
-        // @ts-expect-error FIXME
-        expect(gotScraping.default).toBe(gotScraping);
-        // @ts-expect-error FIXME
-        expect(gotScraping.got).toBe(gotScraping);
+        expect('default' in gotScraping).toBe(false);
     });
 
     test('should allow passing custom properties', async () => {
