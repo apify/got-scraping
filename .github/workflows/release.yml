@@ -80,6 +80,9 @@ jobs:
         if: env.RELEASE_TAG == 'beta'
         run: node ./.github/scripts/before-beta-release.js
       -
+        name: Install Dependencies
+        run: npm install
+      -
         name: Publish to NPM
         run: NODE_AUTH_TOKEN=${{secrets.NPM_TOKEN}} npm publish --tag ${{ env.RELEASE_TAG }} --access public
       -
