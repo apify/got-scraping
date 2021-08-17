@@ -1,5 +1,5 @@
 # This file tells Git which files shouldn't be added to source control
-
+dist
 .idea
 node_modules
 coverage

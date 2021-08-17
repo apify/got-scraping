@@ -1,11 +1,13 @@
-const http2 = require('http2-wrapper');
-const {
+import { URL } from 'url';
+import http2 from 'http2-wrapper';
+import {
     HttpsProxyAgent,
-    HttpProxyAgent
-} = require('hpagent');
+    HttpProxyAgent,
+} from 'hpagent';
 
-const { proxyHook, agentCache } = require('../src/hooks/proxy');
-const TransformHeadersAgent = require('../src/agent/transform-headers-agent');
+import { proxyHook, agentCache } from '../src/hooks/proxy';
+import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
+import { Options } from '../src';
 
 const {
     HttpOverHttp2,
@@ -16,13 +18,13 @@ const {
 } = http2.proxies;
 
 describe('Proxy', () => {
-    let options;
+    let options: Options;
     beforeEach(() => {
         options = {
             context: {},
             https: {},
             url: new URL('https://example.com'),
-        };
+        } as Options;
     });
 
     afterEach(() => {
@@ -62,7 +64,7 @@ describe('Proxy', () => {
 
             const { agent } = options;
             expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
-            expect(agent.http.agent).toBeInstanceOf(HttpProxyAgent);
+            expect((agent.http as any).agent).toBeInstanceOf(HttpProxyAgent);
         });
 
         test('should support https request over http proxy', async () => {
@@ -73,7 +75,7 @@ describe('Proxy', () => {
 
             const { agent } = options;
             expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
-            expect(agent.https.agent).toBeInstanceOf(HttpsProxyAgent);
+            expect((agent.https as any).agent).toBeInstanceOf(HttpsProxyAgent);
         });
 
         test('should support http2 request over http proxy', async () => {
@@ -91,11 +93,11 @@ describe('Proxy', () => {
             // jest.clearAllMocks();
             jest.spyOn(http2.auto, 'resolveProtocol').mockResolvedValueOnce({ alpnProtocol: 'http/1.1' });
 
-            await proxyHook(options, 'here');
+            await proxyHook(options);
 
             const { agent } = options;
             expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
-            expect(agent.http.agent).toBeInstanceOf(HttpsProxyAgent);
+            expect((agent.http as any).agent).toBeInstanceOf(HttpsProxyAgent);
         });
 
         test('should support https request over https proxy', async () => {
@@ -106,7 +108,7 @@ describe('Proxy', () => {
 
             const { agent } = options;
             expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
-            expect(agent.https.agent).toBeInstanceOf(HttpsProxyAgent);
+            expect((agent.https as any).agent).toBeInstanceOf(HttpsProxyAgent);
         });
 
         test('should support http2 request over https proxy', async () => {
@@ -134,7 +136,7 @@ describe('Proxy', () => {
 
             const { agent } = options;
             expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
-            expect(agent.http.agent).toBeInstanceOf(HttpOverHttp2);
+            expect((agent.http as any).agent).toBeInstanceOf(HttpOverHttp2);
         });
 
         test('should support https request over http2 proxy', async () => {
@@ -148,7 +150,7 @@ describe('Proxy', () => {
 
             const { agent } = options;
             expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
-            expect(agent.https.agent).toBeInstanceOf(HttpsOverHttp2);
+            expect((agent.https as any).agent).toBeInstanceOf(HttpsOverHttp2);
         });
 
         test('should support http2 request over http2 proxy', async () => {

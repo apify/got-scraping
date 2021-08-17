@@ -1,18 +1,23 @@
-const net = require('net');
-const { once } = require('events');
-const gotExports = require('got-cjs');
-const getStream = require('get-stream');
-const gotScraping = require('../src');
+import { Server } from 'http';
+import net, { AddressInfo, Server as TCPServer } from 'net';
+import { once } from 'events';
+import gotExports from 'got-cjs';
+import getStream from 'get-stream';
+import { gotScraping, OptionsInit } from '../src';
 
-const { startDummyServer } = require('./helpers/dummy-server');
+import { startDummyServer } from './helpers/dummy-server';
+
+const getPort = (server: TCPServer) => (server.address() as AddressInfo).port;
+
+// All `fixme`s here are related with https://github.com/sindresorhus/got/issues/1117
 
 describe('GotScraping', () => {
-    let server;
-    let port;
+    let server: Server;
+    let port: number;
 
     beforeAll(async () => {
         server = await startDummyServer();
-        port = server.address().port; //eslint-disable-line
+        port = (server.address() as AddressInfo).port;
     });
 
     afterAll(() => {
@@ -25,7 +30,7 @@ describe('GotScraping', () => {
                 'HTTP/1.1 200 OK',
                 'connection: close',
                 'content-length: 0',
-                `host: localhost:${plain.address().port}`,
+                `host: localhost:${getPort(plain)}`,
                 `invalid: \x00`,
                 ``,
                 ``,
@@ -34,7 +39,7 @@ describe('GotScraping', () => {
 
         plain.listen(0, async () => {
             try {
-                const { headers } = await gotScraping(`http://localhost:${plain.address().port}`);
+                const { headers } = await gotScraping(`http://localhost:${getPort(plain)}`);
 
                 expect(headers.invalid).toBe('\x00');
             } catch (error) {
@@ -53,7 +58,7 @@ describe('GotScraping', () => {
                 'HTTP/1.1 200 OK',
                 'connection: close',
                 'content-length: 0',
-                `host: localhost:${plain.address().port}`,
+                `host: localhost:${getPort(plain)}`,
                 `invalid: \x00`,
                 ``,
                 ``,
@@ -62,9 +67,9 @@ describe('GotScraping', () => {
 
         plain.listen(0, async () => {
             try {
-                await gotScraping(`http://localhost:${plain.address().port}`, {
+                await gotScraping(`http://localhost:${getPort(plain)}`, {
                     insecureHTTPParser: false,
-                });
+                } as OptionsInit);
 
                 plain.close();
                 done(new Error('The request went through :('));
@@ -85,13 +90,14 @@ describe('GotScraping', () => {
             expect(key in gotScraping).toBe(true);
 
             if (key !== 'got' && key !== 'default') {
-                expect(gotScraping[key]).toBe(gotExports[key]);
+                const gotScrapingValue = gotScraping[key as keyof typeof gotScraping];
+                const gotExprotsValue = gotExports[key as keyof typeof gotExports];
+
+                expect(String(gotScrapingValue)).toBe(String(gotExprotsValue));
             }
         }
 
-        // Compatibility
-        expect(gotScraping.default).toBe(gotScraping);
-        expect(gotScraping.got).toBe(gotScraping);
+        expect('default' in gotScraping).toBe(false);
     });
 
     test('should allow passing custom properties', async () => {
@@ -207,9 +213,11 @@ describe('GotScraping', () => {
             const response = await gotScraping({
                 url: 'https://eshop.coop-box.cz/',
                 proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
-            });
+            } as OptionsInit);
 
+            // @ts-expect-error FIXME
             expect(response.statusCode).toBe(200);
+            // @ts-expect-error FIXME
             expect(response.httpVersion).toBe('1.1');
         });
 
@@ -225,14 +233,17 @@ describe('GotScraping', () => {
                 url: 'https://api.apify.com/v2/browser-info',
                 proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
                 http2: false,
-            });
+            } as OptionsInit);
 
             expect(response.statusCode).toBe(200);
             expect(response.request.options).toMatchObject({ http2: false });
 
+            // @ts-expect-error FIXME
             expect(responseProxy.statusCode).toBe(200);
 
+            // @ts-expect-error FIXME
             expect(response.body.clientIp).not.toBe(responseProxy.body.clientIp);
+            // @ts-expect-error FIXME
             expect(responseProxy.httpVersion).toBe('1.1');
         });
 
@@ -241,7 +252,8 @@ describe('GotScraping', () => {
                 url: 'https://api.apify.com/v2/browser-info?rawHeaders=1',
                 proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
                 http2: false,
-            }).json();
+                // @ts-expect-error FIXME
+            } as OptionsInit).json();
 
             expect(rawHeaders[0].toLowerCase()).toBe('connection');
         });
@@ -259,11 +271,14 @@ describe('GotScraping', () => {
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
                 proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
-            });
+            } as OptionsInit);
 
             const responseProxy = await proxyPromise;
+            // @ts-expect-error FIXME
             expect(responseProxy.statusCode).toBe(200);
+            // @ts-expect-error FIXME
             expect(response.body.clientIp).not.toBe(responseProxy.body.clientIp);
+            // @ts-expect-error FIXME
             expect(responseProxy.httpVersion).toBe('2.0');
         });
 
@@ -279,6 +294,7 @@ describe('GotScraping', () => {
 
             const response = await gotScraping.get(url, { responseType: 'json' });
             expect(response.statusCode).toBe(200);
+            // @ts-expect-error FIXME
             expect(response.body.tls_version).toBe('TLS 1.3');
         });
     });
@@ -411,6 +427,7 @@ describe('GotScraping', () => {
         });
 
         test('should order headers with proxyUrl and http1', async () => {
+            // @ts-expect-error FIXME
             const body = await getStream(gotScraping.stream({
                 url: 'https://api.apify.com/v2/browser-info?rawHeaders=1',
                 proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
@@ -437,6 +454,7 @@ describe('GotScraping', () => {
             });
 
             test('Should allow https target via http proxy when auto downgrading', async () => {
+                // @ts-expect-error FIXME
                 const stream = gotScraping.stream({
                     url: 'https://eshop.coop-box.cz/',
                     proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
@@ -460,6 +478,7 @@ describe('GotScraping', () => {
                 }
                 const responseBody = chunks.join();
 
+                // @ts-expect-error FIXME
                 const proxyStream = gotScraping.stream({
                     url: 'https://api.apify.com/v2/browser-info',
                     proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
@@ -497,6 +516,7 @@ describe('GotScraping', () => {
                 expect(response.statusCode).toBe(200);
                 expect(response.request.options).toMatchObject({ http2: true });
 
+                // @ts-expect-error FIXME
                 const proxyStream = gotScraping.stream({
                     url: 'https://api.apify.com/v2/browser-info',
                     proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,

@@ -1,10 +1,13 @@
-const http2 = require('http2-wrapper');
-const {
-    HttpsProxyAgent,
-    HttpProxyAgent,
-} = require('hpagent');
-const QuickLRU = require('quick-lru');
-const TransformHeadersAgent = require('../agent/transform-headers-agent');
+import { Agent as HttpAgent } from 'http';
+import { Agent as HttpsAgent } from 'https';
+import { URL } from 'url';
+import { proxies, auto } from 'http2-wrapper';
+import { HttpsProxyAgent, HttpProxyAgent } from 'hpagent';
+import QuickLRU from 'quick-lru';
+import { Options } from 'got-cjs';
+import { TransformHeadersAgent } from '../agent/transform-headers-agent';
+
+type Agent = HttpAgent | HttpsAgent;
 
 const {
     HttpOverHttp2,
@@ -12,30 +15,25 @@ const {
     Http2OverHttp2,
     Http2OverHttps,
     Http2OverHttp,
-} = http2.proxies;
+} = proxies;
+
+const x = {
+    '(https.js:': (a: Agent) => (a as {protocol?: string}).protocol,
+    '(http.js:': (a: Agent) => (a as {protocol?: string}).protocol,
+};
 
 // `agent-base` package does stacktrace checks
 // in order to set `agent.protocol`.
 // The keys in this object are names of functions
 // that will appear in the stacktrace.
-const isAmbiguousAgent = (agent) => {
-    if (!isAmbiguousAgent.x) {
-        isAmbiguousAgent.x = {
-            '(https.js:': (a) => a.protocol,
-            '(http.js:': (a) => a.protocol,
-        };
-    }
-
-    const { x } = isAmbiguousAgent;
-
+const isAmbiguousAgent = (agent: Agent): boolean => {
     return x['(https.js:'](agent) !== x['(http.js:'](agent);
 };
 
 /**
  * @see https://github.com/TooTallNate/node-agent-base/issues/61
- * @param {Agent} agent
  */
-const fixAgentBase = (agent) => {
+const fixAgentBase = (agent: Agent) => {
     if (isAmbiguousAgent(agent)) {
         Object.defineProperty(agent, 'protocol', {
             value: undefined,
@@ -45,34 +43,26 @@ const fixAgentBase = (agent) => {
     return agent;
 };
 
-/**
- * @param {Agent} agent
- */
-const fixAgent = (agent) => {
+const fixAgent = (agent: Agent) => {
     agent = fixAgentBase(agent);
-    agent = new TransformHeadersAgent(agent);
+    agent = new TransformHeadersAgent(agent) as unknown as Agent;
 
     return agent;
 };
 
-/**
- * @param {object} options
- */
-exports.proxyHook = async function (options) {
+export async function proxyHook(options: Options): Promise<void> {
     const { context: { proxyUrl } } = options;
 
     if (proxyUrl) {
-        const parsedProxy = new URL(proxyUrl);
+        const parsedProxy = new URL(proxyUrl as string);
 
         validateProxyProtocol(parsedProxy.protocol);
-        options.agent = await getAgents(parsedProxy, options.https.rejectUnauthorized);
-    }
-};
 
-/**
- * @param {string} protocol
- */
-function validateProxyProtocol(protocol) {
+        options.agent = await getAgents(parsedProxy, options.https.rejectUnauthorized!);
+    }
+}
+
+function validateProxyProtocol(protocol: string) {
     const isSupported = protocol === 'http:' || protocol === 'https:';
 
     if (!isSupported) {
@@ -80,14 +70,9 @@ function validateProxyProtocol(protocol) {
     }
 }
 
-exports.agentCache = new QuickLRU({ maxSize: 1000 });
+export const agentCache = new QuickLRU({ maxSize: 1000 });
 
-/**
- * @param {URL} parsedProxyUrl parsed proxyUrl
- * @param {boolean} rejectUnauthorized
- * @returns {object}
- */
-async function getAgents(parsedProxyUrl, rejectUnauthorized) {
+async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
     const key = `${rejectUnauthorized}:${parsedProxyUrl.href}`;
 
     let agent = exports.agentCache.get(key);
@@ -106,10 +91,11 @@ async function getAgents(parsedProxyUrl, rejectUnauthorized) {
     const proxyUrl = proxy.proxyOptions.url;
 
     if (proxyUrl.protocol === 'https:') {
-        const { alpnProtocol } = await http2.auto.resolveProtocol({
+        const { alpnProtocol } = await auto.resolveProtocol({
             host: parsedProxyUrl.hostname,
             port: parsedProxyUrl.port,
             rejectUnauthorized,
+            // @ts-expect-error Open an issue in http2-wrapper
             ALPNProtocols: ['h2', 'http/1.1'],
             servername: parsedProxyUrl.hostname,
         });
@@ -137,7 +123,7 @@ async function getAgents(parsedProxyUrl, rejectUnauthorized) {
         };
     }
 
-    exports.agentCache.set(key, agent);
+    agentCache.set(key, agent);
 
     return agent;
 }
