@@ -1,8 +1,6 @@
 const http2 = require('http2-wrapper');
-const {
-    HttpsProxyAgent,
-    HttpProxyAgent,
-} = require('hpagent');
+const HttpsProxyAgent = require('https-proxy-agent');
+const HttpProxyAgent = require('http-proxy-agent');
 const QuickLRU = require('quick-lru');
 const TransformHeadersAgent = require('../agent/transform-headers-agent');
 
@@ -124,15 +122,15 @@ async function getAgents(parsedProxyUrl, rejectUnauthorized) {
             };
         } else {
             agent = {
-                http: fixAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
-                https: fixAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
+                http: fixAgent(new HttpsProxyAgent(proxyUrl.href)),
+                https: fixAgent(new HttpsProxyAgent(proxyUrl.href)),
                 http2: new Http2OverHttps(proxy),
             };
         }
     } else {
         agent = {
-            http: fixAgent(new HttpProxyAgent({ proxy: proxyUrl })),
-            https: fixAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
+            http: fixAgent(new HttpProxyAgent(proxyUrl.href)),
+            https: fixAgent(new HttpsProxyAgent(proxyUrl.href)),
             http2: new Http2OverHttp(proxy),
         };
     }
