@@ -1,9 +1,7 @@
 import { URL } from 'url';
 import http2 from 'http2-wrapper';
-import {
-    HttpsProxyAgent,
-    HttpProxyAgent,
-} from 'hpagent';
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import { HttpProxyAgent } from 'http-proxy-agent';
 
 import { proxyHook, agentCache } from '../src/hooks/proxy';
 import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
