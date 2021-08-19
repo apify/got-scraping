@@ -31,9 +31,9 @@ const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callbac
 
             request.end();
 
-            request.once('connect', (_response, socket, head) => {
-                if (head.length > 0) {
-                    reject(new Error(`Unexpected data before CONNECT tunnel: ${head.length} bytes`));
+            request.once('connect', (response, socket, head) => {
+                if (response.statusCode !== 200 || head.length > 0) {
+                    reject(new Error(`Proxy responded with ${response.statusCode}: ${head.length} bytes`));
 
                     socket.destroy();
                     return;

@@ -1,4 +1,3 @@
-import dns from 'dns';
 import { Server } from 'http';
 import net, { AddressInfo, Server as TCPServer } from 'net';
 import { once } from 'events';
@@ -281,32 +280,6 @@ describe('GotScraping', () => {
             expect(response.body.clientIp).not.toBe(responseProxy.body.clientIp);
             // @ts-expect-error FIXME
             expect(responseProxy.httpVersion).toBe('2.0');
-        });
-
-        test('does not leak alpn', async () => {
-            const dnsQueries: string[] = [];
-            const { lookup } = dns;
-
-            // @ts-expect-error TypeScript is weird
-            dns.lookup = (...args) => {
-                dnsQueries.push(args[0]);
-
-                // @ts-expect-error TypeScript is weird
-                return lookup(...args);
-            };
-
-            const proxyPromise = gotScraping({
-                responseType: 'json',
-                url: 'https://api.apify.com/v2/browser-info',
-                proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
-            } as OptionsInit);
-
-            await proxyPromise;
-
-            console.log('dns', dnsQueries);
-            expect(dnsQueries.includes('api.apify.com')).toBe(false);
-
-            dns.lookup = lookup;
         });
 
         test('should support tls 1.2', async () => {
