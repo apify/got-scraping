@@ -305,6 +305,8 @@ describe('GotScraping', () => {
 
             console.log('dns', dnsQueries);
             expect(dnsQueries.includes('api.apify.com')).toBe(false);
+
+            dns.lookup = lookup;
         });
 
         test('should support tls 1.2', async () => {
