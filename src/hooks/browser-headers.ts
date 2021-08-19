@@ -2,6 +2,7 @@ import { URL } from 'url';
 import { Options } from 'got-cjs';
 import http2 from 'http2-wrapper';
 import { Context } from '../context';
+import { createResolveProtocol } from '../resolve-protocol';
 
 /**
  * Merges original generated headers and user provided overrides.
@@ -27,15 +28,18 @@ export async function browserHeadersHook(options: Options): Promise<void> {
         headerGeneratorOptions,
         useHeaderGenerator,
         headerGenerator,
+        proxyUrl,
     } = context as Context;
 
     if (!useHeaderGenerator || !headerGenerator) return;
 
     const url = options.url as URL;
 
+    const resolveProtocol = proxyUrl ? createResolveProtocol(proxyUrl) : http2.auto.resolveProtocol;
+
     let alpnProtocol;
     if (url.protocol === 'https:') {
-        alpnProtocol = (await http2.auto.resolveProtocol({
+        alpnProtocol = (await resolveProtocol({
             host: url.hostname,
             port: url.port || 443,
             rejectUnauthorized: false,
