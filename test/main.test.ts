@@ -1,7 +1,7 @@
 import { Server } from 'http';
 import net, { AddressInfo, Server as TCPServer } from 'net';
 import { once } from 'events';
-import gotExports from 'got-cjs';
+import gotExports, { Response } from 'got-cjs';
 import getStream from 'get-stream';
 import { gotScraping, OptionsInit } from '../src';
 
@@ -219,6 +219,29 @@ describe('GotScraping', () => {
             expect(response.statusCode).toBe(200);
             // @ts-expect-error FIXME
             expect(response.httpVersion).toBe('1.1');
+        });
+
+        test('should work with proxyUrl and unsecure http1', async () => {
+            const unproxiedResponse = await gotScraping({
+                responseType: 'json',
+                url: 'http://httpbin.org/anything',
+            } as OptionsInit);
+
+            const { body: { origin } } = unproxiedResponse as Response<{ origin: string }>;
+
+            const response = await gotScraping({
+                responseType: 'json',
+                url: 'http://httpbin.org/anything',
+                proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+                retry: {
+                    limit: 0,
+                },
+            } as OptionsInit);
+
+            const typedResponse = response as Response<{ origin: string }>;
+
+            expect(typedResponse.statusCode).toBe(200);
+            expect(typedResponse.body.origin).not.toBe(origin);
         });
 
         test('should work with proxyUrl and http1', async () => {

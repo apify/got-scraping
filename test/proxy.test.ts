@@ -1,7 +1,9 @@
 import { URL } from 'url';
 import http2 from 'http2-wrapper';
-import { HttpsProxyAgent } from 'https-proxy-agent';
-import { HttpProxyAgent } from 'http-proxy-agent';
+import {
+    HttpsProxyAgent,
+    HttpRegularProxyAgent,
+} from '../src/agent/h1-proxy-agent';
 
 import { proxyHook, agentCache } from '../src/hooks/proxy';
 import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
@@ -62,7 +64,7 @@ describe('Proxy', () => {
 
             const { agent } = options;
             expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
-            expect((agent.http as any).agent).toBeInstanceOf(HttpProxyAgent);
+            expect((agent.http as any).agent).toBeInstanceOf(HttpRegularProxyAgent);
         });
 
         test('should support https request over http proxy', async () => {
@@ -95,7 +97,7 @@ describe('Proxy', () => {
 
             const { agent } = options;
             expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
-            expect((agent.http as any).agent).toBeInstanceOf(HttpsProxyAgent);
+            expect((agent.http as any).agent).toBeInstanceOf(HttpRegularProxyAgent);
         });
 
         test('should support https request over https proxy', async () => {
