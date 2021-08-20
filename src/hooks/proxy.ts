@@ -2,8 +2,7 @@ import { Agent as HttpAgent } from 'http';
 import { Agent as HttpsAgent } from 'https';
 import { URL } from 'url';
 import { proxies, auto } from 'http2-wrapper';
-import { HttpsProxyAgent } from 'https-proxy-agent';
-import { HttpProxyAgent } from 'http-proxy-agent';
+import { HttpsProxyAgent, HttpProxyAgent } from 'hpagent';
 import QuickLRU from 'quick-lru';
 import { Options } from 'got-cjs';
 import { TransformHeadersAgent } from '../agent/transform-headers-agent';
@@ -111,15 +110,15 @@ async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
             };
         } else {
             agent = {
-                http: fixAgent(new HttpsProxyAgent(proxyUrl.href)),
-                https: fixAgent(new HttpsProxyAgent(proxyUrl.href)),
+                http: fixAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
+                https: fixAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
                 http2: new Http2OverHttps(proxy),
             };
         }
     } else {
         agent = {
-            http: fixAgent(new HttpProxyAgent(proxyUrl.href)),
-            https: fixAgent(new HttpsProxyAgent(proxyUrl.href)),
+            http: fixAgent(new HttpProxyAgent({ proxy: proxyUrl })),
+            https: fixAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
             http2: new Http2OverHttp(proxy),
         };
     }
