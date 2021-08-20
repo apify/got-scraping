@@ -2,9 +2,9 @@ import { Agent as HttpAgent } from 'http';
 import { Agent as HttpsAgent } from 'https';
 import { URL } from 'url';
 import { proxies, auto } from 'http2-wrapper';
-import { HttpsProxyAgent, HttpProxyAgent } from 'hpagent';
 import QuickLRU from 'quick-lru';
 import { Options } from 'got-cjs';
+import { HttpsProxyAgent, HttpRegularProxyAgent } from '../agent/h1-proxy-agent';
 import { TransformHeadersAgent } from '../agent/transform-headers-agent';
 
 type Agent = HttpAgent | HttpsAgent;
@@ -91,14 +91,22 @@ async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
     const proxyUrl = proxy.proxyOptions.url;
 
     if (proxyUrl.protocol === 'https:') {
-        const { alpnProtocol } = await auto.resolveProtocol({
-            host: parsedProxyUrl.hostname,
-            port: parsedProxyUrl.port,
-            rejectUnauthorized,
-            // @ts-expect-error Open an issue in http2-wrapper
-            ALPNProtocols: ['h2', 'http/1.1'],
-            servername: parsedProxyUrl.hostname,
-        });
+        let alpnProtocol = 'http/1.1';
+
+        try {
+            const result = await auto.resolveProtocol({
+                host: parsedProxyUrl.hostname,
+                port: parsedProxyUrl.port,
+                rejectUnauthorized,
+                // @ts-expect-error Open an issue in http2-wrapper
+                ALPNProtocols: ['h2', 'http/1.1'],
+                servername: parsedProxyUrl.hostname,
+            });
+
+            alpnProtocol = result.alpnProtocol;
+        } catch {
+            // Some proxies don't support CONNECT protocol, use http/1.1
+        }
 
         const proxyIsHttp2 = alpnProtocol === 'h2';
 
@@ -109,15 +117,17 @@ async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
                 http2: new Http2OverHttp2(proxy),
             };
         } else {
+            // Upstream proxies hang up connections on CONNECT + unsecure HTTP
             agent = {
-                http: fixAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
+                http: fixAgent(new HttpRegularProxyAgent({ proxy: proxyUrl })),
                 https: fixAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
                 http2: new Http2OverHttps(proxy),
             };
         }
     } else {
+        // Upstream proxies hang up connections on CONNECT + unsecure HTTP
         agent = {
-            http: fixAgent(new HttpProxyAgent({ proxy: proxyUrl })),
+            http: fixAgent(new HttpRegularProxyAgent({ proxy: proxyUrl })),
             https: fixAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
             http2: new Http2OverHttp(proxy),
         };
