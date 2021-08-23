@@ -4,23 +4,18 @@ import { OptionsInit } from '../context';
 export function customOptionsHook(raw: GotOptionsInit, options: Options): void {
     const typedRaw = raw as OptionsInit;
 
-    if ('proxyUrl' in typedRaw) {
-        options.context.proxyUrl = typedRaw.proxyUrl;
-        delete typedRaw.proxyUrl;
-    }
+    const names = [
+        'proxyUrl',
+        'headerGeneratorOptions',
+        'useHeaderGenerator',
+        'insecureHTTPParser',
+        'sessionToken',
+    ] as const;
 
-    if ('headerGeneratorOptions' in typedRaw) {
-        options.context.headerGeneratorOptions = typedRaw.headerGeneratorOptions;
-        delete typedRaw.headerGeneratorOptions;
-    }
-
-    if ('useHeaderGenerator' in typedRaw) {
-        options.context.useHeaderGenerator = typedRaw.useHeaderGenerator;
-        delete typedRaw.useHeaderGenerator;
-    }
-
-    if ('insecureHTTPParser' in raw) {
-        options.context.insecureHTTPParser = typedRaw.insecureHTTPParser;
-        delete typedRaw.insecureHTTPParser;
+    for (const name of names) {
+        if (name in raw) {
+            options.context[name] = typedRaw[name];
+            delete typedRaw[name];
+        }
     }
 }

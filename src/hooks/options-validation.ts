@@ -6,6 +6,7 @@ export function optionsValidationHandler(options: unknown): void {
         useHeaderGenerator: ow.optional.boolean,
         headerGeneratorOptions: ow.optional.object,
         insecureHTTPParser: ow.optional.boolean,
+        sessionToken: ow.optional.object,
     };
 
     ow(options, ow.object.partialShape(validationSchema));

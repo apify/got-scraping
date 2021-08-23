@@ -147,7 +147,7 @@ const SCRAPING_DEFAULT_OPTIONS = {
     throwHttpErrors: false,
     // Node js uses different TLS ciphers by default.
     // This is very useful at fighting protection, but can on some websites cause TLS errors.
-    ciphers: "TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256",
+    https: { ciphers: "TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256" },
     // We need to have browser-like headers to blend in.
     useHeaderGenerator: true,
     // Got has infinite timeout by default. In scraping we have to count with bad proxies. Without custom timeout it would just hang.
@@ -163,6 +163,8 @@ const SCRAPING_DEFAULT_OPTIONS = {
 `useHeaderGenerator` - Turns on the generation of the browser-like header. By default, it is set to `true`.
 
 `headerGeneratorOptions` - See the [HeaderGeneratorOptions](https://github.com/apify/header-generator/tree/master#headergeneratoroptions).
+
+`sessionToken` - A non-primitive unique object which is used to generate headers. By default, it's `undefined`, so new headers will be generated every time. Headers generated with the same `sessionToken` are always the same.
 
 ### Error recovery
 This section covers possible errors that might happen due to different site implementations.

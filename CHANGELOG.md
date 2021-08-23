@@ -1,10 +1,18 @@
-3.0.0 / TBD
+3.0.2 / TBD
+====================
+- Add `sessionToken` option to persist generated headers
+
+3.0.1 / 2021/08/20
+====================
+- Use own proxy agent
+
+3.0.0 / 2021/08/19
 ====================
 - Switch to TypeScript
 - Enable insecure parser by default
 - Use `header-generator` to order headers
-- Migrate to `hpagent`
 - Remove `default` export in favor of `import { gotScraping }`
+- Fix leaking ALPN negotiation
 
 2.1.2 / 2021/08/06
 ====================
