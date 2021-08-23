@@ -275,6 +275,33 @@ describe('Browser headers', () => {
             checkHeaders(headers);
             checkHeaders(secondHeaders);
         });
+
+        test('gives different headers with token', async () => {
+            generatorSpy.mockRestore();
+
+            options.resolveProtocol = () => ({ alpnProtocol: 'http/1.1' });
+
+            options.context = {
+                useHeaderGenerator: true,
+                headerGenerator,
+            };
+
+            const sessionToken = {};
+            options.context.sessionToken = sessionToken;
+
+            await browserHeadersHook(options as unknown as Options);
+            const { headers } = options;
+            options.headers = {};
+
+            options.context.sessionToken = {};
+
+            await browserHeadersHook(options as unknown as Options);
+            const secondHeaders = options.headers;
+
+            expect(headers).not.toEqual(secondHeaders);
+            checkHeaders(headers);
+            checkHeaders(secondHeaders);
+        });
     });
 
     describe('mergeHeaders', () => {
