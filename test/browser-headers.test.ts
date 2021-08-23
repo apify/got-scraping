@@ -276,7 +276,7 @@ describe('Browser headers', () => {
             checkHeaders(secondHeaders);
         });
 
-        test('gives different headers with token', async () => {
+        test('gives different headers with different token', async () => {
             generatorSpy.mockRestore();
 
             options.resolveProtocol = () => ({ alpnProtocol: 'http/1.1' });
