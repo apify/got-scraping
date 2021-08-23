@@ -232,7 +232,9 @@ describe('Browser headers', () => {
 
             options.context = {
                 useHeaderGenerator: true,
-                headerGenerator,
+                headerGenerator: new HeaderGenerator({
+                    browsers: [{ name: 'firefox' }],
+                }),
             };
 
             const sessionToken = {};
@@ -241,6 +243,10 @@ describe('Browser headers', () => {
             await browserHeadersHook(options as unknown as Options);
             const { headers } = options;
             options.headers = {};
+
+            options.context.headerGenerator = new HeaderGenerator({
+                browsers: [{ name: 'chrome' }],
+            });
 
             await browserHeadersHook(options as unknown as Options);
             const secondHeaders = options.headers;
@@ -256,7 +262,9 @@ describe('Browser headers', () => {
 
             options.context = {
                 useHeaderGenerator: true,
-                headerGenerator,
+                headerGenerator: new HeaderGenerator({
+                    browsers: [{ name: 'firefox' }],
+                }),
             };
 
             const sessionToken = {};
@@ -267,6 +275,10 @@ describe('Browser headers', () => {
             options.headers = {};
 
             options.resolveProtocol = () => ({ alpnProtocol: 'h2' });
+
+            options.context.headerGenerator = new HeaderGenerator({
+                browsers: [{ name: 'chrome' }],
+            });
 
             await browserHeadersHook(options as unknown as Options);
             const secondHeaders = options.headers;
@@ -283,7 +295,9 @@ describe('Browser headers', () => {
 
             options.context = {
                 useHeaderGenerator: true,
-                headerGenerator,
+                headerGenerator: new HeaderGenerator({
+                    browsers: [{ name: 'firefox' }],
+                }),
             };
 
             const sessionToken = {};
@@ -294,6 +308,10 @@ describe('Browser headers', () => {
             options.headers = {};
 
             options.context.sessionToken = {};
+
+            options.context.headerGenerator = new HeaderGenerator({
+                browsers: [{ name: 'chrome' }],
+            });
 
             await browserHeadersHook(options as unknown as Options);
             const secondHeaders = options.headers;
