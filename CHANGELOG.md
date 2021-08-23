@@ -1,4 +1,4 @@
-3.0.2 / TBD
+3.1.0 / 2021/08/23
 ====================
 - Add `sessionToken` option to persist generated headers
 
