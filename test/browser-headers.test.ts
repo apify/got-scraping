@@ -218,6 +218,13 @@ describe('Browser headers', () => {
     });
 
     describe('sessionToken', () => {
+        const checkHeaders = (headers: Record<string, unknown>) => {
+            const keys = Object.keys(headers);
+            const lowercasedKeys = keys.map((key) => key.toLowerCase());
+
+            expect(lowercasedKeys.includes('user-agent')).toBe(true);
+        };
+
         test('gives the same headers with the same protocol', async () => {
             generatorSpy.mockRestore();
 
@@ -239,6 +246,7 @@ describe('Browser headers', () => {
             const secondHeaders = options.headers;
 
             expect(headers).toEqual(secondHeaders);
+            checkHeaders(headers);
         });
 
         test('gives different headers with different protocol', async () => {
@@ -264,6 +272,8 @@ describe('Browser headers', () => {
             const secondHeaders = options.headers;
 
             expect(headers).not.toEqual(secondHeaders);
+            checkHeaders(headers);
+            checkHeaders(secondHeaders);
         });
     });
 
