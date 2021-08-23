@@ -7,13 +7,14 @@ import { got } from 'got-cjs';
 
 import { browserHeadersHook, mergeHeaders } from '../src/hooks/browser-headers';
 import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
-import { gotScraping, Options } from '../src/index';
+import { Context, gotScraping, Options } from '../src/index';
 
 import { startDummyServer } from './helpers/dummy-server';
 
 describe('Browser headers', () => {
-    let options: Options;
-    let generatorSpy: jest.SpyInstance;
+    const generatorSpy: jest.SpyInstance = jest.spyOn(HeaderGenerator.prototype, 'getHeaders');
+
+    let options: Options & Context;
     let server: Server;
     let port: number;
 
@@ -26,16 +27,17 @@ describe('Browser headers', () => {
     beforeAll(async () => {
         server = await startDummyServer();
         port = (server.address() as AddressInfo).port;
+
+        generatorSpy.mockReturnValue(mockedHeaders);
     });
 
     beforeEach(() => {
         options = {
             http2: true,
             context: {},
-            url: new URL('http://example.com'),
+            url: new URL('https://example.com'),
             headers: {},
-        } as Options;
-        generatorSpy = jest.spyOn(HeaderGenerator.prototype, 'getHeaders').mockReturnValue(mockedHeaders);
+        } as Options & Context;
     });
 
     afterAll(() => {
@@ -212,6 +214,56 @@ describe('Browser headers', () => {
 
         expect(headers).toMatchObject({
             'x-test': 'foo',
+        });
+    });
+
+    describe('sessionToken', () => {
+        test('gives the same headers with the same protocol', async () => {
+            generatorSpy.mockRestore();
+
+            options.resolveProtocol = () => ({ alpnProtocol: 'http/1.1' });
+
+            options.context = {
+                useHeaderGenerator: true,
+                headerGenerator,
+            };
+
+            const sessionToken = {};
+            options.context.sessionToken = sessionToken;
+
+            await browserHeadersHook(options as unknown as Options);
+            const { headers } = options;
+            options.headers = {};
+
+            await browserHeadersHook(options as unknown as Options);
+            const secondHeaders = options.headers;
+
+            expect(headers).toEqual(secondHeaders);
+        });
+
+        test('gives different headers with different protocol', async () => {
+            generatorSpy.mockRestore();
+
+            options.resolveProtocol = () => ({ alpnProtocol: 'http/1.1' });
+
+            options.context = {
+                useHeaderGenerator: true,
+                headerGenerator,
+            };
+
+            const sessionToken = {};
+            options.context.sessionToken = sessionToken;
+
+            await browserHeadersHook(options as unknown as Options);
+            const { headers } = options;
+            options.headers = {};
+
+            options.resolveProtocol = () => ({ alpnProtocol: 'h2' });
+
+            await browserHeadersHook(options as unknown as Options);
+            const secondHeaders = options.headers;
+
+            expect(headers).not.toEqual(secondHeaders);
         });
     });
 

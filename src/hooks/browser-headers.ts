@@ -22,6 +22,14 @@ export function mergeHeaders(original: Record<string, string>, overrides: Record
     return Object.fromEntries(fixedHeaders.values());
 }
 
+interface StoredHeaders {
+    1: Record<string, string>;
+    2: Record<string, string>;
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+const headers = new WeakMap<object, StoredHeaders>();
+
 export async function browserHeadersHook(options: Options): Promise<void> {
     const { context } = options;
     const {
@@ -29,13 +37,17 @@ export async function browserHeadersHook(options: Options): Promise<void> {
         useHeaderGenerator,
         headerGenerator,
         proxyUrl,
+        sessionToken,
     } = context as Context;
 
     if (!useHeaderGenerator || !headerGenerator) return;
 
     const url = options.url as URL;
 
-    const resolveProtocol = proxyUrl ? createResolveProtocol(proxyUrl) : http2.auto.resolveProtocol;
+    const resolveProtocol = (options as any).resolveProtocol
+        || (proxyUrl
+            ? createResolveProtocol(proxyUrl)
+            : http2.auto.resolveProtocol);
 
     let alpnProtocol;
     if (url.protocol === 'https:') {
@@ -43,19 +55,36 @@ export async function browserHeadersHook(options: Options): Promise<void> {
             host: url.hostname,
             port: url.port || 443,
             rejectUnauthorized: false,
-            // @ts-expect-error Open an issue in http2-wrapper
             ALPNProtocols: ['h2', 'http/1.1'],
             servername: url.hostname,
         })).alpnProtocol;
     }
 
-    const mergedHeaderGeneratorOptions = {
-        httpVersion: alpnProtocol === 'h2' ? '2' : '1',
-        ...headerGeneratorOptions,
-    };
+    const httpVersion = alpnProtocol === 'h2' ? '2' : '1';
 
-    const generatedHeaders = headerGenerator.getHeaders(mergedHeaderGeneratorOptions);
+    let generatedHeaders: Record<string, string>;
+    if (sessionToken) {
+        if (!headers.has(sessionToken)) {
+            headers.set(sessionToken, {
+                1: headerGenerator.getHeaders({
+                    httpVersion: '1',
+                    ...headerGeneratorOptions,
+                }),
+                2: headerGenerator.getHeaders({
+                    httpVersion: '2',
+                    ...headerGeneratorOptions,
+                }),
+            });
+        }
 
-    // TODO: Remove this when Got supports Headers class.
+        generatedHeaders = headers.get(sessionToken)![httpVersion];
+    } else {
+        generatedHeaders = headerGenerator.getHeaders({
+            httpVersion,
+            ...headerGeneratorOptions,
+        });
+    }
+
+    // TODO: Use `options.merge({headers: generatedHeaders})` instead
     options.headers = mergeHeaders(generatedHeaders, options.headers as Record<string, string>);
 }

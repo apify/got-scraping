@@ -98,7 +98,6 @@ async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
                 host: parsedProxyUrl.hostname,
                 port: parsedProxyUrl.port,
                 rejectUnauthorized,
-                // @ts-expect-error Open an issue in http2-wrapper
                 ALPNProtocols: ['h2', 'http/1.1'],
                 servername: parsedProxyUrl.hostname,
             });
