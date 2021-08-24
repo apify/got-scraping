@@ -13,7 +13,7 @@ const groups = {
         // 'secp256r1',
         'secp384r1',
     ].join(':'),
-};
+} as const;
 
 const sigalgs = {
     firefox: [
@@ -39,7 +39,7 @@ const sigalgs = {
         'rsa_pss_rsae_sha512',
         'rsa_pkcs1_sha512',
     ].join(':'),
-};
+} as const;
 
 const ciphers = {
     chrome: [
@@ -83,17 +83,17 @@ const ciphers = {
         'AES256-SHA',
         'DES-CBC3-SHA',
     ].join(':'),
-};
+} as const;
 
 const minVersion = {
     firefox: 'TLSv1.2',
     chrome: 'TLSv1.0',
-};
+} as const;
 
 const maxVersion = {
     firefox: 'TLSv1.3',
     chrome: 'TLSv1.3',
-};
+} as const;
 
 export const SCRAPING_DEFAULT_OPTIONS = {
     // Most of the new browsers use HTTP2
