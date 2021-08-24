@@ -1,3 +1,4 @@
+// @ts-expect-error Maybe we'll use this later
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const groups = {
     firefox: [
