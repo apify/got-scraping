@@ -52,12 +52,12 @@ const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callbac
     })();
 });
 
-const create = () => ({
+const createCaches = () => ({
     protocolCache: new QuickLRU<string, string>({ maxSize: 1000 }),
     resolveAlpnQueue: new Map(),
 });
 
-const defaults = create();
+const defaults = createCaches();
 
 interface ProtocolCache {
     protocolCache?: typeof defaults.protocolCache;
@@ -69,7 +69,7 @@ export const createResolveProtocol = (proxyUrl: string, sessionData?: ProtocolCa
 
     if (sessionData) {
         if (!sessionData.protocolCache || !sessionData.resolveAlpnQueue) {
-            Object.assign(sessionData, create());
+            Object.assign(sessionData, createCaches());
         }
 
         protocolCache = sessionData.protocolCache!;
