@@ -57,7 +57,7 @@ export async function browserHeadersHook(options: Options): Promise<void> {
 
     if (!useHeaderGenerator || !headerGenerator) return;
 
-    const create = () => ({
+    const createHeadersPair = () => ({
         1: headerGenerator.getHeaders({
             httpVersion: '1',
             ...headerGeneratorOptions,
@@ -88,7 +88,7 @@ export async function browserHeadersHook(options: Options): Promise<void> {
     let generatedHeaders: Record<string, string>;
     if (sessionData) {
         if (!sessionData.headers) {
-            sessionData.headers = create();
+            sessionData.headers = createHeadersPair();
         }
 
         generatedHeaders = sessionData.headers[httpVersion];
