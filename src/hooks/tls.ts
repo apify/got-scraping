@@ -111,7 +111,8 @@ export function tlsHook(options: Options): void {
 
     const browser: Browser = getBrowser(getUserAgent(options.headers));
 
-    const useDefault = () => {
+    // Firefox is one of the browsers with low failure rates
+    const useFirefox = () => {
         https.ciphers = knownCiphers.firefox;
         https.signatureAlgorithms = sigalgs.firefox;
         https.minVersion = minVersion.firefox;
@@ -141,5 +142,5 @@ export function tlsHook(options: Options): void {
         }
     }
 
-    useDefault();
+    useFirefox();
 }
