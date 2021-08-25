@@ -163,16 +163,7 @@ export function tlsHook(options: Options): void {
 
     const browser: Browser = getBrowser(getUserAgent(options.headers));
 
-    // Firefox is one of the browsers with low failure rates
-    const useFirefoxSettings = () => {
-        https.ciphers = knownCiphers.firefox;
-        https.signatureAlgorithms = sigalgs.firefox;
-        https.minVersion = minVersion.firefox;
-        https.maxVersion = maxVersion.firefox;
-    };
-
     if (browser && browser in knownCiphers) {
-        // This is ugly because TS doesn't type object[nonExistent] as undefined
         https.ciphers = knownCiphers[browser];
         https.signatureAlgorithms = sigalgs[browser];
         // @ts-expect-error @types/node doesn't accept TLSv1.0
@@ -182,5 +173,9 @@ export function tlsHook(options: Options): void {
         return;
     }
 
-    useFirefoxSettings();
+    // Let's default to Firefox settings as it has low failure rates
+    https.ciphers = knownCiphers.firefox;
+    https.signatureAlgorithms = sigalgs.firefox;
+    https.minVersion = minVersion.firefox;
+    https.maxVersion = maxVersion.firefox;
 }
