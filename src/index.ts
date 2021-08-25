@@ -48,12 +48,12 @@ const gotScraping = gotCjs.extend({
             customOptionsHook,
         ],
         beforeRequest: [
+            insecureParserHook,
             sessionDataHook,
-            tlsHook,
             http2Hook,
             proxyHook,
             browserHeadersHook,
-            insecureParserHook,
+            tlsHook,
         ],
     },
 });

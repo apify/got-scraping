@@ -140,7 +140,7 @@ export const knownCiphers = {
 
 export const minVersion = {
     firefox: 'TLSv1.2',
-    chrome: 'TLSv1.0',
+    chrome: 'TLSv1',
     safari: 'TLSv1.2',
 } as const;
 
@@ -165,7 +165,6 @@ export function tlsHook(options: Options): void {
         https.ciphers = knownCiphers[browser];
         https.signatureAlgorithms = sigalgs[browser];
         https.ecdhCurve = ecdhCurve[browser];
-        // @ts-expect-error @types/node doesn't accept TLSv1.0
         https.minVersion = minVersion[browser];
         https.maxVersion = maxVersion[browser];
 
