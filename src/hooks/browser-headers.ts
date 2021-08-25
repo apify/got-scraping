@@ -31,6 +31,20 @@ interface HeadersData {
     headers?: StoredHeaders;
 }
 
+const getResolveProtocolFunction = (options: Options, proxyUrl: string | undefined, sessionData: unknown) => {
+    const { resolveProtocol } = options as any;
+
+    if (resolveProtocol) {
+        return resolveProtocol;
+    }
+
+    if (proxyUrl) {
+        return createResolveProtocol(proxyUrl, sessionData as any);
+    }
+
+    return http2.auto.resolveProtocol;
+};
+
 export async function browserHeadersHook(options: Options): Promise<void> {
     const { context } = options;
     const {
@@ -56,10 +70,7 @@ export async function browserHeadersHook(options: Options): Promise<void> {
 
     const url = options.url as URL;
 
-    const resolveProtocol = (options as any).resolveProtocol
-        || (proxyUrl
-            ? createResolveProtocol(proxyUrl, sessionData as any)
-            : http2.auto.resolveProtocol);
+    const resolveProtocol = getResolveProtocolFunction(options, proxyUrl, sessionData);
 
     let alpnProtocol;
     if (url.protocol === 'https:') {
