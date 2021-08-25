@@ -18,6 +18,12 @@ const ecdhCurve = {
         // 'secp256r1',
         'secp384r1',
     ].join(':'),
+    safari: [
+        'X25519',
+        // 'secp256r1',
+        'secp384r1',
+        'secp521r1',
+    ].join(':'),
 } as const;
 
 export const sigalgs = {
@@ -43,6 +49,19 @@ export const sigalgs = {
         'rsa_pkcs1_sha384',
         'rsa_pss_rsae_sha512',
         'rsa_pkcs1_sha512',
+    ].join(':'),
+    safari: [
+        // SHA256/ECDSA,
+        // RSA_PSS_SHA256,
+        // SHA256/RSA,
+        // SHA384/ECDSA,
+        // SHA1/ECDSA,
+        // RSA_PSS_SHA384,
+        // RSA_PSS_SHA384,
+        // SHA384/RSA,
+        // RSA_PSS_SHA512,
+        // SHA512/RSA,
+        // SHA1/RSA
     ].join(':'),
 } as const;
 
@@ -88,16 +107,49 @@ export const knownCiphers = {
         'AES256-SHA',
         'DES-CBC3-SHA',
     ].join(':'),
+    safari: [
+        // Safari v14
+        'TLS_AES_128_GCM_SHA256',
+        'TLS_AES_256_GCM_SHA384',
+        'TLS_CHACHA20_POLY1305_SHA256',
+        'ECDHE-ECDSA-AES256-GCM-SHA384',
+        'ECDHE-ECDSA-AES128-GCM-SHA256',
+        'ECDHE-ECDSA-CHACHA20-POLY1305',
+        'ECDHE-RSA-AES256-GCM-SHA384',
+        'ECDHE-RSA-AES128-GCM-SHA256',
+        'ECDHE-RSA-CHACHA20-POLY1305',
+        // Legacy:
+        'ECDHE-ECDSA-AES256-SHA384',
+        'ECDHE-ECDSA-AES128-SHA256',
+        'ECDHE-ECDSA-AES256-SHA',
+        'ECDHE-ECDSA-AES128-SHA',
+        'ECDHE-RSA-AES256-SHA384',
+        'ECDHE-RSA-AES128-SHA256',
+        'ECDHE-RSA-AES256-SHA',
+        'ECDHE-RSA-AES128-SHA',
+        'AES256-GCM-SHA384',
+        'AES128-GCM-SHA256',
+        'AES256-SHA256',
+        'AES128-SHA256',
+        'AES256-SHA',
+        'AES128-SHA',
+        // ??? Is this even supported ???
+        // 'ECDHE-ECDSA-DES-CBC3-SHA',
+        // 'ECDHE-RSA-DES-CBC3-SHA',
+        // Missing: TLS_RSA_WITH_3DES_EDE_CBC_SHA
+    ].join(':'),
 } as const;
 
 export const minVersion = {
     firefox: 'TLSv1.2',
     chrome: 'TLSv1.0',
+    safari: 'TLSv1.2',
 } as const;
 
 export const maxVersion = {
     firefox: 'TLSv1.3',
     chrome: 'TLSv1.3',
+    safari: 'TLSv1.3',
 } as const;
 
 type Browser = 'chrome' | 'firefox' | 'safari' | undefined;
@@ -112,35 +164,23 @@ export function tlsHook(options: Options): void {
     const browser: Browser = getBrowser(getUserAgent(options.headers));
 
     // Firefox is one of the browsers with low failure rates
-    const useFirefox = () => {
+    const useFirefoxSettings = () => {
         https.ciphers = knownCiphers.firefox;
         https.signatureAlgorithms = sigalgs.firefox;
         https.minVersion = minVersion.firefox;
         https.maxVersion = maxVersion.firefox;
     };
 
-    if (browser) {
-        if (browser in knownCiphers) {
-            // This is ugly because TS doesn't type object[nonExistent] as undefined
-            https.ciphers = knownCiphers[browser as keyof typeof knownCiphers];
-            https.signatureAlgorithms = sigalgs[browser as keyof typeof knownCiphers];
-            // @ts-expect-error @types/node doesn't accept TLSv1.0
-            https.minVersion = minVersion[browser as keyof typeof knownCiphers];
-            https.maxVersion = maxVersion[browser as keyof typeof knownCiphers];
+    if (browser && browser in knownCiphers) {
+        // This is ugly because TS doesn't type object[nonExistent] as undefined
+        https.ciphers = knownCiphers[browser];
+        https.signatureAlgorithms = sigalgs[browser];
+        // @ts-expect-error @types/node doesn't accept TLSv1.0
+        https.minVersion = minVersion[browser];
+        https.maxVersion = maxVersion[browser];
 
-            return;
-        }
-
-        if (browser === 'safari') {
-            https.ciphers = knownCiphers.chrome;
-            https.signatureAlgorithms = sigalgs.chrome;
-            // @ts-expect-error @types/node doesn't accept TLSv1.0
-            https.minVersion = minVersion.chrome;
-            https.maxVersion = maxVersion.chrome;
-
-            return;
-        }
+        return;
     }
 
-    useFirefox();
+    useFirefoxSettings();
 }
