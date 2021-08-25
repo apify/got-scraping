@@ -51,17 +51,16 @@ export const sigalgs = {
         'rsa_pkcs1_sha512',
     ].join(':'),
     safari: [
-        // SHA256/ECDSA,
-        // RSA_PSS_SHA256,
-        // SHA256/RSA,
-        // SHA384/ECDSA,
-        // SHA1/ECDSA,
-        // RSA_PSS_SHA384,
-        // RSA_PSS_SHA384,
-        // SHA384/RSA,
-        // RSA_PSS_SHA512,
-        // SHA512/RSA,
-        // SHA1/RSA
+        'ecdsa_secp256r1_sha256',
+        'rsa_pss_rsae_sha256',
+        'rsa_pkcs1_sha256',
+        'ecdsa_secp384r1_sha384',
+        'ECDSA+SHA1',
+        'rsa_pss_rsae_sha384',
+        'rsa_pkcs1_sha384',
+        'rsa_pss_rsae_sha512',
+        'rsa_pkcs1_sha512',
+        'RSA+SHA1',
     ].join(':'),
 } as const;
 
