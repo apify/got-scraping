@@ -33,9 +33,9 @@ function validateProxyProtocol(protocol: string) {
     }
 }
 
-const create = () => new QuickLRU<string, Agents>({ maxSize: 1000 });
+const createAgentCache = () => new QuickLRU<string, Agents>({ maxSize: 1000 });
 
-export const defaultAgentCache = create();
+export const defaultAgentCache = createAgentCache();
 
 interface AgentsData {
     agentCache?: typeof defaultAgentCache;
@@ -45,7 +45,7 @@ async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean, sessi
     const key = `${rejectUnauthorized}:${parsedProxyUrl.href}`;
 
     if (sessionData && !sessionData.agentCache) {
-        sessionData.agentCache = create();
+        sessionData.agentCache = createAgentCache();
     }
 
     const agentCache = sessionData?.agentCache ?? defaultAgentCache;
