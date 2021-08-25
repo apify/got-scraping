@@ -1,13 +1,9 @@
-import { Agent as HttpAgent } from 'http';
-import { Agent as HttpsAgent } from 'https';
 import { URL } from 'url';
 import { proxies, auto } from 'http2-wrapper';
 import QuickLRU from 'quick-lru';
 import { Agents, Options } from 'got-cjs';
 import { HttpsProxyAgent, HttpRegularProxyAgent } from '../agent/h1-proxy-agent';
 import { TransformHeadersAgent } from '../agent/transform-headers-agent';
-
-type Agent = HttpAgent | HttpsAgent;
 
 const {
     HttpOverHttp2,
@@ -16,12 +12,6 @@ const {
     Http2OverHttps,
     Http2OverHttp,
 } = proxies;
-
-const fixAgent = <T extends Agent>(agent: T) => {
-    agent = new TransformHeadersAgent(agent) as unknown as T;
-
-    return agent;
-};
 
 export async function proxyHook(options: Options): Promise<void> {
     const { context: { proxyUrl } } = options;
@@ -96,23 +86,23 @@ async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean, sessi
 
         if (proxyIsHttp2) {
             agent = {
-                http: fixAgent(new HttpOverHttp2(proxy)),
-                https: fixAgent(new HttpsOverHttp2(proxy)),
+                http: new TransformHeadersAgent(new HttpOverHttp2(proxy)),
+                https: new TransformHeadersAgent(new HttpsOverHttp2(proxy)),
                 http2: new Http2OverHttp2(proxy),
             };
         } else {
             // Upstream proxies hang up connections on CONNECT + unsecure HTTP
             agent = {
-                http: fixAgent(new HttpRegularProxyAgent({ proxy: proxyUrl })),
-                https: fixAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
+                http: new TransformHeadersAgent(new HttpRegularProxyAgent({ proxy: proxyUrl })),
+                https: new TransformHeadersAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
                 http2: new Http2OverHttps(proxy),
             };
         }
     } else {
         // Upstream proxies hang up connections on CONNECT + unsecure HTTP
         agent = {
-            http: fixAgent(new HttpRegularProxyAgent({ proxy: proxyUrl })),
-            https: fixAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
+            http: new TransformHeadersAgent(new HttpRegularProxyAgent({ proxy: proxyUrl })),
+            https: new TransformHeadersAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
             http2: new Http2OverHttp(proxy),
         };
     }
