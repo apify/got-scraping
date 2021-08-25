@@ -2,12 +2,11 @@ import { Options } from 'got-cjs';
 // @ts-expect-error Missing types
 import { getBrowser, getUserAgent } from 'header-generator/src/utils';
 
-// @ts-expect-error Custom ECDH curves are not used yet as Node.js doesn't support some of them.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// OpenSSL supports secp256r1. It's just reffered to as prime256v1.
 const ecdhCurve = {
     firefox: [
         'X25519',
-        // 'secp256r1',
+        'prime256v1',
         'secp384r1',
         'secp521r1',
         // 'ffdhe2048',
@@ -15,12 +14,12 @@ const ecdhCurve = {
     ].join(':'),
     chrome: [
         'X25519',
-        // 'secp256r1',
+        'prime256v1',
         'secp384r1',
     ].join(':'),
     safari: [
         'X25519',
-        // 'secp256r1',
+        'prime256v1',
         'secp384r1',
         'secp521r1',
     ].join(':'),
@@ -165,6 +164,7 @@ export function tlsHook(options: Options): void {
     if (browser && browser in knownCiphers) {
         https.ciphers = knownCiphers[browser];
         https.signatureAlgorithms = sigalgs[browser];
+        https.ecdhCurve = ecdhCurve[browser];
         // @ts-expect-error @types/node doesn't accept TLSv1.0
         https.minVersion = minVersion[browser];
         https.maxVersion = maxVersion[browser];
@@ -175,6 +175,7 @@ export function tlsHook(options: Options): void {
     // Let's default to Firefox settings as it has low failure rates
     https.ciphers = knownCiphers.firefox;
     https.signatureAlgorithms = sigalgs.firefox;
+    https.ecdhCurve = ecdhCurve.firefox;
     https.minVersion = minVersion.firefox;
     https.maxVersion = maxVersion.firefox;
 }
