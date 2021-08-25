@@ -33,16 +33,4 @@ describe('Scraping defaults', () => {
 
         expect(response.request.options).toMatchObject(customOptions);
     });
-
-    test('should have compatible defaults with node 10', () => {
-        const nodeVersion = parseFloat(process.versions.node);
-
-        if (nodeVersion < 12) {
-            expect(SCRAPING_DEFAULT_OPTIONS.https.ciphers).toBe(undefined);
-        } else {
-            expect(SCRAPING_DEFAULT_OPTIONS.https.ciphers
-                .startsWith('TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256'))
-                .toBe(true);
-        }
-    });
 });
