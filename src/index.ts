@@ -15,6 +15,8 @@ import { browserHeadersHook } from './hooks/browser-headers';
 import { proxyHook } from './hooks/proxy';
 import { http2Hook } from './hooks/http2';
 import { insecureParserHook } from './hooks/insecure-parser';
+import { tlsHook } from './hooks/tls';
+import { sessionDataHook } from './hooks/storage';
 
 const gotScraping = gotCjs.extend({
     mutableDefaults: true,
@@ -34,6 +36,8 @@ const gotScraping = gotCjs.extend({
             customOptionsHook,
         ],
         beforeRequest: [
+            sessionDataHook,
+            tlsHook,
             http2Hook,
             proxyHook,
             browserHeadersHook,

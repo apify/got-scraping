@@ -3,7 +3,7 @@ import { Agent as HttpsAgent } from 'https';
 import { URL } from 'url';
 import { proxies, auto } from 'http2-wrapper';
 import QuickLRU from 'quick-lru';
-import { Options } from 'got-cjs';
+import { Agents, Options } from 'got-cjs';
 import { HttpsProxyAgent, HttpRegularProxyAgent } from '../agent/h1-proxy-agent';
 import { TransformHeadersAgent } from '../agent/transform-headers-agent';
 
@@ -17,35 +17,8 @@ const {
     Http2OverHttp,
 } = proxies;
 
-const x = {
-    '(https.js:': (a: Agent) => (a as {protocol?: string}).protocol,
-    '(http.js:': (a: Agent) => (a as {protocol?: string}).protocol,
-};
-
-// `agent-base` package does stacktrace checks
-// in order to set `agent.protocol`.
-// The keys in this object are names of functions
-// that will appear in the stacktrace.
-const isAmbiguousAgent = (agent: Agent): boolean => {
-    return x['(https.js:'](agent) !== x['(http.js:'](agent);
-};
-
-/**
- * @see https://github.com/TooTallNate/node-agent-base/issues/61
- */
-const fixAgentBase = (agent: Agent) => {
-    if (isAmbiguousAgent(agent)) {
-        Object.defineProperty(agent, 'protocol', {
-            value: undefined,
-        });
-    }
-
-    return agent;
-};
-
-const fixAgent = (agent: Agent) => {
-    agent = fixAgentBase(agent);
-    agent = new TransformHeadersAgent(agent) as unknown as Agent;
+const fixAgent = <T extends Agent>(agent: T) => {
+    agent = new TransformHeadersAgent(agent) as unknown as T;
 
     return agent;
 };
@@ -70,12 +43,24 @@ function validateProxyProtocol(protocol: string) {
     }
 }
 
-export const agentCache = new QuickLRU({ maxSize: 1000 });
+const create = () => new QuickLRU<string, Agents>({ maxSize: 1000 });
 
-async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
+export const defaultAgentCache = create();
+
+interface AgentsData {
+    agentCache?: typeof defaultAgentCache;
+}
+
+async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean, sessionData?: AgentsData) {
     const key = `${rejectUnauthorized}:${parsedProxyUrl.href}`;
 
-    let agent = exports.agentCache.get(key);
+    if (sessionData && !sessionData.agentCache) {
+        sessionData.agentCache = create();
+    }
+
+    const agentCache = sessionData?.agentCache ?? defaultAgentCache;
+
+    let agent = agentCache.get(key);
     if (agent) {
         return agent;
     }

@@ -16,7 +16,7 @@ const groups = {
     ].join(':'),
 } as const;
 
-const sigalgs = {
+export const sigalgs = {
     firefox: [
         'ecdsa_secp256r1_sha256',
         'ecdsa_secp384r1_sha384',
@@ -42,7 +42,7 @@ const sigalgs = {
     ].join(':'),
 } as const;
 
-const ciphers = {
+export const ciphers = {
     chrome: [
         // Chrome v92
         'TLS_AES_128_GCM_SHA256',
@@ -86,12 +86,12 @@ const ciphers = {
     ].join(':'),
 } as const;
 
-const minVersion = {
+export const minVersion = {
     firefox: 'TLSv1.2',
     chrome: 'TLSv1.0',
 } as const;
 
-const maxVersion = {
+export const maxVersion = {
     firefox: 'TLSv1.3',
     chrome: 'TLSv1.3',
 } as const;

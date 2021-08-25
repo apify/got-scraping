@@ -52,12 +52,30 @@ const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callbac
     })();
 });
 
-// TODO: The cache should be storted in Agents
+const create = () => ({
+    protocolCache: new QuickLRU<string, string>({ maxSize: 1000 }),
+    resolveAlpnQueue: new Map(),
+});
 
-const protocolCache = new QuickLRU<string, string>({ maxSize: 1000 });
-const resolveAlpnQueue = new Map();
+const defaults = create();
 
-export const createResolveProtocol = (proxyUrl: string): ResolveProtocolFunction => {
+interface ProtocolCache {
+    protocolCache?: typeof defaults.protocolCache;
+    resolveAlpnQueue?: typeof defaults.resolveAlpnQueue;
+}
+
+export const createResolveProtocol = (proxyUrl: string, sessionData?: ProtocolCache): ResolveProtocolFunction => {
+    let { protocolCache, resolveAlpnQueue } = defaults;
+
+    if (sessionData) {
+        if (!sessionData.protocolCache || !sessionData.resolveAlpnQueue) {
+            Object.assign(sessionData, create());
+        }
+
+        protocolCache = sessionData.protocolCache!;
+        resolveAlpnQueue = sessionData.resolveAlpnQueue!;
+    }
+
     const connectWithProxy: ResolveProtocolConnectFunction = async (pOptions, pCallback) => {
         return connect(proxyUrl, pOptions, pCallback);
     };

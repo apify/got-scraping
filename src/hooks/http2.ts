@@ -5,13 +5,13 @@ import { Context } from '../context';
 import { createResolveProtocol } from '../resolve-protocol';
 
 export function http2Hook(options: Options): void {
-    const { proxyUrl } = options.context as Context;
+    const { proxyUrl, sessionData } = options.context as Context;
 
     if (options.http2 && (options.url as URL).protocol !== 'http:') {
         options.request = (url, requestOptions, callback) => {
             const typedRequestOptions = requestOptions as AutoRequestOptions;
             if (proxyUrl) {
-                typedRequestOptions.resolveProtocol = createResolveProtocol(proxyUrl);
+                typedRequestOptions.resolveProtocol = createResolveProtocol(proxyUrl, sessionData as any);
             }
 
             return auto(url, typedRequestOptions, callback);
