@@ -8,6 +8,10 @@ type Browser = 'chrome' | 'firefox' | 'safari' | undefined;
 export function tlsHook(options: Options): void {
     const { https } = options;
 
+    if (https.ciphers || https.signatureAlgorithms || https.minVersion || https.maxVersion) {
+        return;
+    }
+
     const browser: Browser = getBrowser(getUserAgent(options.headers));
 
     const useDefault = () => {

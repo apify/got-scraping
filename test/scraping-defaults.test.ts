@@ -1,4 +1,6 @@
 import { AddressInfo } from 'net';
+// @ts-expect-error @types/node is missing types
+import { DEFAULT_CIPHERS } from 'tls';
 import { Server } from 'http';
 import { SCRAPING_DEFAULT_OPTIONS } from '../src/scraping-defaults';
 import { gotScraping } from '../src/index';
@@ -28,7 +30,7 @@ describe('Scraping defaults', () => {
     });
 
     test('should allow user to override the defaults', async () => {
-        const customOptions = { https: { ciphers: undefined }, http2: false, throwHttpErrors: false };
+        const customOptions = { https: { ciphers: DEFAULT_CIPHERS }, http2: false, throwHttpErrors: false };
         const response = await gotScraping.get(`http://localhost:${port}/html`, customOptions);
 
         expect(response.request.options).toMatchObject(customOptions);
