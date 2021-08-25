@@ -17,7 +17,6 @@ import { http2Hook } from './hooks/http2';
 import { insecureParserHook } from './hooks/insecure-parser';
 import { tlsHook } from './hooks/tls';
 import { sessionDataHook } from './hooks/storage';
-import { toughCookieHook } from './hooks/tough-cookie';
 
 const gotScraping = gotCjs.extend({
     mutableDefaults: true,
@@ -43,7 +42,6 @@ const gotScraping = gotCjs.extend({
             proxyHook,
             browserHeadersHook,
             insecureParserHook,
-            toughCookieHook,
         ],
     },
 });
