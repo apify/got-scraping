@@ -42,7 +42,7 @@ export const sigalgs = {
     ].join(':'),
 } as const;
 
-export const ciphers = {
+export const knownCiphers = {
     chrome: [
         // Chrome v92
         'TLS_AES_128_GCM_SHA256',
@@ -105,7 +105,7 @@ export const SCRAPING_DEFAULT_OPTIONS = {
         rejectUnauthorized: false,
 
         // Node.js ships with different defaults
-        ciphers: ciphers.firefox,
+        ciphers: knownCiphers.firefox,
         signatureAlgorithms: sigalgs.firefox,
         minVersion: minVersion.firefox,
         maxVersion: maxVersion.firefox,
