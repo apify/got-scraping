@@ -131,10 +131,9 @@ export const knownCiphers = {
         'AES128-SHA256',
         'AES256-SHA',
         'AES128-SHA',
-        // ??? Is this even supported ???
-        // 'ECDHE-ECDSA-DES-CBC3-SHA',
-        // 'ECDHE-RSA-DES-CBC3-SHA',
-        // Missing: TLS_RSA_WITH_3DES_EDE_CBC_SHA
+        'ECDHE-ECDSA-DES-CBC3-SHA',
+        'ECDHE-RSA-DES-CBC3-SHA',
+        'DES-CBC3-SHA',
     ].join(':'),
 } as const;
 
