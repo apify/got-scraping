@@ -10,6 +10,7 @@ import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
 import { Context, gotScraping, Options } from '../src/index';
 
 import { startDummyServer } from './helpers/dummy-server';
+import { sessionDataHook } from '../src/hooks/storage';
 
 describe('Browser headers', () => {
     const generatorSpy: jest.SpyInstance = jest.spyOn(HeaderGenerator.prototype, 'getHeaders');
@@ -239,6 +240,7 @@ describe('Browser headers', () => {
 
             const sessionToken = {};
             options.context.sessionToken = sessionToken;
+            sessionDataHook(options);
 
             await browserHeadersHook(options as unknown as Options);
             const { headers } = options;
@@ -269,6 +271,7 @@ describe('Browser headers', () => {
 
             const sessionToken = {};
             options.context.sessionToken = sessionToken;
+            sessionDataHook(options);
 
             await browserHeadersHook(options as unknown as Options);
             const { headers } = options;
@@ -302,12 +305,14 @@ describe('Browser headers', () => {
 
             const sessionToken = {};
             options.context.sessionToken = sessionToken;
+            sessionDataHook(options);
 
             await browserHeadersHook(options as unknown as Options);
             const { headers } = options;
             options.headers = {};
 
             options.context.sessionToken = {};
+            sessionDataHook(options);
 
             options.context.headerGenerator = new HeaderGenerator({
                 browsers: [{ name: 'chrome' }],

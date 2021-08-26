@@ -27,8 +27,23 @@ interface StoredHeaders {
     2: Record<string, string>;
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-const headers = new WeakMap<object, StoredHeaders>();
+interface HeadersData {
+    headers?: StoredHeaders;
+}
+
+const getResolveProtocolFunction = (options: Options, proxyUrl: string | undefined, sessionData: unknown) => {
+    const { resolveProtocol } = options as any;
+
+    if (resolveProtocol) {
+        return resolveProtocol;
+    }
+
+    if (proxyUrl) {
+        return createResolveProtocol(proxyUrl, sessionData as any);
+    }
+
+    return http2.auto.resolveProtocol;
+};
 
 export async function browserHeadersHook(options: Options): Promise<void> {
     const { context } = options;
@@ -37,17 +52,25 @@ export async function browserHeadersHook(options: Options): Promise<void> {
         useHeaderGenerator,
         headerGenerator,
         proxyUrl,
-        sessionToken,
     } = context as Context;
+    const sessionData = context.sessionData as HeadersData | undefined;
 
     if (!useHeaderGenerator || !headerGenerator) return;
 
+    const createHeadersPair = () => ({
+        1: headerGenerator.getHeaders({
+            httpVersion: '1',
+            ...headerGeneratorOptions,
+        }),
+        2: headerGenerator.getHeaders({
+            httpVersion: '2',
+            ...headerGeneratorOptions,
+        }),
+    });
+
     const url = options.url as URL;
 
-    const resolveProtocol = (options as any).resolveProtocol
-        || (proxyUrl
-            ? createResolveProtocol(proxyUrl)
-            : http2.auto.resolveProtocol);
+    const resolveProtocol = getResolveProtocolFunction(options, proxyUrl, sessionData);
 
     let alpnProtocol;
     if (url.protocol === 'https:') {
@@ -63,21 +86,12 @@ export async function browserHeadersHook(options: Options): Promise<void> {
     const httpVersion = alpnProtocol === 'h2' ? '2' : '1';
 
     let generatedHeaders: Record<string, string>;
-    if (sessionToken) {
-        if (!headers.has(sessionToken)) {
-            headers.set(sessionToken, {
-                1: headerGenerator.getHeaders({
-                    httpVersion: '1',
-                    ...headerGeneratorOptions,
-                }),
-                2: headerGenerator.getHeaders({
-                    httpVersion: '2',
-                    ...headerGeneratorOptions,
-                }),
-            });
+    if (sessionData) {
+        if (!sessionData.headers) {
+            sessionData.headers = createHeadersPair();
         }
 
-        generatedHeaders = headers.get(sessionToken)![httpVersion];
+        generatedHeaders = sessionData.headers[httpVersion];
     } else {
         generatedHeaders = headerGenerator.getHeaders({
             httpVersion,

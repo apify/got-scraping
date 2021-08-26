@@ -5,7 +5,7 @@ import {
     HttpRegularProxyAgent,
 } from '../src/agent/h1-proxy-agent';
 
-import { proxyHook, agentCache } from '../src/hooks/proxy';
+import { proxyHook, defaultAgentCache } from '../src/hooks/proxy';
 import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
 import { Options } from '../src';
 
@@ -31,7 +31,7 @@ describe('Proxy', () => {
         // Do not use clearAllMocks: https://github.com/facebook/jest/issues/7136
         jest.restoreAllMocks();
 
-        agentCache.clear();
+        defaultAgentCache.clear();
     });
 
     test('should not add an agent if proxyUrl is not provided', async () => {

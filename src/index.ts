@@ -7,7 +7,6 @@ import { got as gotCjs } from 'got-cjs';
 import HeaderGenerator from 'header-generator';
 
 import { TransformHeadersAgent } from './agent/transform-headers-agent';
-import { SCRAPING_DEFAULT_OPTIONS } from './scraping-defaults';
 
 import { optionsValidationHandler } from './hooks/options-validation';
 import { customOptionsHook } from './hooks/custom-options';
@@ -15,10 +14,25 @@ import { browserHeadersHook } from './hooks/browser-headers';
 import { proxyHook } from './hooks/proxy';
 import { http2Hook } from './hooks/http2';
 import { insecureParserHook } from './hooks/insecure-parser';
+import { tlsHook } from './hooks/tls';
+import { sessionDataHook } from './hooks/storage';
 
 const gotScraping = gotCjs.extend({
     mutableDefaults: true,
-    ...SCRAPING_DEFAULT_OPTIONS,
+    // Most of the new browsers use HTTP/2
+    http2: true,
+    https: {
+        // In contrast to browsers, we don't usually do login operations.
+        // We want the content.
+        rejectUnauthorized: false,
+    },
+    // Don't fail on 404
+    throwHttpErrors: false,
+    timeout: { request: 60000 },
+    retry: { limit: 0 },
+    headers: {
+        'user-agent': undefined,
+    },
     context: {
         headerGenerator: new HeaderGenerator(),
         useHeaderGenerator: true,
@@ -34,10 +48,12 @@ const gotScraping = gotCjs.extend({
             customOptionsHook,
         ],
         beforeRequest: [
+            insecureParserHook,
+            sessionDataHook,
             http2Hook,
             proxyHook,
             browserHeadersHook,
-            insecureParserHook,
+            tlsHook,
         ],
     },
 });
