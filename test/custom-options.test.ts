@@ -47,7 +47,7 @@ describe('Custom options', () => {
         };
         try {
             await gotScraping(options);
-        } catch (e) {
+        } catch (e: any) {
             expect(e.message).toBe('request aborted');
         }
     });
