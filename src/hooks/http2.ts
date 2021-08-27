@@ -16,5 +16,9 @@ export function http2Hook(options: Options): void {
 
             return auto(url, typedRequestOptions, callback);
         };
+    } else {
+        // Restore to default.
+        // Otherwise it would use the `request` function above after redirects.
+        options.request = undefined;
     }
 }
