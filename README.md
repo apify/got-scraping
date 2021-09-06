@@ -136,7 +136,7 @@ Got scraping package is built using `got.extend` functionality and supports all 
 const SCRAPING_DEFAULT_OPTIONS = {
     // Most of the new browsers use HTTP2
     http2: true,
-    https: { 
+    https: {
         // We usually don't want to fail because of SSL errors.
         // We want the content.
         rejectUnauthorized: false,
