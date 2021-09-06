@@ -140,14 +140,14 @@ const SCRAPING_DEFAULT_OPTIONS = {
         // We usually don't want to fail because of SSL errors.
         // We want the content.
         rejectUnauthorized: false,
+        // Node js uses different TLS ciphers by default.
+        // This is very useful at fighting protection, but can on some websites cause TLS errors.
+        ciphers: "TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256" 
     },
     // This would fail all of 404, 403 responses.
     // We usually don't want to consider these as errors.
     // We want to take some action after this.
     throwHttpErrors: false,
-    // Node js uses different TLS ciphers by default.
-    // This is very useful at fighting protection, but can on some websites cause TLS errors.
-    https: { ciphers: "TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256" },
     // We need to have browser-like headers to blend in.
     useHeaderGenerator: true,
     // Got has infinite timeout by default. In scraping we have to count with bad proxies. Without custom timeout it would just hang.
