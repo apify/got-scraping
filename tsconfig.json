@@ -1,8 +1,7 @@
 {
 	"extends": "@apify/tsconfig",
 	"compilerOptions": {
-		"outDir": "dist",
-		"importHelpers": false
+		"outDir": "dist"
 	},
 	"include": [
 		"src"
