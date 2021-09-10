@@ -44,11 +44,9 @@
     "scripts": {
         "build": "rimraf dist && tsc",
         "prepublishOnly": "npm run build",
-        "build-docs": "npm run build-toc",
-        "build-toc": "markdown-toc ./README.md -i",
         "lint": "eslint src test",
         "lint:fix": "eslint src test --fix",
-        "test": "jest --maxWorkers=3 --collect-coverage"
+        "test": "jest --coverage"
     },
     "author": {
         "name": "Apify",

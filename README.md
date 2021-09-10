@@ -1,70 +1,51 @@
 # Got Scraping
-Got Scraping is a small but powerful `got` extension that allows you to send browser-like requests with only a little configuration seamlessly and with a single function call. [Got](https://github.com/sindresorhus/got) is a widely used and powerful client that provides extensibility and customization. Sending browser-like requests is essential in the web scraping industry to blend in with the website traffic. You can read more about the mimics [here](#simulating-browser-like-requests). Because HTTP2 support in older versions of Node.js is buggy, we require using Node.js >=15.10.0 in v2. For older node versions you can use v1.
 
-## Motivation
-With the increasing popularity of web scraping, it is becoming more important to blend in with the typical internet traffic. This package implements multiple mimics to make GET requests similar to browsers. Thanks to the included [`header-generator`](https://github.com/apify/header-generator) package, you can choose various browsers from different operating systems and devices. The `header-generator` package generates all the headers for you so that you can focus on the important stuff.
+Got Scraping is a small but powerful [`got` extension](https://github.com/sindresorhus/got) with the purpose of sending browser-like requests out of the box. This is very essential in the web scraping industry to blend in with the website traffic.
 
-But the `got-scraping` doesn't stop here. The `got-scraping` package also tries to mimic the full request fingerprint, including the correct HTTP protocol and TLS ciphers.
-
-Proxies are essential in the web scraping industry. Another goal of this package is to simplify the usage of `HTTP` and `HTTPS` proxies. All you have to do is pass the `proxyUrl` option.
-
-There is one more good news for loyal `got` users. This package is modified `got` instance using handlers so that you can use the `got` interface as always. We've added just a few extras.
-
-<!-- toc -->
-
-- [Got Scraping](#got-scraping)
-  - [Motivation](#motivation)
-  - [Simulating browser-like requests](#simulating-browser-like-requests)
-  - [Proxies](#proxies)
-  - [Installation](#installation)
-  - [Examples](#examples)
-    - [Simple GET request](#simple-get-request)
-    - [GET request with proxy](#get-request-with-proxy)
-    - [Overriding request headers](#overriding-request-headers)
-    - [Customizing Header generator options](#customizing-header-generator-options)
-    - [Get JSON](#get-json)
-  - [API reference](#api-reference)
-    - [Got scraping default values](#got-scraping-default-values)
-    - [Got scraping extra options](#got-scraping-extra-options)
-    - [Error recovery](#error-recovery)
-
-<!-- tocstop -->
-
-## Simulating browser-like requests
-The Got Scraping package's primary goal is to make the document GET request look like a real browser made it. The crucial part of this process is to send browser-like headers. This process is outsourced to the `header-generator` package, allowing you to customize browsers, devices, languages, and operating systems to generate the request headers. The generation of the request headers is based on real-world data, and the algorithm is periodically updated. For more information, see the `header-generator` [README](https://github.com/apify/header-generator).
-
-This package can only generate all the standard attributes. There still might be site-specific attributes that you need to add. One of those attributes you might want to add is the `referer` header. Referer header might add more credibility to your request and hence reduce the blocking. Check out more info about the `referer` header [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer). Please bear in mind that these headers are made for GET requests for HTML documents. If you want to make POST requests or GET requests for any other content type, you should alter these headers according to your needs. You can do so by passing a headers option or writing a custom [got handler](https://github.com/sindresorhus/got/blob/main/documentation/advanced-creation.md#examples).
-
-The second colossal factor is using the same HTTP version as browsers. Most modern browsers use HTTP v2, so using it when the server supports it takes you one more step further to look like a browser. Luckily you don't have to care about the server HTTP version support since `got` automatically handles [ALPN protocol negotiation](https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation) and uses the HTTP v2 only if it is supported.
-The last step is to have a browser-like TLS suite and ciphers. According to our research, the cipher `TLS_AES_256_GCM_SHA384` is used among all modern browsers. We use this cipher as a default one. However, feel free to change it.
-
-HTTP/1.1 headers are always automatically formatted in [`Pascal-Case`](https://pl.wikipedia.org/wiki/PascalCase). There is an exception: [`x-`](https://datatracker.ietf.org/doc/html/rfc7231#section-8.3.1) headers are not modified in *any* way.
-
-This package should provide a solid start for your browser request emulation process. All websites are built differently, and some of them might require some additional special care.
-
-## Proxies
-Got Scraping package makes using proxies with your requests ridiculously easy. It supports multiple variations of connections through HTTP1 and HTTP2 proxies to HTTP1 and HTTP2 servers. You can see the supported variations below. All you have to do is pass a valid `proxyUrl` option.
-
-| Proxy type 	| Proxy HTTP version 	| Agents             	|
-|------------	|--------------------	|--------------------	|
-| https      	| http2              	| http2, https, http 	|
-| https      	| http1              	| http2, https       	|
-| http       	| http1              	| http2, https, http 	|
-
-The proxy type and proxy HTTP version is a type of connection to a proxy. The agents are supported connections from the proxy to the target, let's say, a website.
 ## Installation
 
-Node 15.10+ is required because of HTTP2 and TLS cipher support we use to emulate the browser.
-
-```bash
+```
 $ npm install got-scraping
 ```
 
+**Note:**
+> - Node.js >=15.10.0 is required due to instability of HTTP/2 support in lower versions.
+
+## API
+
+Got scraping package is built using the [`got.extend(...)`](https://github.com/sindresorhus/got/blob/main/documentation/10-instances.md) functionality, therefore it supports all the features Got has.
+
+### options
+
+#### `proxyUrl`
+
+Type: **`string`**
+
+URL of the HTTP or HTTPS based proxy. HTTP2 proxies are supported as well.
+
+#### `useHeaderGenerator`
+
+Type: **`boolean`**\
+Default: **`true`**
+
+Whether to use the generation of the browser-like headers.
+
+#### `headerGeneratorOptions`
+
+See the [`HeaderGeneratorOptions`](https://github.com/apify/header-generator/tree/master#headergeneratoroptions) docs.
+
+#### `sessionToken`
+
+A non-primitive unique object which describes the current session. By default, it's `undefined`, so new headers will be generated every time. Headers generated with the same `sessionToken` never change.
+
 ## Examples
+
 These examples should help you to grasp the concept of the `got-scraping` package quickly.
+
 ### Simple GET request
+
 ```javascript
-const gotScraping = require('got-scraping');
+const { gotScraping } = require('got-scraping');
 
 gotScraping
     .get('https://apify.com')
@@ -72,20 +53,20 @@ gotScraping
 ```
 
 ### GET request with proxy
+
 ```javascript
-const gotScraping = require('got-scraping');
+const { gotScraping } = require('got-scraping');
 
-gotScraping({
-    url: 'https://apify.com',
-    proxyUrl: 'http://myproxy.com:1234',
-})
-    .then(({ body }) => console.log(body));
-
+gotScraping
+    .get({
+        url: 'https://apify.com',
+        proxyUrl: 'http://usernamed:password@myproxy.com:1234',
+    })
+    .then(({ body }) => console.log(body))
 ```
 
 ### Overriding request headers
 
-By passing options:
 ```javascript
 const response = await gotScraping({
     url: 'https://apify.com/',
@@ -95,7 +76,7 @@ const response = await gotScraping({
 });
 ```
 
-You can check out how to override request headers using handlers in the original `got` repo under the [instances](https://github.com/sindresorhus/got/blob/main/documentation/10-instances.md) section.
+For more advanced usage please refer to the [Got documentation](https://github.com/sindresorhus/got/#documentation).
 
 ### Customizing Header generator options
 
@@ -103,7 +84,7 @@ You can check out how to override request headers using handlers in the original
 const response = await gotScraping({
     url: 'https://api.apify.com/v2/browser-info',
     headerGeneratorOptions:{
-        browsers:[
+        browsers: [
             {
                 name: 'chrome',
                 minVersion: 87,
@@ -112,13 +93,14 @@ const response = await gotScraping({
         ],
         devices: ['desktop'],
         locales: ['de-DE', 'en-US'],
-        operatingSystems: ['windows', 'linux']
+        operatingSystems: ['windows', 'linux'],
     }
 });
 ```
 
-### Get JSON
-You can get `JSON` body with this package too, but please bear in mind that the request header generation is done specifically for `HTML` content type. You might want to alter the generated headers to match the browser ones.
+### JSON mode
+
+You can parse JSON with this package too, but please bear in mind that the request header generation is done specifically for `HTML` content type. You might want to alter the generated headers to match the browser ones.
 
 ```javascript
 const response = await gotScraping({
@@ -127,46 +109,32 @@ const response = await gotScraping({
 });
 ```
 
-## API reference
+## Under the hood
 
-Got scraping package is built using `got.extend` functionality and supports all of the [got API](https://github.com/sindresorhus/got#api). On top of that, it adds few more options to the `got` once and then passes them by a handler to the `got` context object. This package also alters `got` defaults to be more scraping friendly.
+Thanks to the included [`header-generator`](https://github.com/apify/header-generator) package, you can choose various browsers from different operating systems and devices. It generates all the headers automatically so you can focus on the important stuff instead.
 
-### Got scraping default values
-```javascript
-const SCRAPING_DEFAULT_OPTIONS = {
-    // Most of the new browsers use HTTP2
-    http2: true,
-    https: {
-        // We usually don't want to fail because of SSL errors.
-        // We want the content.
-        rejectUnauthorized: false,
-        // Node js uses different TLS ciphers by default.
-        // This is very useful at fighting protection, but can on some websites cause TLS errors.
-        ciphers: "TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256" 
-    },
-    // This would fail all of 404, 403 responses.
-    // We usually don't want to consider these as errors.
-    // We want to take some action after this.
-    throwHttpErrors: false,
-    // We need to have browser-like headers to blend in.
-    useHeaderGenerator: true,
-    // Got has infinite timeout by default. In scraping we have to count with bad proxies. Without custom timeout it would just hang.
-    timeout: 60000,
-    // Retries should be handled by a crawler not the request package.
-    retry: { retries: 0, maxRetryAfter: 0 },
+Yet another goal is to simplify the usage of proxies. Just pass the `proxyUrl` option and you are set. Got Scraping automatically detects the HTTP protocol that the proxy server supports. After the connection is established, it does another ALPN negotiation for the end server. Once that is complete, Got Scraping can proceed with HTTP requests.
 
-};
-```
-### Got scraping extra options
-`proxyUrl` - Url of HTTPS or HTTP based proxy. HTTP2 proxies are supported.
+There's only one property necessary for this entire operation: the `proxyUrl` option.
 
-`useHeaderGenerator` - Turns on the generation of the browser-like header. By default, it is set to `true`.
+Use the same HTTP version that browsers do is important as well. Most modern browsers use HTTP/2, so Got Scraping is making a use of it too - this feature is already supported by Got. It automatically handles [ALPN protocol negotiation](https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation) to select the available protocol.
 
-`headerGeneratorOptions` - See the [HeaderGeneratorOptions](https://github.com/apify/header-generator/tree/master#headergeneratoroptions).
+HTTP/1.1 headers are always automatically formatted in [`Pascal-Case`](https://pl.wikipedia.org/wiki/PascalCase). However, there is an exception: [`x-`](https://datatracker.ietf.org/doc/html/rfc7231#section-8.3.1) headers are not modified in *any* way.
 
-`sessionToken` - A non-primitive unique object which is used to generate headers. By default, it's `undefined`, so new headers will be generated every time. Headers generated with the same `sessionToken` are always the same.
+To get more detailed information about the implementation, please refer to the [source code](https://github.com/apify/got-scraping/blob/master/src/index.ts).
+
+## Tips
+
+This package can only generate all the standard attributes. You might want to add the [`referer` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer) if necessary. Please bear in mind that these headers are made for GET requests for HTML documents. If you want to make POST requests or GET requests for any other content type, you should alter these headers according to your needs. You can do so by passing a headers option or writing a custom [Got handler](https://github.com/sindresorhus/got/blob/main/documentation/10-instances.md).
+
+This package should provide a solid start for your browser request emulation process. All websites are built differently, and some of them might require some additional special care.
 
 ### Error recovery
+
 This section covers possible errors that might happen due to different site implementations.
 
-`RequestError: Client network socket disconnected before secure TLS connection was established` - Try changing the ciphers parameter to either `undefined` or a custom value.
+```
+RequestError: Client network socket disconnected before secure TLS connection was established
+```
+
+The error above can be a result of the server not supporting the provided TLS setings. Try changing the ciphers parameter to either `undefined` or a custom value.
