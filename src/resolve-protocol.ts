@@ -1,3 +1,4 @@
+import { isIPv6 } from 'net';
 import tls, { TLSSocket } from 'tls';
 import { URL } from 'url';
 import { Headers } from 'got-cjs';
@@ -5,7 +6,11 @@ import { auto, ResolveProtocolConnectFunction, ResolveProtocolFunction } from 'h
 import QuickLRU from 'quick-lru';
 
 const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callback: () => void) => new Promise<TLSSocket>((resolve, reject) => {
-    const host = `${options.host}:${options.port}`;
+    let host = `${options.host}:${options.port}`;
+
+    if (isIPv6(options.host!)) {
+        host = `[${options.host}]:${options.port}`;
+    }
 
     (async () => {
         try {

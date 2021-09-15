@@ -1,5 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { URL } from 'url';
+import { isIPv6 } from 'net';
 import tls, { ConnectionOptions } from 'tls';
 import http, { ClientRequest, ClientRequestArgs } from 'http';
 import https from 'https';
@@ -43,7 +44,12 @@ export class HttpRegularProxyAgent extends http.Agent {
             return;
         }
 
-        const hostport = `${options.host}:${options.port}`;
+        let hostport = `${options.host}:${options.port}`;
+
+        if (isIPv6(options.host!)) {
+            hostport = `[${options.host}]:${options.port}`;
+        }
+
         const url = new URL(`${request.protocol}//${hostport}${request.path}`);
 
         options = {
@@ -82,7 +88,11 @@ export class HttpProxyAgent extends http.Agent {
 
         const fn = this.proxy.protocol === 'https:' ? https.request : http.request;
 
-        const hostport = `${options.host}:${options.port}`;
+        let hostport = `${options.host}:${options.port}`;
+
+        if (isIPv6(options.host!)) {
+            hostport = `[${options.host}]:${options.port}`;
+        }
 
         const headers: Record<string, string> = {
             host: hostport,
