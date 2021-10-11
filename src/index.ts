@@ -1,7 +1,7 @@
 import http from 'http';
 import https from 'https';
 
-import { got as gotCjs } from 'got-cjs';
+import { got as gotCjs, Options } from 'got-cjs';
 
 // @ts-expect-error Missing types
 import HeaderGenerator from 'header-generator';
@@ -57,6 +57,29 @@ const gotScraping = gotCjs.extend({
         ],
     },
 });
+
+/**
+ * Mock the `decodeURI` global for the time when Got is normalizing the URL.
+ * @see https://github.com/apify/apify-js/issues/1205
+ */
+const setupDecodeURI = () => {
+    const { set } = Object.getOwnPropertyDescriptor(Options.prototype, 'url')!;
+
+    Object.defineProperty(Options.prototype, 'url', {
+        set(value) {
+            const originalDecodeURI = global.decodeURI;
+            global.decodeURI = (str) => str;
+
+            try {
+                return set!.call(this, value);
+            } finally {
+                global.decodeURI = originalDecodeURI;
+            }
+        },
+    });
+};
+
+setupDecodeURI();
 
 export * from 'got-cjs';
 export { gotScraping };

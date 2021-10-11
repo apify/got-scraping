@@ -80,6 +80,22 @@ describe('GotScraping', () => {
         });
     });
 
+    test('accepts invalid URIs', async () => {
+        const testQueries = [
+            // [query, raw]
+            ['%20', '%20'],
+            ['%cf', '%cf'],
+            ['helios-–-the-primordial-sun', 'helios-%E2%80%93-the-primordial-sun'],
+            ['helios-%E2%80%93-the-primordial-sun', 'helios-%E2%80%93-the-primordial-sun'],
+            ['%C3%A8----%C3%A9', '%C3%A8----%C3%A9'],
+            ['è----é', '%C3%A8----%C3%A9'],
+        ];
+
+        const result = await Promise.all(testQueries.map((query) => gotScraping(`http://localhost:${port}/query?${query[0]}`).text()));
+
+        expect(result).toEqual(testQueries.map((query) => query[1]));
+    });
+
     test('should have got interface', () => {
         expect(typeof gotScraping.post).toBe('function');
         expect(typeof gotScraping.get).toBe('function');

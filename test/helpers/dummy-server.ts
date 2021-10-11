@@ -53,6 +53,10 @@ const startDummyServer = async (port = 0): Promise<Server> => {
         res.json(parseHeaders(req.rawHeaders));
     });
 
+    app.get('/query', (req, res) => {
+        res.send(req.url.slice(req.url.indexOf('?') + 1));
+    });
+
     return startExpressAppPromise(app, port);
 };
 
