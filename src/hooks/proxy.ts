@@ -1,6 +1,5 @@
 import { URL } from 'url';
 import { proxies, auto } from 'http2-wrapper';
-import QuickLRU from 'quick-lru';
 import { Agents, Options } from 'got-cjs';
 import { HttpsProxyAgent, HttpRegularProxyAgent } from '../agent/h1-proxy-agent';
 import { TransformHeadersAgent } from '../agent/transform-headers-agent';
@@ -33,39 +32,34 @@ function validateProxyProtocol(protocol: string) {
     }
 }
 
-const createAgentCache = () => new QuickLRU<string, Agents>({ maxSize: 1000 });
+async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
+    // Sockets must not be reused, the proxy server may rotate upstream proxies as well.
 
-export const defaultAgentCache = createAgentCache();
-
-interface AgentsData {
-    agentCache?: typeof defaultAgentCache;
-}
-
-async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean, sessionData?: AgentsData) {
-    const key = `${rejectUnauthorized}:${parsedProxyUrl.href}`;
-
-    if (sessionData && !sessionData.agentCache) {
-        sessionData.agentCache = createAgentCache();
-    }
-
-    const agentCache = sessionData?.agentCache ?? defaultAgentCache;
-
-    let agent = agentCache.get(key);
-    if (agent) {
-        return agent;
-    }
-
-    const proxy = {
+    // `http2-wrapper` Agent options
+    const wrapperOptions = {
         proxyOptions: {
             url: parsedProxyUrl,
 
-            rejectUnauthorized, // based on the got https.rejectUnauthorized option.
+            // Based on the got https.rejectUnauthorized option
+            rejectUnauthorized,
         },
+
+        // The sockets won't be reused, no need to keep them
+        maxFreeSockets: 0,
+        maxEmptySessions: 0,
     };
 
-    const proxyUrl = proxy.proxyOptions.url;
+    // Native `http.Agent` options
+    const nativeOptions = {
+        proxy: parsedProxyUrl,
 
-    if (proxyUrl.protocol === 'https:') {
+        // The sockets won't be reused, no need to keep them
+        maxFreeSockets: 0,
+    };
+
+    let agent: Agents;
+
+    if (parsedProxyUrl.protocol === 'https:') {
         let alpnProtocol = 'http/1.1';
 
         try {
@@ -86,28 +80,26 @@ async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean, sessi
 
         if (proxyIsHttp2) {
             agent = {
-                http: new TransformHeadersAgent(new HttpOverHttp2(proxy)),
-                https: new TransformHeadersAgent(new HttpsOverHttp2(proxy)),
-                http2: new Http2OverHttp2(proxy),
+                http: new TransformHeadersAgent(new HttpOverHttp2(wrapperOptions)),
+                https: new TransformHeadersAgent(new HttpsOverHttp2(wrapperOptions)),
+                http2: new Http2OverHttp2(wrapperOptions),
             };
         } else {
             // Upstream proxies hang up connections on CONNECT + unsecure HTTP
             agent = {
-                http: new TransformHeadersAgent(new HttpRegularProxyAgent({ proxy: proxyUrl })),
-                https: new TransformHeadersAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
-                http2: new Http2OverHttps(proxy),
+                http: new TransformHeadersAgent(new HttpRegularProxyAgent(nativeOptions)),
+                https: new TransformHeadersAgent(new HttpsProxyAgent(nativeOptions)),
+                http2: new Http2OverHttps(wrapperOptions),
             };
         }
     } else {
         // Upstream proxies hang up connections on CONNECT + unsecure HTTP
         agent = {
-            http: new TransformHeadersAgent(new HttpRegularProxyAgent({ proxy: proxyUrl })),
-            https: new TransformHeadersAgent(new HttpsProxyAgent({ proxy: proxyUrl })),
-            http2: new Http2OverHttp(proxy),
+            http: new TransformHeadersAgent(new HttpRegularProxyAgent(nativeOptions)),
+            https: new TransformHeadersAgent(new HttpsProxyAgent(nativeOptions)),
+            http2: new Http2OverHttp(wrapperOptions),
         };
     }
-
-    agentCache.set(key, agent);
 
     return agent;
 }
