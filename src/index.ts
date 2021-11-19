@@ -5,6 +5,8 @@ import { got as gotCjs, Options } from 'got-cjs';
 
 // @ts-expect-error Missing types
 import HeaderGenerator from 'header-generator';
+// @ts-expect-error Missing types
+import tlsHook from 'https-tls/hook';
 
 import { TransformHeadersAgent } from './agent/transform-headers-agent';
 
@@ -14,7 +16,6 @@ import { browserHeadersHook } from './hooks/browser-headers';
 import { proxyHook } from './hooks/proxy';
 import { http2Hook } from './hooks/http2';
 import { insecureParserHook } from './hooks/insecure-parser';
-import { tlsHook } from './hooks/tls';
 import { sessionDataHook } from './hooks/storage';
 
 const gotScraping = gotCjs.extend({
