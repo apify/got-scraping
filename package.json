@@ -10,7 +10,7 @@
         "dist"
     ],
     "dependencies": {
-        "got-cjs": "12.0.0-beta.4",
+        "got-cjs": "12.0.0",
         "header-generator": "^1.1.1",
         "http2-wrapper": "^2.1.4",
         "ow": "^0.23.0",
