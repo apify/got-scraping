@@ -16,6 +16,7 @@ import { http2Hook } from './hooks/http2';
 import { insecureParserHook } from './hooks/insecure-parser';
 import { tlsHook } from './hooks/tls';
 import { sessionDataHook } from './hooks/storage';
+import { fixDecompress } from './hooks/fix-decompress';
 
 const gotScraping = gotCjs.extend({
     mutableDefaults: true,
@@ -29,7 +30,6 @@ const gotScraping = gotCjs.extend({
     // Don't fail on 404
     throwHttpErrors: false,
     timeout: { request: 60000 },
-    retry: { limit: 0 },
     headers: {
         'user-agent': undefined,
     },
@@ -55,6 +55,18 @@ const gotScraping = gotCjs.extend({
             browserHeadersHook,
             tlsHook,
         ],
+        beforeRetry: [
+            fixDecompress,
+        ],
+    },
+    retry: {
+        calculateDelay: ({ error, attemptCount }) => {
+            if (error.code === 'Z_DATA_ERROR' && attemptCount === 0) {
+                return 1;
+            }
+
+            return 0;
+        },
     },
 });
 
