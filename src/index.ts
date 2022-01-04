@@ -16,7 +16,7 @@ import { http2Hook } from './hooks/http2';
 import { insecureParserHook } from './hooks/insecure-parser';
 import { tlsHook } from './hooks/tls';
 import { sessionDataHook } from './hooks/storage';
-import { fixDecompress } from './hooks/fix-decompress';
+import { fixDecompress, shouldDecompress } from './hooks/fix-decompress';
 
 const gotScraping = gotCjs.extend({
     mutableDefaults: true,
@@ -54,6 +54,7 @@ const gotScraping = gotCjs.extend({
             proxyHook,
             browserHeadersHook,
             tlsHook,
+            shouldDecompress,
         ],
         beforeRetry: [
             fixDecompress,
