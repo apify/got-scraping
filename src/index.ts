@@ -62,7 +62,7 @@ const gotScraping = gotCjs.extend({
     },
     retry: {
         calculateDelay: ({ error, attemptCount }) => {
-            if (error.code === 'Z_DATA_ERROR' && attemptCount === 0) {
+            if (error.code === 'Z_DATA_ERROR' && error.options.method === 'GET' && attemptCount === 0) {
                 return 1;
             }
 
