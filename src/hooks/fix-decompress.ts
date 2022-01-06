@@ -33,13 +33,23 @@ const onResponse = (response: IncomingMessage, propagate: (fixedResponse: Incomi
     if (encoding === 'gzip' || encoding === 'x-gzip') {
         useDecompressor(zlib.createGunzip(zlibOptions));
     } else if (encoding === 'deflate' || encoding === 'x-deflate') {
+        let read = false;
+
         response.once('data', (chunk: Buffer) => {
+            read = true;
+
             response.unshift(chunk);
 
             // See http://stackoverflow.com/questions/37519828
             // eslint-disable-next-line no-bitwise
             const decompressor = (chunk[0] & 0x0F) === 0x08 ? zlib.createInflate() : zlib.createInflateRaw();
             useDecompressor(decompressor);
+        });
+
+        response.once('end', () => {
+            if (!read) {
+                propagate(response);
+            }
         });
     } else if (encoding === 'br') {
         useDecompressor(zlib.createBrotliDecompress());
