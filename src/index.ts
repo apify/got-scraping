@@ -16,8 +16,12 @@ import { http2Hook } from './hooks/http2';
 import { insecureParserHook } from './hooks/insecure-parser';
 import { tlsHook } from './hooks/tls';
 import { sessionDataHook } from './hooks/storage';
+import { fixDecompress } from './hooks/fix-decompress';
 
 const gotScraping = gotCjs.extend({
+    handlers: [
+        fixDecompress,
+    ],
     mutableDefaults: true,
     // Most of the new browsers use HTTP/2
     http2: true,
