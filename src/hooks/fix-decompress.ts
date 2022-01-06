@@ -5,7 +5,7 @@ import { PassThrough, Transform } from 'stream';
 import mimicResponse from 'mimic-response';
 
 const onResponse = (response: IncomingMessage, propagate: (fixedResponse: IncomingMessage) => void) => {
-    const encoding = response.headers['content-encoding'];
+    const encoding = response.headers['content-encoding']?.toLowerCase();
 
     // Append empty chunk.
     const zlibOptions = {
@@ -66,11 +66,13 @@ export const fixDecompress: HandlerFunction = (options, next) => {
             if (event === 'response') {
                 const response = args[0] as IncomingMessage;
 
+                const emitted = request.listenerCount('response') !== 0;
+
                 onResponse(response, (fixedResponse: IncomingMessage) => {
                     emit('response', fixedResponse);
                 });
 
-                return request.listenerCount('response') !== 0;
+                return emitted;
             }
 
             return emit.call(request, event, ...args);
