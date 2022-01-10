@@ -1,4 +1,5 @@
 import { Server } from 'http';
+import zlib from 'zlib';
 import express, { Express } from 'express';
 import bodyParser from 'body-parser';
 
@@ -55,6 +56,11 @@ const startDummyServer = async (port = 0): Promise<Server> => {
 
     app.get('/query', (req, res) => {
         res.send(req.url.slice(req.url.indexOf('?') + 1));
+    });
+
+    app.get('/invalid-deflate', (_req, res) => {
+        res.setHeader('content-encoding', 'deflate');
+        res.send(zlib.deflateRawSync('ok'));
     });
 
     return startExpressAppPromise(app, port);

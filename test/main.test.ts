@@ -338,6 +338,11 @@ describe('GotScraping', () => {
         });
     });
 
+    test('is lenient on decompression', async () => {
+        const response = await gotScraping.get(`http://localhost:${port}/invalid-deflate`);
+        expect(response.body).toBe('ok');
+    });
+
     describe('same thing with streams', () => {
         test('should order headers', async () => {
             const body = await getStream(gotScraping.stream({ url: 'https://api.apify.com/v2/browser-info?rawHeaders=1' }));
