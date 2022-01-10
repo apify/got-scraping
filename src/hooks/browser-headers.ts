@@ -99,6 +99,14 @@ export async function browserHeadersHook(options: Options): Promise<void> {
         });
     }
 
+    if (!options.decompress) {
+        for (const key of Object.keys(generatedHeaders)) {
+            if (key.toLowerCase() === 'accept-encoding') {
+                delete generatedHeaders[key];
+            }
+        }
+    }
+
     // TODO: Use `options.merge({headers: generatedHeaders})` instead
     options.headers = mergeHeaders(generatedHeaders, options.headers as Record<string, string>);
 }

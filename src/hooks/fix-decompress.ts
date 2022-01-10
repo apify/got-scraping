@@ -25,6 +25,10 @@ const onResponse = (response: IncomingMessage, propagate: (fixedResponse: Incomi
             },
         });
 
+        decompressor.once('error', (error) => {
+            result.destroy(error);
+        });
+
         response.pipe(decompressor).pipe(result);
 
         propagate(mimicResponse(response, result));
@@ -58,14 +62,10 @@ const onResponse = (response: IncomingMessage, propagate: (fixedResponse: Incomi
     }
 };
 
+// Some websites incorrectly compress the response.
+// Got is very strict so it would throw.
+// Browsers don't, so we need fix this.
 export const fixDecompress: HandlerFunction = (options, next) => {
-    if (options.decompress) {
-        options.headers['accept-encoding'] = process.versions.brotli ? 'gzip, deflate, br' : 'gzip, deflate';
-        options.decompress = false;
-    } else {
-        return next(options);
-    }
-
     const result = next(options);
 
     // @ts-expect-error Looks like a TypeScript bug
@@ -73,7 +73,9 @@ export const fixDecompress: HandlerFunction = (options, next) => {
         const emit = request.emit.bind(request);
 
         request.emit = (event: string, ...args: unknown[]) => {
-            if (event === 'response') {
+            // It won't double decompress, because Got checks the content-encoding header.
+            // We delete it if the response is compressed.
+            if (event === 'response' && options.decompress) {
                 const response = args[0] as IncomingMessage;
 
                 const emitted = request.listenerCount('response') !== 0;
@@ -85,7 +87,7 @@ export const fixDecompress: HandlerFunction = (options, next) => {
                 return emitted;
             }
 
-            return emit.call(request, event, ...args);
+            return emit(event, ...args);
         };
     });
 
