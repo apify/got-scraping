@@ -9,13 +9,13 @@ const ecdhCurve = {
         'prime256v1',
         'secp384r1',
         'secp521r1',
+        'ffdhe2048',
+        'ffdhe3072',
     ] : [
         'X25519',
         'prime256v1',
         'secp384r1',
         'secp521r1',
-        'ffdhe2048',
-        'ffdhe3072',
     ]).join(':'),
     chrome: [
         'X25519',
