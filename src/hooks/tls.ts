@@ -1,6 +1,11 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-bitwise */
 import { Options } from 'got-cjs';
 
 const supportsFirefoxFully = Number(process.versions.node.split('.')[0]) >= 17;
+
+const SSL_OP_TLSEXT_PADDING = 1 << 4;
+const SSL_OP_NO_ENCRYPT_THEN_MAC = 1 << 19;
 
 // OpenSSL supports secp256r1. It's just reffered to as prime256v1.
 const ecdhCurve = {
@@ -154,6 +159,18 @@ export const maxVersion = {
     safari: 'TLSv1.3',
 } as const;
 
+export const secureOptions = {
+    firefox: SSL_OP_TLSEXT_PADDING | SSL_OP_NO_ENCRYPT_THEN_MAC,
+    chrome: SSL_OP_TLSEXT_PADDING | SSL_OP_NO_ENCRYPT_THEN_MAC,
+    safari: SSL_OP_TLSEXT_PADDING | SSL_OP_NO_ENCRYPT_THEN_MAC,
+} as const;
+
+export const requestOCSP = {
+    firefox: true,
+    chrome: true,
+    safari: true,
+};
+
 type BrowserName = 'chrome' | 'firefox' | 'safari' | undefined;
 
 const getUserAgent = (headers: Record<string, string | string[] | undefined>): string | undefined => {
@@ -189,22 +206,20 @@ export function tlsHook(options: Options): void {
         return;
     }
 
-    const browser: BrowserName = getBrowser(getUserAgent(options.headers));
-
-    if (browser && browser in knownCiphers) {
-        https.ciphers = knownCiphers[browser];
-        https.signatureAlgorithms = sigalgs[browser];
-        https.ecdhCurve = ecdhCurve[browser];
-        https.minVersion = minVersion[browser];
-        https.maxVersion = maxVersion[browser];
-
-        return;
-    }
-
     // Let's default to Firefox settings as it has low failure rates
-    https.ciphers = knownCiphers.firefox;
-    https.signatureAlgorithms = sigalgs.firefox;
-    https.ecdhCurve = ecdhCurve.firefox;
-    https.minVersion = minVersion.firefox;
-    https.maxVersion = maxVersion.firefox;
+    const browser = getBrowser(getUserAgent(options.headers)) ?? 'firefox';
+
+    https.ciphers = knownCiphers[browser];
+    https.signatureAlgorithms = sigalgs[browser];
+    https.ecdhCurve = ecdhCurve[browser];
+    https.minVersion = minVersion[browser];
+    https.maxVersion = maxVersion[browser];
+
+    // @ts-expect-error Private use
+    options._unixOptions = {
+        // @ts-expect-error Private use
+        ...options._unixOptions,
+        secureOptions: secureOptions[browser],
+        requestOCSP: requestOCSP[browser],
+    };
 }
