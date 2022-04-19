@@ -1,8 +1,7 @@
 import { URL } from 'url';
 import { AddressInfo } from 'net';
 import http, { Server } from 'http';
-// @ts-expect-error Missing types
-import HeaderGenerator from 'header-generator';
+import { HeaderGenerator } from 'header-generator';
 import { got } from 'got-cjs';
 
 import { browserHeadersHook, mergeHeaders } from '../src/hooks/browser-headers';
