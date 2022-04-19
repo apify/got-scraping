@@ -1,17 +1,22 @@
 import { Options } from 'got-cjs';
-// @ts-expect-error Missing types
-import { getBrowser, getUserAgent } from 'header-generator/src/utils';
+
+const supportsFirefoxFully = Number(process.versions.node.split('.')[0]) >= 17;
 
 // OpenSSL supports secp256r1. It's just reffered to as prime256v1.
 const ecdhCurve = {
-    firefox: [
+    firefox: (supportsFirefoxFully ? [
         'X25519',
         'prime256v1',
         'secp384r1',
         'secp521r1',
-        // 'ffdhe2048',
-        // 'ffdhe3072',
-    ].join(':'),
+    ] : [
+        'X25519',
+        'prime256v1',
+        'secp384r1',
+        'secp521r1',
+        'ffdhe2048',
+        'ffdhe3072',
+    ]).join(':'),
     chrome: [
         'X25519',
         'prime256v1',
@@ -149,7 +154,33 @@ export const maxVersion = {
     safari: 'TLSv1.3',
 } as const;
 
-type Browser = 'chrome' | 'firefox' | 'safari' | undefined;
+type BrowserName = 'chrome' | 'firefox' | 'safari' | undefined;
+
+const getUserAgent = (headers: Record<string, string | string[] | undefined>): string | undefined => {
+    for (const [header, value] of Object.entries(headers)) {
+        if (header.toLowerCase() === 'user-agent') {
+            return value as string;
+        }
+    }
+    return undefined;
+};
+
+const getBrowser = (userAgent?: string): BrowserName | undefined => {
+    if (!userAgent) {
+        return;
+    }
+
+    let browser;
+    if (userAgent.includes('Firefox')) {
+        browser = 'firefox';
+    } else if (userAgent.includes('Chrome')) {
+        browser = 'chrome';
+    } else {
+        browser = 'safari';
+    }
+
+    return browser as BrowserName;
+};
 
 export function tlsHook(options: Options): void {
     const { https } = options;
@@ -158,7 +189,7 @@ export function tlsHook(options: Options): void {
         return;
     }
 
-    const browser: Browser = getBrowser(getUserAgent(options.headers));
+    const browser: BrowserName = getBrowser(getUserAgent(options.headers));
 
     if (browser && browser in knownCiphers) {
         https.ciphers = knownCiphers[browser];

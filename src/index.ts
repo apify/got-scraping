@@ -2,9 +2,7 @@ import http from 'http';
 import https from 'https';
 
 import { got as gotCjs, Options } from 'got-cjs';
-
-// @ts-expect-error Missing types
-import HeaderGenerator from 'header-generator';
+import { HeaderGenerator } from 'header-generator';
 
 import { TransformHeadersAgent } from './agent/transform-headers-agent';
 

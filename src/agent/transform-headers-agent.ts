@@ -1,6 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-// @ts-expect-error TODO: Type `header-generator`
-import HeaderGenerator from 'header-generator';
+import { HeaderGenerator } from 'header-generator';
 import { OutgoingMessage, Agent, ClientRequest, ClientRequestArgs } from 'http';
 import { WrappedAgent } from './wrapped-agent';
 
@@ -67,7 +66,7 @@ export class TransformHeadersAgent<T extends Agent> extends WrappedAgent<T> {
             }
         }
 
-        const transformedHeaders: Record<string, string | number | string[]> = sortHeaders ? generator.orderHeaders(headers) : headers;
+        const transformedHeaders: Record<string, string | number | string[]> = sortHeaders ? generator.orderHeaders(headers as any) : headers;
 
         for (const [key, value] of Object.entries(transformedHeaders)) {
             request.setHeader(key, value);
