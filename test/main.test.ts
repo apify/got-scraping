@@ -208,7 +208,8 @@ describe('GotScraping', () => {
     });
 
     describe('Integration', () => {
-        test('should order headers', async () => {
+        // FIXME: this should be using a local server instead
+        test.skip('should order headers', async () => {
             const { rawHeaders } = await gotScraping({ url: 'https://api.apify.com/v2/browser-info?rawHeaders=1' }).json();
             expect(rawHeaders[0].toLowerCase()).toBe('connection');
         });
@@ -286,7 +287,8 @@ describe('GotScraping', () => {
             expect(responseProxy.httpVersion).toBe('1.1');
         });
 
-        test('should order headers with proxyUrl and http1', async () => {
+        // FIXME: this should be using a local server instead
+        test.skip('should order headers with proxyUrl and http1', async () => {
             const { rawHeaders } = await gotScraping({
                 url: 'https://api.apify.com/v2/browser-info?rawHeaders=1',
                 proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
@@ -344,7 +346,8 @@ describe('GotScraping', () => {
     });
 
     describe('same thing with streams', () => {
-        test('should order headers', async () => {
+        // FIXME: this should be using a local server instead
+        test.skip('should order headers', async () => {
             const body = await getStream(gotScraping.stream({ url: 'https://api.apify.com/v2/browser-info?rawHeaders=1' }));
             const { rawHeaders } = JSON.parse(body);
 
@@ -470,7 +473,8 @@ describe('GotScraping', () => {
             expect(JSON.parse(responseBody)).toEqual(body);
         });
 
-        test('should order headers with proxyUrl and http1', async () => {
+        // FIXME: this should be using a local server instead
+        test.skip('should order headers with proxyUrl and http1', async () => {
             // @ts-expect-error FIXME
             const body = await getStream(gotScraping.stream({
                 url: 'https://api.apify.com/v2/browser-info?rawHeaders=1',
