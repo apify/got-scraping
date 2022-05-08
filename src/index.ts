@@ -15,6 +15,7 @@ import { insecureParserHook } from './hooks/insecure-parser';
 import { tlsHook } from './hooks/tls';
 import { sessionDataHook } from './hooks/storage';
 import { fixDecompress } from './hooks/fix-decompress';
+import { refererHook } from './hooks/referer';
 
 const gotScraping = gotCjs.extend({
     handlers: [
@@ -56,6 +57,9 @@ const gotScraping = gotCjs.extend({
             proxyHook,
             browserHeadersHook,
             tlsHook,
+        ],
+        beforeRedirect: [
+            refererHook,
         ],
     },
 });
