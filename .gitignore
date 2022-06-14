@@ -1,6 +1,17 @@
 # This file tells Git which files shouldn't be added to source control
 dist
-.idea
 node_modules
+*.log
+*.pid
+*.seed
+.DS_Store
 coverage
-package-lock.json
+.nyc_output
+logs
+pids
+.idea
+.vscode
+yarn.lock
+tmp
+jsconfig.json
+tsconfig.tsbuildinfo
