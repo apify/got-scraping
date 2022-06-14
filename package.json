@@ -71,6 +71,5 @@
     },
     "bugs": {
         "url": "https://github.com/apify/got-scraping/issues"
-    },
-    "type": "module"
+    }
 }
