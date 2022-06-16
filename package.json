@@ -2,13 +2,13 @@
     "name": "got-scraping",
     "version": "3.2.10",
     "description": "HTTP client made for scraping based on got.",
-    "main": "./dist/index.cjs",
-    "module": "./dist/index.js",
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
     "types": "./dist/index.d.ts",
     "exports": {
         ".": {
-            "require": "./dist/index.cjs",
-            "import": "./dist/index.js",
+            "require": "./dist/index.js",
+            "import": "./dist/index.mjs",
             "types": "./dist/index.d.ts"
         }
     },
