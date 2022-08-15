@@ -220,13 +220,15 @@ describe('GotScraping', () => {
             expect(response.httpVersion).toBe('2.0');
         });
 
-        test('Should auto downgrade protocol', async () => {
+        // FIXME: this should use a local server instead
+        test.skip('Should auto downgrade protocol', async () => {
             const response = await gotScraping({ url: 'https://eshop.coop-box.cz/' });
             expect(response.statusCode).toBe(200);
             expect(response.httpVersion).toBe('1.1');
         });
 
-        test('Should allow https target via http proxy when auto downgrading', async () => {
+        // FIXME: this should use a local server instead
+        test.skip('Should allow https target via http proxy when auto downgrading', async () => {
             const response = await gotScraping({
                 url: 'https://eshop.coop-box.cz/',
                 proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
@@ -507,14 +509,16 @@ describe('GotScraping', () => {
                 expect(response.httpVersion).toBe('2.0');
             });
 
-            test('Should auto downgrade protocol', async () => {
+            // FIXME: this should use a local server instead
+            test.skip('Should auto downgrade protocol', async () => {
                 const stream = gotScraping.stream({ url: 'https://eshop.coop-box.cz/' });
                 const [response] = await once(stream, 'response');
                 expect(response.statusCode).toBe(200);
                 expect(response.httpVersion).toBe('1.1');
             });
 
-            test('Should allow https target via http proxy when auto downgrading', async () => {
+            // FIXME: this should use a local server instead
+            test.skip('Should allow https target via http proxy when auto downgrading', async () => {
                 // @ts-expect-error FIXME
                 const stream = gotScraping.stream({
                     url: 'https://eshop.coop-box.cz/',
