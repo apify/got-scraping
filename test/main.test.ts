@@ -486,7 +486,6 @@ describe('GotScraping', () => {
             expect(JSON.parse(responseBody)).toEqual(body);
         });
 
-
         // FIXME: this should be using a local server instead
         test.skip('should order headers with proxyUrl and http1', async () => {
             // @ts-expect-error FIXME
