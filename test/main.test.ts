@@ -323,6 +323,19 @@ describe('GotScraping', () => {
             expect(responseProxy.httpVersion).toBe('2.0');
         });
 
+        test('should work with default proxy port', async () => {
+            try {
+                await gotScraping({
+                    url: 'http://api.apify.com/v2/browser-info',
+                    context: {
+                        proxyUrl: 'http://127.0.0.1:80',
+                    },
+                });
+            } catch (error: any) {
+                expect(error.code).not.toBe('ERR_SOCKET_BAD_PORT');
+            }
+        });
+
         test('should support tls 1.2', async () => {
             const url = 'https://tls-v1-2.badssl.com:1012/';
 
@@ -472,6 +485,7 @@ describe('GotScraping', () => {
             expect(response.statusCode).toBe(200);
             expect(JSON.parse(responseBody)).toEqual(body);
         });
+
 
         // FIXME: this should be using a local server instead
         test.skip('should order headers with proxyUrl and http1', async () => {

@@ -14,6 +14,22 @@ const initialize = (self: http.Agent & { proxy: URL }, options: AgentOptions) =>
     self.proxy = typeof options.proxy === 'string' ? new URL(options.proxy) : options.proxy;
 };
 
+const getPort = (url: URL): number => {
+    if (url.port !== '') {
+        return Number(url.port);
+    }
+
+    if (url.protocol === 'http:') {
+        return 80;
+    }
+
+    if (url.protocol === 'https:') {
+        return 443;
+    }
+
+    throw new Error(`Unexpected protocol: ${url.protocol}`);
+};
+
 const getBasic = (url: URL): string => {
     let basic = '';
     if (url.username || url.password) {
@@ -55,7 +71,7 @@ export class HttpRegularProxyAgent extends http.Agent {
         options = {
             ...options,
             host: this.proxy.hostname,
-            port: this.proxy.port,
+            port: getPort(this.proxy),
         };
 
         request.path = url.href;
