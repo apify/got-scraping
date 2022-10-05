@@ -210,7 +210,7 @@ describe('GotScraping', () => {
     describe('Integration', () => {
         // FIXME: this should be using a local server instead
         test.skip('should order headers', async () => {
-            const { rawHeaders } = await gotScraping({ url: 'https://api.apify.com/v2/browser-info?rawHeaders=1' }).json();
+            const { rawHeaders } = await gotScraping({ url: 'https://api.apify.com/v2/browser-info?rawHeaders=1' }).json<{ rawHeaders: string[] }>();
             expect(rawHeaders[0].toLowerCase()).toBe('connection');
         });
 
