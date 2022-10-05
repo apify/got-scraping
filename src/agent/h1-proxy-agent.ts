@@ -133,7 +133,7 @@ export class HttpProxyAgent extends http.Agent {
             if (head.length > 0 || response.statusCode !== 200) {
                 socket.destroy();
 
-                const error = new Error(`The proxy responded with ${response.statusCode}: ${head.toString()}`);
+                const error = new Error(`The proxy responded with ${response.statusCode} ${response.statusMessage}: ${head.toString()}`);
                 callback(error);
                 return;
             }
