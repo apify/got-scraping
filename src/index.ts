@@ -1,7 +1,7 @@
 import http from 'http';
 import https from 'https';
 
-import { got as gotCjs, Options } from 'got-cjs';
+import { Got, got as gotCjs, HTTPAlias, Options } from 'got-cjs';
 import { HeaderGenerator } from 'header-generator';
 
 import { TransformHeadersAgent } from './agent/transform-headers-agent';
@@ -16,6 +16,7 @@ import { tlsHook } from './hooks/tls';
 import { sessionDataHook } from './hooks/storage';
 import { fixDecompress } from './hooks/fix-decompress';
 import { refererHook } from './hooks/referer';
+import { ExtendedGotRequestFunction } from './types';
 
 const gotScraping = gotCjs.extend({
     handlers: [
@@ -62,7 +63,7 @@ const gotScraping = gotCjs.extend({
             refererHook,
         ],
     },
-});
+}) as Got & Record<HTTPAlias, ExtendedGotRequestFunction> & ExtendedGotRequestFunction;
 
 /**
  * Mock the `decodeURI` global for the time when Got is normalizing the URL.
