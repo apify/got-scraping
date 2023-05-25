@@ -6,7 +6,6 @@ on:
     pull_request:
 
 jobs:
-    # NPM install is done in a separate job and cached to speed up the following jobs.
     build_and_test:
         name: Build & Test
         if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
@@ -15,14 +14,14 @@ jobs:
         strategy:
             matrix:
                 os: [ubuntu-latest, windows-latest, macos-latest]
-                node-version: [15, 16]
+                node-version: [15, 16, 18, 20]
 
         steps:
             -
-                uses: actions/checkout@v2
+                uses: actions/checkout@v3
             -
                 name: Use Node.js ${{ matrix.node-version }}
-                uses: actions/setup-node@v1
+                uses: actions/setup-node@v3
                 with:
                     node-version: ${{ matrix.node-version }}
             -
@@ -32,7 +31,7 @@ jobs:
                 name: Run Tests
                 run: npm test
                 env:
-                    APIFY_PROXY_PASSWORD: ${{ secrets.APIFY_PROXY_PASSWORD }}
+                    APIFY_PROXY_PASSWORD: ${{ secrets.APIFY_TEST_USER_PROXY_PASSWORD }}
 
     lint:
         name: Lint
@@ -40,10 +39,10 @@ jobs:
 
         steps:
             -
-                uses: actions/checkout@v2
+                uses: actions/checkout@v3
             -
                 name: Use Node.js 16
-                uses: actions/setup-node@v1
+                uses: actions/setup-node@v3
                 with:
                     node-version: 16
             -
