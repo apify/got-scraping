@@ -4,6 +4,8 @@ import getStream from 'get-stream';
 import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
 import { startDummyServer } from './helpers/dummy-server';
 
+const NODE_MAJOR_VERSION = parseInt(process.versions.node.split('.')[0], 10);
+
 const agent = new http.Agent({
     keepAlive: true,
 });
@@ -42,7 +44,11 @@ describe('TransformHeadersAgent', () => {
 
             expect(headers.Cookie).toBe(requestHeaders.cookie);
             expect(headers['User-Agent']).toBe(requestHeaders['user-agent']);
-            expect(headers.Connection).toBe('close');
+            if (NODE_MAJOR_VERSION >= 19) {
+                expect(headers.Connection).toBe('keep-alive');
+            } else {
+                expect(headers.Connection).toBe('close');
+            }
 
             done();
         });

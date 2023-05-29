@@ -68,4 +68,75 @@ export class WrappedAgent<T extends HttpAgent> implements HttpAgent {
     get requests(): HttpAgent['requests'] {
         return this.agent.requests;
     }
+
+    on(eventName: string | symbol, listener: (...args: any[]) => void): this {
+        this.agent.on(eventName, listener);
+        return this;
+    }
+
+    once(eventName: string | symbol, listener: (...args: any[]) => void): this {
+        this.agent.once(eventName, listener);
+        return this;
+    }
+
+    off(eventName: string | symbol, listener: (...args: any[]) => void): this {
+        this.agent.off(eventName, listener);
+        return this;
+    }
+
+    addListener(eventName: string | symbol, listener: (...args: any[]) => void): this {
+        this.agent.addListener(eventName, listener);
+        return this;
+    }
+
+    removeListener(eventName: string | symbol, listener: (...args: any[]) => void): this {
+        this.agent.removeListener(eventName, listener);
+        return this;
+    }
+
+    removeAllListeners(eventName?: string | symbol): this {
+        this.agent.removeAllListeners(eventName);
+        return this;
+    }
+
+    setMaxListeners(n: number): this {
+        this.agent.setMaxListeners(n);
+        return this;
+    }
+
+    getMaxListeners(): number {
+        return this.agent.getMaxListeners();
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    listeners(eventName: string | symbol): Function[] {
+        return this.agent.listeners(eventName);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    rawListeners(eventName: string | symbol): Function[] {
+        return this.agent.rawListeners(eventName);
+    }
+
+    emit(eventName: string | symbol, ...args: any[]): boolean {
+        return this.agent.emit(eventName, ...args);
+    }
+
+    eventNames(): (string | symbol)[] {
+        return this.agent.eventNames();
+    }
+
+    listenerCount(eventName: string | symbol): number {
+        return this.agent.listenerCount(eventName);
+    }
+
+    prependListener(eventName: string | symbol, listener: (...args: any[]) => void): this {
+        this.agent.prependListener(eventName, listener);
+        return this;
+    }
+
+    prependOnceListener(eventName: string | symbol, listener: (...args: any[]) => void): this {
+        this.agent.prependOnceListener(eventName, listener);
+        return this;
+    }
 }
