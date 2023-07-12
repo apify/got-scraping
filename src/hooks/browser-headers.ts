@@ -45,6 +45,17 @@ const getResolveProtocolFunction = (options: Options, proxyUrl: string | undefin
     return http2.auto.resolveProtocol;
 };
 
+function filterInjectableHeaders(headers: Record<string, string>) : Record<string, string> {
+    const forbiddenHeaders = [
+        'connection',
+    ];
+
+    return Object.fromEntries(
+        Object.entries(headers)
+            .filter(([key]) => !forbiddenHeaders.includes(key.toLowerCase())),
+    );
+}
+
 export async function browserHeadersHook(options: Options): Promise<void> {
     const { context } = options;
     const {
@@ -93,10 +104,10 @@ export async function browserHeadersHook(options: Options): Promise<void> {
 
         generatedHeaders = sessionData.headers[httpVersion];
     } else {
-        generatedHeaders = headerGenerator.getHeaders({
+        generatedHeaders = filterInjectableHeaders(headerGenerator.getHeaders({
             httpVersion,
             ...headerGeneratorOptions,
-        });
+        }));
     }
 
     if (!options.decompress) {
