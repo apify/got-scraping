@@ -31,8 +31,9 @@ const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callbac
                 method: 'CONNECT',
                 headers,
                 path: host,
+                pathname: host,
                 rejectUnauthorized: false,
-            });
+            } as any);
 
             request.end();
 
