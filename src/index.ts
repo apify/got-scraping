@@ -18,10 +18,30 @@ import { fixDecompress } from './hooks/fix-decompress';
 import { refererHook } from './hooks/referer';
 import { ExtendedGotRequestFunction } from './types';
 
+const handlers = [
+    fixDecompress,
+];
+
+const beforeRequest = [
+    insecureParserHook,
+    sessionDataHook,
+    http2Hook,
+    proxyHook,
+    browserHeadersHook,
+    tlsHook,
+];
+
+const init = [
+    optionsValidationHandler,
+    customOptionsHook,
+];
+
+const beforeRedirect = [
+    refererHook,
+];
+
 const gotScraping = gotCjs.extend({
-    handlers: [
-        fixDecompress,
-    ],
+    handlers,
     mutableDefaults: true,
     // Most of the new browsers use HTTP/2
     http2: true,
@@ -47,21 +67,9 @@ const gotScraping = gotCjs.extend({
         https: new TransformHeadersAgent(https.globalAgent),
     },
     hooks: {
-        init: [
-            optionsValidationHandler,
-            customOptionsHook,
-        ],
-        beforeRequest: [
-            insecureParserHook,
-            sessionDataHook,
-            http2Hook,
-            proxyHook,
-            browserHeadersHook,
-            tlsHook,
-        ],
-        beforeRedirect: [
-            refererHook,
-        ],
+        init,
+        beforeRequest,
+        beforeRedirect,
     },
 }) as Got & Record<HTTPAlias, ExtendedGotRequestFunction> & ExtendedGotRequestFunction;
 
@@ -89,7 +97,23 @@ const setupDecodeURI = () => {
 setupDecodeURI();
 
 export * from 'got-cjs';
-export { gotScraping };
+export { gotScraping, TransformHeadersAgent };
+
+export const hooks = {
+    init,
+    beforeRequest,
+    beforeRedirect,
+    fixDecompress,
+    insecureParserHook,
+    sessionDataHook,
+    http2Hook,
+    proxyHook,
+    browserHeadersHook,
+    tlsHook,
+    optionsValidationHandler,
+    customOptionsHook,
+    refererHook,
+};
 
 export {
     GotOptionsInit,
