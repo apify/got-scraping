@@ -7,6 +7,10 @@ import { createResolveProtocol } from '../resolve-protocol';
 export function http2Hook(options: Options): void {
     const { proxyUrl, sessionData } = options.context as Context;
 
+    if (!proxyUrl?.startsWith('http')) {
+        options.http2 = false;
+    }
+
     if (options.http2 && (options.url as URL).protocol !== 'http:') {
         options.request = (url, requestOptions, callback) => {
             const typedRequestOptions = requestOptions as AutoRequestOptions;

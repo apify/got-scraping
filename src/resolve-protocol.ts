@@ -4,8 +4,33 @@ import { URL } from 'url';
 import { Headers } from 'got-cjs';
 import { auto, ResolveProtocolConnectFunction, ResolveProtocolFunction } from 'http2-wrapper';
 import QuickLRU from 'quick-lru';
+import { SocksClient } from 'socks';
 
-const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callback: () => void) => new Promise<TLSSocket>((resolve, reject) => {
+const connectSocks = async (proxyUrl: string, options: tls.ConnectionOptions, callback: () => void) => {
+    const url = new URL(proxyUrl);
+    const {socket} = await SocksClient.createConnection({
+        proxy: {
+            host: url.hostname,
+            port: parseInt(url.port, 10),
+            password: decodeURIComponent(url.password),
+            // determine type 4 or 5 based on protocol, may be different like socks4, socks5, socks5h, socks
+            type: url.protocol.includes('4') ? 4 : 5,
+        },
+        command: 'connect',
+        destination: {
+            host: options.host!,
+            port: options.port!,
+        },
+        existing_socket: options.socket,
+        timeout: options.timeout,
+    });
+    return tls.connect({
+        ...options,
+        socket,
+    }, callback);
+};
+
+const connectHttp = async (proxyUrl: string, options: tls.ConnectionOptions, callback: () => void) => new Promise<TLSSocket>((resolve, reject) => {
     let host = `${options.host}:${options.port}`;
 
     if (isIPv6(options.host!)) {
@@ -85,7 +110,7 @@ export const createResolveProtocol = (proxyUrl: string, sessionData?: ProtocolCa
     }
 
     const connectWithProxy: ResolveProtocolConnectFunction = async (pOptions, pCallback) => {
-        return connect(proxyUrl, pOptions, pCallback);
+        return (proxyUrl.startsWith('http') ? connectHttp : connectSocks)(proxyUrl, pOptions, pCallback);
     };
 
     return auto.createResolveProtocol(
