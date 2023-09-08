@@ -12,7 +12,6 @@ const onResponse = (response: IncomingMessage, propagate: (fixedResponse: Incomi
         flush: zlib.constants.Z_SYNC_FLUSH,
         finishFlush: zlib.constants.Z_SYNC_FLUSH,
     };
-
     const useDecompressor = (decompressor: Transform) => {
         delete response.headers['content-encoding'];
 
@@ -71,8 +70,8 @@ export const fixDecompress: HandlerFunction = (options, next) => {
     // @ts-expect-error Looks like a TypeScript bug
     result.on('request', (request: ClientRequest) => {
         const emit = request.emit.bind(request);
-
         request.emit = (event: string, ...args: unknown[]) => {
+
             // It won't double decompress, because Got checks the content-encoding header.
             // We delete it if the response is compressed.
             if (event === 'response' && options.decompress) {
@@ -86,7 +85,6 @@ export const fixDecompress: HandlerFunction = (options, next) => {
 
                 return emitted;
             }
-
             return emit(event, ...args);
         };
     });

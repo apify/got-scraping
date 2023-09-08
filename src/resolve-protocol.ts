@@ -8,12 +8,11 @@ import { SocksClient } from 'socks';
 
 const connectSocks = async (proxyUrl: string, options: tls.ConnectionOptions, callback: () => void) => {
     const url = new URL(proxyUrl);
-    const {socket} = await SocksClient.createConnection({
+    const { socket } = await SocksClient.createConnection({
         proxy: {
             host: url.hostname,
             port: parseInt(url.port, 10),
             password: decodeURIComponent(url.password),
-            // determine type 4 or 5 based on protocol, may be different like socks4, socks5, socks5h, socks
             type: url.protocol.includes('4') ? 4 : 5,
         },
         command: 'connect',

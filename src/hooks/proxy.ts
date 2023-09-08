@@ -1,9 +1,11 @@
 import { URL } from 'url';
 import { proxies, auto } from 'http2-wrapper';
 import { Agents, Options } from 'got-cjs';
-import { SocksProxyAgent } from 'socks-proxy-agent';
 import { HttpsProxyAgent, HttpRegularProxyAgent } from '../agent/h1-proxy-agent';
 import { TransformHeadersAgent } from '../agent/transform-headers-agent';
+import { SocksHttp2Agent } from '../agent/socks/socks-http2-agent';
+import { HttpSocksAgent } from '../agent/socks/http-socks-agent';
+import { HttpsSocksAgent } from '../agent/socks/https-socks-agent';
 
 const {
     HttpOverHttp2,
@@ -102,12 +104,13 @@ async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
         };
     } else {
         agent = {
-            http: new TransformHeadersAgent(new SocksProxyAgent(nativeOptions.proxy, {
+            http: new TransformHeadersAgent(new HttpSocksAgent(nativeOptions.proxy, {
                 maxFreeSockets: nativeOptions.maxFreeSockets,
             })),
-            https: new TransformHeadersAgent(new SocksProxyAgent(nativeOptions.proxy, {
+            https: new TransformHeadersAgent(new HttpsSocksAgent(nativeOptions.proxy, {
                 maxFreeSockets: nativeOptions.maxFreeSockets,
             })),
+            http2: new SocksHttp2Agent(wrapperOptions),
         };
     }
 
