@@ -5,12 +5,12 @@ import tls, { ConnectionOptions } from 'tls';
 import http, { ClientRequest, ClientRequestArgs } from 'http';
 import https from 'https';
 
-interface AgentOptions extends http.AgentOptions {
+export interface AgentOptions extends http.AgentOptions {
     proxy: string | URL;
     disableConnect?: boolean;
 }
 
-const initialize = (self: http.Agent & { proxy: URL }, options: AgentOptions) => {
+export const initialize = (self: { proxy: URL }, options: AgentOptions) => {
     self.proxy = typeof options.proxy === 'string' ? new URL(options.proxy) : options.proxy;
 };
 

@@ -13,7 +13,6 @@ export function http2Hook(options: Options): void {
             if (proxyUrl) {
                 typedRequestOptions.resolveProtocol = createResolveProtocol(proxyUrl, sessionData as any);
             }
-
             return auto(url, typedRequestOptions, callback);
         };
     } else {

@@ -3,6 +3,9 @@ import { proxies, auto } from 'http2-wrapper';
 import { Agents, Options } from 'got-cjs';
 import { HttpsProxyAgent, HttpRegularProxyAgent } from '../agent/h1-proxy-agent';
 import { TransformHeadersAgent } from '../agent/transform-headers-agent';
+import { SocksHttp2Agent } from '../agent/socks/socks-http2-agent';
+import { HttpSocksAgent } from '../agent/socks/http-socks-agent';
+import { HttpsSocksAgent } from '../agent/socks/https-socks-agent';
 
 const {
     HttpOverHttp2,
@@ -25,10 +28,10 @@ export async function proxyHook(options: Options): Promise<void> {
 }
 
 function validateProxyProtocol(protocol: string) {
-    const isSupported = protocol === 'http:' || protocol === 'https:';
+    const isSupported = protocol === 'http:' || protocol === 'https:' || protocol.startsWith('socks');
 
     if (!isSupported) {
-        throw new Error(`Proxy URL protocol "${protocol}" is not supported. Please use HTTP or HTTPS.`);
+        throw new Error(`Proxy URL protocol "${protocol}" is not supported. Please use HTTP, HTTPS or SOCKS family.`);
     }
 }
 
@@ -92,12 +95,22 @@ async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
                 http2: new Http2OverHttps(wrapperOptions),
             };
         }
-    } else {
+    } else if (parsedProxyUrl.protocol === 'http:') {
         // Upstream proxies hang up connections on CONNECT + unsecure HTTP
         agent = {
             http: new TransformHeadersAgent(new HttpRegularProxyAgent(nativeOptions)),
             https: new TransformHeadersAgent(new HttpsProxyAgent(nativeOptions)),
             http2: new Http2OverHttp(wrapperOptions),
+        };
+    } else {
+        agent = {
+            http: new TransformHeadersAgent(new HttpSocksAgent(nativeOptions.proxy, {
+                maxFreeSockets: nativeOptions.maxFreeSockets,
+            })),
+            https: new TransformHeadersAgent(new HttpsSocksAgent(nativeOptions.proxy, {
+                maxFreeSockets: nativeOptions.maxFreeSockets,
+            })),
+            http2: new SocksHttp2Agent(wrapperOptions),
         };
     }
 
