@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 
-import { Options } from 'got-cjs';
+import { Options } from 'got';
 
 export function insecureParserHook(options: Options): void {
     if (options.context.insecureHTTPParser !== undefined) {

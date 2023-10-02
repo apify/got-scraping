@@ -1,8 +1,8 @@
-import { AddressInfo } from 'net';
-import http, { Server } from 'http';
+import type { AddressInfo } from 'node:net';
+import http, { Server } from 'node:http';
 import getStream from 'get-stream';
-import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
-import { startDummyServer } from './helpers/dummy-server';
+import { TransformHeadersAgent } from '../src/agent/transform-headers-agent.js';
+import { startDummyServer } from './helpers/dummy-server.js';
 
 const NODE_MAJOR_VERSION = parseInt(process.versions.node.split('.')[0], 10);
 

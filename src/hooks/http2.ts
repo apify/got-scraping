@@ -1,8 +1,8 @@
-import { URL } from 'url';
-import { Options } from 'got-cjs';
-import { auto, AutoRequestOptions } from 'http2-wrapper';
-import { Context } from '../context';
-import { createResolveProtocol } from '../resolve-protocol';
+import { URL } from 'node:url';
+import { Options } from 'got';
+import { auto, type AutoRequestOptions } from 'http2-wrapper';
+import type { Context } from '../context.js';
+import { createResolveProtocol } from '../resolve-protocol.js';
 
 export function http2Hook(options: Options): void {
     const { proxyUrl, sessionData } = options.context as Context;

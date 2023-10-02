@@ -1,7 +1,7 @@
-import zlib from 'zlib';
-import { ClientRequest, IncomingMessage } from 'http';
-import { HandlerFunction } from 'got-cjs';
-import { PassThrough, Transform } from 'stream';
+import zlib from 'node:zlib';
+import { ClientRequest, IncomingMessage } from 'node:http';
+import type { HandlerFunction } from 'got';
+import { PassThrough, Transform } from 'node:stream';
 import mimicResponse from 'mimic-response';
 
 const onResponse = (response: IncomingMessage, propagate: (fixedResponse: IncomingMessage) => void) => {

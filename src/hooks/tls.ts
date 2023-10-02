@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-bitwise */
-import { Options } from 'got-cjs';
+import { Options } from 'got';
 
 const supportsFirefoxFully = Number(process.versions.node.split('.')[0]) >= 17;
 

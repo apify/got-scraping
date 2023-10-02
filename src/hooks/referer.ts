@@ -1,5 +1,5 @@
-import { BeforeRedirectHook } from 'got-cjs';
-import { URL } from 'url';
+import type { BeforeRedirectHook } from 'got';
+import { URL } from 'node:url';
 
 export const refererHook: BeforeRedirectHook = (options, response) => {
     const url = options.url as URL;

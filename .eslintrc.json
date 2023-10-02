@@ -1,8 +1,13 @@
 {
-    "extends": [
-      "@apify/ts"
-    ],
-    "parserOptions": {
-      "project": "tsconfig.eslint.json"
-    }
-  }
+	"extends": [
+		"@apify/ts"
+	],
+	"parserOptions": {
+		"project": "tsconfig.eslint.json",
+		"ecmaVersion": 2022
+	},
+	"rules": {
+		"@typescript-eslint/no-explicit-any": "off",
+		"no-void": "off"
+	}
+ }

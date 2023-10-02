@@ -1,7 +1,6 @@
-import { Server } from 'http';
-import zlib from 'zlib';
-import express, { Express } from 'express';
-import bodyParser from 'body-parser';
+import { Server } from 'node:http';
+import zlib from 'node:zlib';
+import express, { type Express } from 'express';
 
 const startExpressAppPromise = (app: Express, port: number): Promise<Server> => {
     return new Promise((resolve) => {
@@ -9,7 +8,7 @@ const startExpressAppPromise = (app: Express, port: number): Promise<Server> => 
     });
 };
 
-const parseHeaders = (rawHeaders: string[], obj: any = {}) => {
+const parseHeaders = (rawHeaders: string[], obj: Record<string, string | string[]> = {}) => {
     for (let i = 0; i < rawHeaders.length; i += 2) {
         // We don't want to normalize them.
         const key = rawHeaders[i].toString()/* .toLowerCase() */;
@@ -32,10 +31,10 @@ const parseHeaders = (rawHeaders: string[], obj: any = {}) => {
 
 const startDummyServer = async (port = 0): Promise<Server> => {
     const app = express();
-    app.use(bodyParser.urlencoded({
+    app.use(express.urlencoded({
         extended: true,
     }));
-    app.use(bodyParser.json());
+    app.use(express.json());
 
     app.get('/json', (_req, res) => {
         res.json({ test: 123 });

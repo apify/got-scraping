@@ -1,8 +1,8 @@
-import { isIPv6 } from 'net';
-import tls, { TLSSocket } from 'tls';
-import { URL } from 'url';
-import { Headers } from 'got-cjs';
-import { auto, ResolveProtocolConnectFunction, ResolveProtocolFunction } from 'http2-wrapper';
+import { isIPv6 } from 'node:net';
+import tls, { TLSSocket } from 'node:tls';
+import { URL } from 'node:url';
+import { type Headers } from 'got';
+import { auto, type ResolveProtocolConnectFunction, type ResolveProtocolFunction } from 'http2-wrapper';
 import QuickLRU from 'quick-lru';
 
 const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callback: () => void) => new Promise<TLSSocket>((resolve, reject) => {
@@ -12,7 +12,7 @@ const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callbac
         host = `[${options.host}]:${options.port}`;
     }
 
-    (async () => {
+    void (async () => {
         try {
             const headers: Headers = {
                 host,
@@ -31,9 +31,10 @@ const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callbac
                 method: 'CONNECT',
                 headers,
                 path: host,
+                // TODO: this property doesn't exist according to the types
                 pathname: host,
                 rejectUnauthorized: false,
-            } as any);
+            } as never);
 
             request.end();
 

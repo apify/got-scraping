@@ -1,5 +1,5 @@
-import dns from 'dns';
-import { gotScraping, OptionsInit } from '../src';
+import dns from 'node:dns';
+import { gotScraping, type OptionsInit } from '../src/index.js';
 
 describe('ALPN negotiation', () => {
     test('does not leak alpn', async () => {
@@ -22,6 +22,7 @@ describe('ALPN negotiation', () => {
 
         await proxyPromise;
 
+        // eslint-disable-next-line no-console
         console.log('dns', dnsQueries);
         expect(dnsQueries.includes('api.apify.com')).toBe(false);
 

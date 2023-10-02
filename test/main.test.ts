@@ -1,11 +1,12 @@
-import { Server } from 'http';
-import net, { AddressInfo, Server as TCPServer } from 'net';
+import { Server } from 'node:http';
+import net, { type AddressInfo, Server as TCPServer } from 'node:net';
 import { once } from 'events';
-import gotExports, { Response } from 'got-cjs';
+import gotExports, { type Response } from 'got';
 import getStream from 'get-stream';
-import { gotScraping, OptionsInit } from '../src';
+import { jest } from '@jest/globals';
+import { gotScraping, type OptionsInit } from '../src/index.js';
 
-import { startDummyServer } from './helpers/dummy-server';
+import { startDummyServer } from './helpers/dummy-server.js';
 
 const getPort = (server: TCPServer) => (server.address() as AddressInfo).port;
 
