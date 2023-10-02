@@ -77,7 +77,7 @@ jobs:
         # Check version consistency and increment pre-release version number for beta only.
         name: Bump pre-release version
         if: env.RELEASE_TAG == 'beta'
-        run: node ./.github/scripts/before-beta-release.js
+        run: node ./.github/scripts/before-beta-release.cjs
       -
         name: Install Dependencies
         run: npm install
