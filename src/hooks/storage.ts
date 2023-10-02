@@ -1,14 +1,12 @@
 import { Options } from 'got';
 
 class Storage {
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    storage: WeakMap<object, any>;
+    storage: WeakMap<object, unknown>;
 
     constructor() {
         this.storage = new WeakMap();
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
     get<T extends object>(token: object | undefined): T | undefined {
         if (!token) {
             return;
@@ -18,13 +16,12 @@ class Storage {
             this.storage.set(token, {});
         }
 
-        return this.storage.get(token);
+        return this.storage.get(token) as T | undefined;
     }
 }
 
 const storage = new Storage();
 
 export const sessionDataHook = (options: Options): void => {
-    // eslint-disable-next-line @typescript-eslint/ban-types
     options.context.sessionData = storage.get(options.context.sessionToken as object | undefined);
 };
