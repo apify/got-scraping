@@ -3,6 +3,14 @@
       "@apify/ts"
     ],
     "parserOptions": {
-      "project": "tsconfig.eslint.json"
-    }
+      "project": "tsconfig.eslint.json",
+      "ecmaVersion": 2022
+    },"overrides": [
+      {
+        "files": ["./test/**/*.ts"],
+        "rules": {
+          "@typescript-eslint/no-explicit-any": "off"
+        }
+      }
+    ]
   }

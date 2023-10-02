@@ -1,5 +1,5 @@
-import { CancelableRequest, Options, Request, Response } from 'got-cjs';
-import { OptionsInit } from './context';
+import type { CancelableRequest, ExtendOptions, Got, HTTPAlias, Options, Request, Response } from 'got';
+import type { OptionsInit } from './context.js';
 
 type Except<ObjectType, KeysType extends keyof ObjectType> = Pick<ObjectType, Exclude<keyof ObjectType, KeysType>>;
 type Merge<FirstType, SecondType> = Except<FirstType, Extract<keyof FirstType, keyof SecondType>> & SecondType;
@@ -56,3 +56,12 @@ export type ExtendedOptionsOfUnknownResponseBody = Merge<OptionsInit, {
 export type ResponseBodyOnly = {
     resolveBodyOnly: true;
 };
+
+export type ExtendedExtendOptions = ExtendOptions & OptionsInit;
+
+export interface GotScraping extends Record<HTTPAlias, ExtendedGotRequestFunction>, ExtendedGotRequestFunction {
+    stream: Got['stream'];
+    paginate: Got['paginate'];
+    defaults: Got['defaults'];
+    extend: (...instancesOrOptions: Array<GotScraping | ExtendedExtendOptions>) => GotScraping;
+}

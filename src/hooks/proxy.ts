@@ -1,8 +1,8 @@
-import { URL } from 'url';
-import { proxies, auto } from 'http2-wrapper';
-import { Agents, Options } from 'got-cjs';
-import { HttpsProxyAgent, HttpRegularProxyAgent } from '../agent/h1-proxy-agent';
-import { TransformHeadersAgent } from '../agent/transform-headers-agent';
+import { Options, type Agents } from 'got';
+import http2, { auto } from 'http2-wrapper';
+import { URL } from 'node:url';
+import { HttpRegularProxyAgent, HttpsProxyAgent } from '../agent/h1-proxy-agent.js';
+import { TransformHeadersAgent } from '../agent/transform-headers-agent.js';
 
 const {
     HttpOverHttp2,
@@ -10,7 +10,7 @@ const {
     Http2OverHttp2,
     Http2OverHttps,
     Http2OverHttp,
-} = proxies;
+} = http2.proxies;
 
 export async function proxyHook(options: Options): Promise<void> {
     const { context: { proxyUrl } } = options;

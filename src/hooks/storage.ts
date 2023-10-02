@@ -1,4 +1,4 @@
-import { Options } from 'got-cjs';
+import { Options } from 'got';
 
 class Storage {
     // eslint-disable-next-line @typescript-eslint/ban-types

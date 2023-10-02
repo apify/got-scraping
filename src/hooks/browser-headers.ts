@@ -1,8 +1,8 @@
-import { URL } from 'url';
-import { Options } from 'got-cjs';
+import { Options } from 'got';
 import http2 from 'http2-wrapper';
-import { Context } from '../context';
-import { createResolveProtocol } from '../resolve-protocol';
+import { URL } from 'node:url';
+import type { Context } from '../context.js';
+import { createResolveProtocol } from '../resolve-protocol.js';
 
 /**
  * Merges original generated headers and user provided overrides.

@@ -1,9 +1,9 @@
 /* eslint-disable max-classes-per-file */
-import { URL } from 'url';
-import { isIPv6 } from 'net';
-import tls, { ConnectionOptions } from 'tls';
-import http, { ClientRequest, ClientRequestArgs } from 'http';
-import https from 'https';
+import http, { ClientRequest, type ClientRequestArgs } from 'node:http';
+import https from 'node:https';
+import { isIPv6 } from 'node:net';
+import tls, { type ConnectionOptions } from 'node:tls';
+import { URL } from 'node:url';
 
 interface AgentOptions extends http.AgentOptions {
     proxy: string | URL;

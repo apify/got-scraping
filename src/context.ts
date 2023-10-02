@@ -1,6 +1,6 @@
-import { OptionsInit as GotOptionsInit } from 'got-cjs';
+import type { OptionsInit as GotOptionsInit } from 'got';
 
-export { GotOptionsInit };
+export type { GotOptionsInit };
 
 export interface Context extends Record<string, unknown> {
     proxyUrl?: string;

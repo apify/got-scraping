@@ -1,18 +1,19 @@
-import { URL } from 'url';
-import { AddressInfo } from 'net';
-import http, { Server } from 'http';
+import { URL } from 'node:url';
+import type { AddressInfo } from 'node:net';
+import http, { Server } from 'node:http';
 import { HeaderGenerator } from 'header-generator';
-import { got } from 'got-cjs';
+import { got } from 'got';
+import { jest } from '@jest/globals';
 
-import { browserHeadersHook, mergeHeaders } from '../src/hooks/browser-headers';
-import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
-import { Context, gotScraping, Options } from '../src/index';
+import { browserHeadersHook, mergeHeaders } from '../src/hooks/browser-headers.js';
+import { TransformHeadersAgent } from '../src/agent/transform-headers-agent.js';
+import { type Context, gotScraping, Options } from '../src/index.js';
 
-import { startDummyServer } from './helpers/dummy-server';
-import { sessionDataHook } from '../src/hooks/storage';
+import { startDummyServer } from './helpers/dummy-server.js';
+import { sessionDataHook } from '../src/hooks/storage.js';
 
 describe('Browser headers', () => {
-    const generatorSpy: jest.SpyInstance = jest.spyOn(HeaderGenerator.prototype, 'getHeaders');
+    const generatorSpy = jest.spyOn(HeaderGenerator.prototype, 'getHeaders');
 
     let options: Options & Context;
     let server: Server;

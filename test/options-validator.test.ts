@@ -1,6 +1,6 @@
 import {
     optionsValidationHandler,
-} from '../src/hooks/options-validation';
+} from '../src/hooks/options-validation.js';
 
 describe('Options validation', () => {
     let options: any;

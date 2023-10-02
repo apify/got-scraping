@@ -1,5 +1,5 @@
-import dns from 'dns';
-import { gotScraping, OptionsInit } from '../src';
+import dns from 'node:dns';
+import { gotScraping, type OptionsInit } from '../src/index.js';
 
 describe('ALPN negotiation', () => {
     test('does not leak alpn', async () => {

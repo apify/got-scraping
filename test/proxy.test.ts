@@ -1,13 +1,14 @@
-import { URL } from 'url';
+import { URL } from 'node:url';
 import http2 from 'http2-wrapper';
+import { jest } from '@jest/globals';
 import {
     HttpsProxyAgent,
     HttpRegularProxyAgent,
-} from '../src/agent/h1-proxy-agent';
+} from '../src/agent/h1-proxy-agent.js';
 
-import { proxyHook } from '../src/hooks/proxy';
-import { TransformHeadersAgent } from '../src/agent/transform-headers-agent';
-import { Options } from '../src';
+import { proxyHook } from '../src/hooks/proxy.js';
+import { TransformHeadersAgent } from '../src/agent/transform-headers-agent.js';
+import { Options } from '../src/index.js';
 
 const {
     HttpOverHttp2,

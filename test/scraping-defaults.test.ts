@@ -1,9 +1,8 @@
-import { AddressInfo } from 'net';
-// @ts-expect-error @types/node is missing types
-import { DEFAULT_CIPHERS } from 'tls';
-import { Server } from 'http';
-import { gotScraping } from '../src/index';
-import { startDummyServer } from './helpers/dummy-server';
+import type { AddressInfo } from 'node:net';
+import { DEFAULT_CIPHERS } from 'node:tls';
+import { Server } from 'node:http';
+import { gotScraping } from '../src/index.js';
+import { startDummyServer } from './helpers/dummy-server.js';
 
 describe('Scraping defaults', () => {
     let server: Server;
