@@ -22,6 +22,7 @@ describe('ALPN negotiation', () => {
 
         await proxyPromise;
 
+        // eslint-disable-next-line no-console
         console.log('dns', dnsQueries);
         expect(dnsQueries.includes('api.apify.com')).toBe(false);
 

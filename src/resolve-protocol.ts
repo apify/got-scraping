@@ -12,7 +12,6 @@ const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callbac
         host = `[${options.host}]:${options.port}`;
     }
 
-    // eslint-disable-next-line no-void
     void (async () => {
         try {
             const headers: Headers = {
