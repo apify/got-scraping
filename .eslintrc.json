@@ -5,7 +5,8 @@
     "parserOptions": {
       "project": "tsconfig.eslint.json",
       "ecmaVersion": 2022
-    },"overrides": [
+    },
+    "overrides": [
       {
         "files": ["./test/**/*.ts"],
         "rules": {
