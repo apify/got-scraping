@@ -1,17 +1,16 @@
-import { readFileSync } from 'fs';
 import { setTimeout } from 'timers/promises';
-import { gotScraping } from '../../dist/index.js'; 
 import got from 'got';
+import { gotScraping } from '../../dist/index.js';
 
 async function processUrls(gotImplementation, urls) {
     let passed = 0;
     let blocked = 0;
     let failed = 0;
 
-    let url = null;
-    while (url = urls.shift()) {
+    let url = urls.shift();
+    while (url) {
         try {
-            //console.log(`crawling ${url}`);
+            // console.log(`crawling ${url}`);
             const request = gotImplementation.get(url);
 
             const result = await Promise.race([
@@ -24,7 +23,7 @@ async function processUrls(gotImplementation, urls) {
                 throw new Error('timeout');
             }
 
-            //console.log(`crawled ${url}`);
+            // console.log(`crawled ${url}`);
 
             if (result.body.includes('Just a moment...')) {
                 blocked++;
@@ -33,12 +32,13 @@ async function processUrls(gotImplementation, urls) {
             }
         } catch (e) {
             failed++;
-            //console.error(e.message);
-            continue;
+            // console.error(e.message);
         }
+
+        url = urls.shift();
     }
 
-    //console.log('done!');
+    // console.log('done!');
     return { passed, blocked, failed };
 }
 
@@ -51,11 +51,11 @@ async function runInParallel(implementation, urls) {
         acc.blocked += blocked;
         acc.failed += failed;
         return acc;
-    }, {passed: 0, blocked: 0, failed: 0});
+    }, { passed: 0, blocked: 0, failed: 0 });
 }
 
 (async () => {
-    const { body } = await got.get('https://raw.githubusercontent.com/apify/fingerprint-suite/master/test/antibot-services/live-testing/cloudflare-websites.csv')
+    const { body } = await got.get('https://raw.githubusercontent.com/apify/fingerprint-suite/master/test/antibot-services/live-testing/cloudflare-websites.csv');
     const urls = body.split('\n');
 
     const [gotScrapingResults, gotResults] = await Promise.all([
