@@ -53,7 +53,9 @@
         "prepublishOnly": "npm run build",
         "lint": "eslint src test",
         "lint:fix": "eslint src test --fix",
-        "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage"
+        "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage",
+        "pretest:blocking": "npm run build",
+        "test:blocking": "ts-node -T ./test/live-testing/index.js"
     },
     "author": {
         "name": "Apify",
