@@ -9,7 +9,7 @@ $ npm install got-scraping
 ```
 
 **Note:**
-> - Node.js >=15.10.0 is required due to instability of HTTP/2 support in lower versions.
+> - Node.js >=16 is required due to instability of HTTP/2 support in lower versions.
 
 ## API
 
@@ -18,11 +18,22 @@ Got scraping package is built using the [`got.extend(...)`](https://github.com/s
 Interested what's [under the hood](#under-the-hood)?
 
 ```javascript
-const { gotScraping } = require('got-scraping');
+import { gotScraping } from 'got-scraping';
 
 gotScraping
     .get('https://apify.com')
-    .then( ({ body }) => console.log(body))
+    .then( ({ body }) => console.log(body));
+```
+
+```javascript
+// If you're still using CJS and cannot use the import syntax
+let gotScraping;
+
+async function fetchWithGotScraping(url) {
+    gotScraping ??= (await import('got-scraping')).gotScraping;
+
+    return gotScraping.get(url);
+}
 ```
 
 ### options
@@ -34,14 +45,14 @@ Type: **`string`**
 URL of the HTTP or HTTPS based proxy. HTTP/2 proxies are supported as well.
 
 ```javascript
-const { gotScraping } = require('got-scraping');
+import { gotScraping } from 'got-scraping';
 
 gotScraping
     .get({
         url: 'https://apify.com',
         proxyUrl: 'http://usernamed:password@myproxy.com:1234',
     })
-    .then(({ body }) => console.log(body))
+    .then(({ body }) => console.log(body));
 ```
 
 #### `useHeaderGenerator`
