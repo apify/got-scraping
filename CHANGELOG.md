@@ -1,3 +1,10 @@
+4.0.0 / 2023/11/07
+====================
+- **BREAKING**: This module is now ESM only.
+  - You will need to either migrate your projects to ESM, or import `got-scraping` in an async context via `await import('got-scraping);`
+- **BREAKING**: This module now requires Node.js >= 18
+- Update `got` to v13
+
 3.1.0 / 2021/08/23
 ====================
 - Add `sessionToken` option to persist generated headers
