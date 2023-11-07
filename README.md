@@ -9,6 +9,8 @@ $ npm install got-scraping
 ```
 
 **Note:**
+> This project is ESM only, which means it can only be imported using the `import` statement or the `import()` method. It is not possible to `require()` it.
+
 > - Node.js >=16 is required due to instability of HTTP/2 support in lower versions.
 
 ## API
