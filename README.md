@@ -8,9 +8,28 @@ Got Scraping is a small but powerful [`got` extension](https://github.com/sindre
 $ npm install got-scraping
 ```
 
-**Note:**
-> This project is ESM only, which means it can only be imported using the `import` statement or the `import()` method. It is not possible to `require()` it.
+# The module is now ESM only
 
+This means you have to import it by using an `import` expression, or the `import()` method. You can do so by either migrating your project to ESM, or importing `got-scraping` in an async context
+
+```diff
+-const { gotScraping } = require('got-scraping');
++import { gotScraping } from 'got-scraping';
+```
+
+If you cannot migrate to ESM, here's an example of how to import it in an async context:
+
+```javascript
+let gotScraping;
+
+async function fetchWithGotScraping(url) {
+    gotScraping ??= (await import('got-scraping')).gotScraping;
+
+    return gotScraping.get(url);
+}
+```
+
+**Note:**
 > - Node.js >=16 is required due to instability of HTTP/2 support in lower versions.
 
 ## API
@@ -25,17 +44,6 @@ import { gotScraping } from 'got-scraping';
 gotScraping
     .get('https://apify.com')
     .then( ({ body }) => console.log(body));
-```
-
-```javascript
-// If you're still using CJS and cannot use the import syntax
-let gotScraping;
-
-async function fetchWithGotScraping(url) {
-    gotScraping ??= (await import('got-scraping')).gotScraping;
-
-    return gotScraping.get(url);
-}
 ```
 
 ### options
