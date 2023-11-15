@@ -1,5 +1,7 @@
 import { setTimeout } from 'timers/promises';
+
 import got from 'got';
+
 import { gotScraping } from '../../dist/index.js';
 
 async function processUrls(gotImplementation, urls) {

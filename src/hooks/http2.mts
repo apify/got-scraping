@@ -1,14 +1,16 @@
 import { URL } from 'node:url';
+
 import { Options } from 'got';
 import { auto, type AutoRequestOptions } from 'http2-wrapper';
-import type { Context } from '../context.js';
-import { createResolveProtocol } from '../resolve-protocol.js';
+
+import type { Context } from '../context.mjs';
+import { createResolveProtocol } from '../resolve-protocol.mjs';
 
 export function http2Hook(options: Options): void {
     const { proxyUrl, sessionData } = options.context as Context;
 
     if (options.http2 && (options.url as URL).protocol !== 'http:') {
-        options.request = (url, requestOptions, callback) => {
+        options.request = async (url, requestOptions, callback) => {
             const typedRequestOptions = requestOptions as AutoRequestOptions;
             if (proxyUrl) {
                 typedRequestOptions.resolveProtocol = createResolveProtocol(proxyUrl, sessionData as any);

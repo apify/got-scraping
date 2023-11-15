@@ -1,7 +1,8 @@
 import { Server } from 'http';
 import type { AddressInfo } from 'net';
-import { gotScraping, type OptionsInit } from '../src/index.js';
+
 import { startDummyServer } from './helpers/dummy-server.js';
+import { gotScraping, type OptionsInit } from '../src/index.js';
 
 describe('Custom options', () => {
     let server: Server;

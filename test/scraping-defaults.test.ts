@@ -1,8 +1,9 @@
+import { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { DEFAULT_CIPHERS } from 'node:tls';
-import { Server } from 'node:http';
-import { gotScraping } from '../src/index.js';
+
 import { startDummyServer } from './helpers/dummy-server.js';
+import { gotScraping } from '../src/index.js';
 
 describe('Scraping defaults', () => {
     let server: Server;

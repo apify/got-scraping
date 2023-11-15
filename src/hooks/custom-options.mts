@@ -1,5 +1,6 @@
 import { type OptionsInit as GotOptionsInit, Options } from 'got';
-import type { OptionsInit } from '../context.js';
+
+import type { OptionsInit } from '../context.mjs';
 
 export function customOptionsHook(raw: GotOptionsInit, options: Options): void {
     const typedRaw = raw as OptionsInit;

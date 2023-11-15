@@ -1,8 +1,9 @@
 import { Server } from 'node:http';
 import zlib from 'node:zlib';
+
 import express, { type Express } from 'express';
 
-const startExpressAppPromise = (app: Express, port: number): Promise<Server> => {
+const startExpressAppPromise = async (app: Express, port: number): Promise<Server> => {
     return new Promise((resolve) => {
         const server = app.listen(port, () => resolve(server));
     });

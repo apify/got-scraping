@@ -4,19 +4,18 @@ import https from 'node:https';
 import { got as originalGot, Options } from 'got';
 import { HeaderGenerator } from 'header-generator';
 
-import { TransformHeadersAgent } from './agent/transform-headers-agent.js';
-
-import { browserHeadersHook } from './hooks/browser-headers.js';
-import { customOptionsHook } from './hooks/custom-options.js';
-import { fixDecompress } from './hooks/fix-decompress.js';
-import { http2Hook } from './hooks/http2.js';
-import { insecureParserHook } from './hooks/insecure-parser.js';
-import { optionsValidationHandler } from './hooks/options-validation.js';
-import { proxyHook } from './hooks/proxy.js';
-import { refererHook } from './hooks/referer.js';
-import { sessionDataHook } from './hooks/storage.js';
-import { tlsHook } from './hooks/tls.js';
-import type { GotScraping } from './types.js';
+import { TransformHeadersAgent } from './agent/transform-headers-agent.mjs';
+import { browserHeadersHook } from './hooks/browser-headers.mjs';
+import { customOptionsHook } from './hooks/custom-options.mjs';
+import { fixDecompress } from './hooks/fix-decompress.mjs';
+import { http2Hook } from './hooks/http2.mjs';
+import { insecureParserHook } from './hooks/insecure-parser.mjs';
+import { optionsValidationHandler } from './hooks/options-validation.mjs';
+import { proxyHook } from './hooks/proxy.mjs';
+import { refererHook } from './hooks/referer.mjs';
+import { sessionDataHook } from './hooks/storage.mjs';
+import { tlsHook } from './hooks/tls.mjs';
+import type { GotScraping } from './types.mjs';
 
 const handlers = [
     fixDecompress,
@@ -119,6 +118,6 @@ export {
     type Context,
     type GotOptionsInit,
     type OptionsInit,
-} from './context.js';
+} from './context.mjs';
 
-export type * from './types.js';
+export type * from './types.mjs';

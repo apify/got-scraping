@@ -1,8 +1,10 @@
+import { URL } from 'node:url';
+
 import { Options, type Agents } from 'got';
 import http2, { auto } from 'http2-wrapper';
-import { URL } from 'node:url';
-import { HttpRegularProxyAgent, HttpsProxyAgent } from '../agent/h1-proxy-agent.js';
-import { TransformHeadersAgent } from '../agent/transform-headers-agent.js';
+
+import { HttpRegularProxyAgent, HttpsProxyAgent } from '../agent/h1-proxy-agent.mjs';
+import { TransformHeadersAgent } from '../agent/transform-headers-agent.mjs';
 
 const {
     HttpOverHttp2,

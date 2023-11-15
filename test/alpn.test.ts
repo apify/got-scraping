@@ -1,4 +1,5 @@
 import dns from 'node:dns';
+
 import { gotScraping, type OptionsInit } from '../src/index.js';
 
 describe('ALPN negotiation', () => {

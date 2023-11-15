@@ -1,5 +1,6 @@
 import type { CancelableRequest, ExtendOptions, Got, HTTPAlias, Options, Request, Response } from 'got';
-import type { OptionsInit } from './context.js';
+
+import type { OptionsInit } from './context.mjs';
 
 type Except<ObjectType, KeysType extends keyof ObjectType> = Pick<ObjectType, Exclude<keyof ObjectType, KeysType>>;
 type Merge<FirstType, SecondType> = Except<FirstType, Extract<keyof FirstType, keyof SecondType>> & SecondType;

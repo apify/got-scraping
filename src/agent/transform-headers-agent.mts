@@ -1,7 +1,9 @@
 /* eslint-disable no-underscore-dangle */
-import { HeaderGenerator } from 'header-generator';
 import { Agent, ClientRequest, OutgoingMessage, type ClientRequestArgs } from 'node:http';
-import { WrappedAgent } from './wrapped-agent.js';
+
+import { HeaderGenerator } from 'header-generator';
+
+import { WrappedAgent } from './wrapped-agent.mjs';
 
 // @ts-expect-error Private property
 const { _storeHeader } = OutgoingMessage.prototype;
