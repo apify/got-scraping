@@ -1,3 +1,7 @@
+4.0.1 / 2023/11/16
+====================
+- Fix compilation errors when this module is used in TypeScript with a project that isn't using `Node16`/`NodeNext` `module`/`moduleResolution`
+
 4.0.0 / 2023/11/07
 ====================
 - **BREAKING**: This module is now ESM only.

@@ -3,6 +3,7 @@
 	"include": [
 		"src",
 		"test",
-		"jest.config.ts"
+		"jest.config.ts",
+		"tsup.config.ts"
 	]
 }
