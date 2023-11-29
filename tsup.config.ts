@@ -6,7 +6,7 @@ export default defineConfig({
     noExternal: [],
     platform: 'node',
     format: ['esm'],
-    target: 'es2022',
+    target: 'es2021',
     skipNodeModulesBundle: true,
     clean: true,
     minify: false,
