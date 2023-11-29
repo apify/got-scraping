@@ -1,3 +1,7 @@
+4.0.2 / 2023/11/29
+====================
+- Fixed runtime exceptions when using `got-scraping` in a project with older versions of node.js 16
+
 4.0.1 / 2023/11/16
 ====================
 - Fix compilation errors when this module is used in TypeScript with a project that isn't using `Node16`/`NodeNext` `module`/`moduleResolution`
