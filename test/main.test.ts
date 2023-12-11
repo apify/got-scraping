@@ -493,7 +493,6 @@ describe('GotScraping', () => {
 
         // FIXME: this should be using a local server instead
         test.skip('should order headers with proxyUrl and http1', async () => {
-            // @ts-expect-error FIXME
             const body = await getStream(gotScraping.stream({
                 url: 'https://api.apify.com/v2/browser-info?rawHeaders=1',
                 proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
@@ -522,7 +521,6 @@ describe('GotScraping', () => {
 
             // FIXME: this should use a local server instead
             test.skip('Should allow https target via http proxy when auto downgrading', async () => {
-                // @ts-expect-error FIXME
                 const stream = gotScraping.stream({
                     url: 'https://eshop.coop-box.cz/',
                     proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
@@ -546,7 +544,6 @@ describe('GotScraping', () => {
                 }
                 const responseBody = chunks.join();
 
-                // @ts-expect-error FIXME
                 const proxyStream = gotScraping.stream({
                     url: 'https://api.apify.com/v2/browser-info',
                     proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
@@ -584,7 +581,6 @@ describe('GotScraping', () => {
                 expect(response.statusCode).toBe(200);
                 expect(response.request.options).toMatchObject({ http2: true });
 
-                // @ts-expect-error FIXME
                 const proxyStream = gotScraping.stream({
                     url: 'https://api.apify.com/v2/browser-info',
                     proxyUrl: `http://groups-SHADER:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,

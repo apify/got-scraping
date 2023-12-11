@@ -68,7 +68,7 @@ const createCaches = () => ({
 
 const defaults = createCaches();
 
-interface ProtocolCache {
+export interface ProtocolCache {
     protocolCache?: typeof defaults.protocolCache;
     resolveAlpnQueue?: typeof defaults.resolveAlpnQueue;
 }

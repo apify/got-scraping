@@ -1,3 +1,8 @@
+4.0.3 / 2023/12/11
+====================
+- Fixed missing extended types for `gotScraping.stream` and `gotScraping.paginate`
+- Fixed general type issues with `got-scraping`, including not reporting incorrect types for known properties like `proxyUrl`
+
 4.0.2 / 2023/11/29
 ====================
 - Fixed runtime exceptions when using `got-scraping` in a project with older versions of node.js 16
