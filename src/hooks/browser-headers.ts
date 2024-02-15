@@ -39,10 +39,13 @@ const getResolveProtocolFunction = (options: Options, proxyUrl: string | undefin
     }
 
     if (proxyUrl) {
-        return createResolveProtocol(proxyUrl, sessionData as any);
+        return createResolveProtocol(proxyUrl, sessionData as any, options?.timeout?.connect ?? options?.timeout?.request);
     }
 
-    return http2.auto.resolveProtocol;
+    return (...args: Parameters<typeof http2.auto.resolveProtocol>) => http2.auto.resolveProtocol({
+        ...args[0],
+        timeout: options?.timeout?.connect ?? options?.timeout?.request,
+    });
 };
 
 export async function browserHeadersHook(options: Options): Promise<void> {
