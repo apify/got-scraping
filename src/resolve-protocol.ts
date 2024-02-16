@@ -73,7 +73,7 @@ export interface ProtocolCache {
     resolveAlpnQueue?: typeof defaults.resolveAlpnQueue;
 }
 
-export const createResolveProtocol = (proxyUrl: string, sessionData?: ProtocolCache): ResolveProtocolFunction => {
+export const createResolveProtocol = (proxyUrl: string, sessionData?: ProtocolCache, timeout?: number): ResolveProtocolFunction => {
     let { protocolCache, resolveAlpnQueue } = defaults;
 
     if (sessionData) {
@@ -89,9 +89,14 @@ export const createResolveProtocol = (proxyUrl: string, sessionData?: ProtocolCa
         return connect(proxyUrl, pOptions, pCallback);
     };
 
-    return auto.createResolveProtocol(
+    const resolveProtocol: ResolveProtocolFunction = auto.createResolveProtocol(
         protocolCache as unknown as Map<string, string>,
         resolveAlpnQueue,
         connectWithProxy,
     );
+
+    return async (...args: Parameters<ResolveProtocolFunction>) => resolveProtocol({
+        ...args[0],
+        timeout,
+    });
 };

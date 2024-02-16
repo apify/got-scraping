@@ -11,7 +11,11 @@ export function http2Hook(options: Options): void {
         options.request = (url, requestOptions, callback) => {
             const typedRequestOptions = requestOptions as AutoRequestOptions;
             if (proxyUrl) {
-                typedRequestOptions.resolveProtocol = createResolveProtocol(proxyUrl, sessionData as any);
+                typedRequestOptions.resolveProtocol = createResolveProtocol(
+                    proxyUrl,
+                    sessionData as any,
+                    Math.min(options?.timeout?.connect ?? 60_000, options?.timeout?.request ?? 60_000),
+                );
             }
 
             return auto(url, typedRequestOptions, callback);
