@@ -39,12 +39,12 @@ const getResolveProtocolFunction = (options: Options, proxyUrl: string | undefin
     }
 
     if (proxyUrl) {
-        return createResolveProtocol(proxyUrl, sessionData as any, options?.timeout?.connect ?? options?.timeout?.request);
+        return createResolveProtocol(proxyUrl, sessionData as any, Math.min(options?.timeout?.connect ?? 60_000, options?.timeout?.request ?? 60_000));
     }
 
     return (...args: Parameters<typeof http2.auto.resolveProtocol>) => http2.auto.resolveProtocol({
         ...args[0],
-        timeout: options?.timeout?.connect ?? options?.timeout?.request,
+        timeout: Math.min(options?.timeout?.connect ?? 60_000, options?.timeout?.request ?? 60_000),
     });
 };
 

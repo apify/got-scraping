@@ -14,7 +14,7 @@ export function http2Hook(options: Options): void {
                 typedRequestOptions.resolveProtocol = createResolveProtocol(
                     proxyUrl,
                     sessionData as any,
-                    options?.timeout?.connect ?? options?.timeout?.request,
+                    Math.min(options?.timeout?.connect ?? 60_000, options?.timeout?.request ?? 60_000),
                 );
             }
 
