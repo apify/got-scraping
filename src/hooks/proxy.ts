@@ -1,7 +1,7 @@
 import { Options, type Agents } from 'got';
 import http2, { auto } from 'http2-wrapper';
 import { URL } from 'node:url';
-import { HttpRegularProxyAgent, HttpsProxyAgent } from '../agent/h1-proxy-agent.js';
+import { HttpProxyAgent, HttpRegularProxyAgent, HttpsProxyAgent } from '../agent/h1-proxy-agent.js';
 import { TransformHeadersAgent } from '../agent/transform-headers-agent.js';
 
 const {
@@ -87,7 +87,7 @@ async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
         } else {
             // Upstream proxies hang up connections on CONNECT + unsecure HTTP
             agent = {
-                http: new TransformHeadersAgent(new HttpRegularProxyAgent(nativeOptions)),
+                http: new TransformHeadersAgent(new HttpProxyAgent(nativeOptions)),
                 https: new TransformHeadersAgent(new HttpsProxyAgent(nativeOptions)),
                 http2: new Http2OverHttps(wrapperOptions),
             };

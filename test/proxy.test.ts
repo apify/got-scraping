@@ -4,6 +4,7 @@ import { jest } from '@jest/globals';
 import {
     HttpsProxyAgent,
     HttpRegularProxyAgent,
+    HttpProxyAgent,
 } from '../src/agent/h1-proxy-agent.js';
 
 import { proxyHook } from '../src/hooks/proxy.js';
@@ -96,7 +97,7 @@ describe('Proxy', () => {
 
             const { agent } = options;
             expect(agent.http).toBeInstanceOf(TransformHeadersAgent);
-            expect((agent.http as any).agent).toBeInstanceOf(HttpRegularProxyAgent);
+            expect((agent.http as any).agent).toBeInstanceOf(HttpProxyAgent);
         });
 
         test('should support https request over https proxy', async () => {
