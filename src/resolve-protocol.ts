@@ -42,8 +42,11 @@ const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callbac
 
             request.once('connect', (response, socket, head) => {
                 if (response.statusCode !== 200 || head.length > 0) {
-                    reject(new Error(`Proxy responded with ${response.statusCode} ${response.statusMessage}: ${head.length} bytes`));
+                    reject(new Error(`Proxy responded with ${response.statusCode} ${response.statusMessage}: ${head.length} bytes.
 
+Below is the first 100 bytes of the proxy response body:
+${head.toString('utf8', 0, 100)}
+`));
                     socket.destroy();
                     return;
                 }
