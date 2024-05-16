@@ -24,11 +24,13 @@ export async function proxyHook(options: Options): Promise<void> {
     }
 }
 
+export class ProxyError extends Error {}
+
 function validateProxyProtocol(protocol: string) {
     const isSupported = protocol === 'http:' || protocol === 'https:';
 
     if (!isSupported) {
-        throw new Error(`Proxy URL protocol "${protocol}" is not supported. Please use HTTP or HTTPS.`);
+        throw new ProxyError(`Proxy URL protocol "${protocol}" is not supported. Please use HTTP or HTTPS.`);
     }
 }
 
