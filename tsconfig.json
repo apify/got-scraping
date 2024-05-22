@@ -6,6 +6,7 @@
 		"target": "ES2022",
 		"verbatimModuleSyntax": true,
 		"incremental": false,
+		"lib": ["DOM", "ESNext"],
 	},
 	"include": [
 		"src"

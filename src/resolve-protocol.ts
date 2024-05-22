@@ -4,6 +4,7 @@ import { URL } from 'node:url';
 import { type Headers } from 'got';
 import { auto, type ResolveProtocolConnectFunction, type ResolveProtocolFunction } from 'http2-wrapper';
 import QuickLRU from 'quick-lru';
+import { ProxyError } from './hooks/proxy.js';
 
 const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callback: () => void) => new Promise<TLSSocket>((resolve, reject) => {
     let host = `${options.host}:${options.port}`;
@@ -42,8 +43,10 @@ const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callbac
 
             request.once('connect', (response, socket, head) => {
                 if (response.statusCode !== 200 || head.length > 0) {
-                    reject(new Error(`Proxy responded with ${response.statusCode} ${response.statusMessage}: ${head.length} bytes`));
+                    reject(new ProxyError(`Proxy responded with ${response.statusCode} ${response.statusMessage}: ${head.length} bytes.
 
+Below is the first 100 bytes of the proxy response body:
+${head.toString('utf8', 0, 100)}`, { cause: head.toString('utf8') }));
                     socket.destroy();
                     return;
                 }
