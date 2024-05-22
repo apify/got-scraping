@@ -1,3 +1,15 @@
+4.0.6 / 2024/05/22
+====================
+- Logging `CONNECT` error response body instead of the length only
+
+4.0.5 / 2024/04/03
+====================
+- Fixed processing `http://` requests over `https://` proxies correctly
+
+4.0.4 / 2024/02/16
+====================
+- Fixed passing the timeout to the `resolveProtocol` calls
+
 4.0.3 / 2023/12/11
 ====================
 - Fixed missing extended types for `gotScraping.stream` and `gotScraping.paginate`
