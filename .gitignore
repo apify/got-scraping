@@ -3,3 +3,4 @@ dist
 .idea
 node_modules
 coverage
+.npmrc

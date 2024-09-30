@@ -1,6 +1,13 @@
 {
-    "name": "got-scraping",
-    "version": "4.0.6",
+    "name": "@ali-sharif/got-scraping",
+    "version": "4.0.6-fork.0",
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ali-sharif/got-scraping"
+    },
     "description": "HTTP client made for scraping based on got.",
     "engines": {
         "node": ">=16"
@@ -63,10 +70,6 @@
         "url": "https://apify.com"
     },
     "license": "Apache-2.0",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/apify/got-scraping"
-    },
     "bugs": {
         "url": "https://github.com/apify/got-scraping/issues"
     }

@@ -1,0 +1,4 @@
+legacy-peer-deps=true
+registry=https://registry.npmjs.org/
+@ali-sharif:registry=https://npm.pkg.github.com/
+//npm.pkg.github.com/:_authToken={ github token with scopes: read:packages, write:packages, and delete:packages }
