@@ -1,6 +1,6 @@
 {
     "name": "@ali-sharif/got-scraping",
-    "version": "4.0.6-fork.0",
+    "version": "4.0.6-fork.5",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com/"
     },

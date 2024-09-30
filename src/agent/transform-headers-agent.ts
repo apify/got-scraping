@@ -18,6 +18,7 @@ export class TransformHeadersAgent<T extends Agent> extends WrappedAgent<T> {
      */
     transformRequest(request: ClientRequest, { sortHeaders }: {sortHeaders: boolean}): void {
         const headers: Record<string, string | number | string[]> = {};
+
         const hasConnection = request.hasHeader('connection');
         const hasContentLength = request.hasHeader('content-length');
         const hasTransferEncoding = request.hasHeader('transfer-encoding');
@@ -25,9 +26,10 @@ export class TransformHeadersAgent<T extends Agent> extends WrappedAgent<T> {
         const keys = request.getHeaderNames();
 
         for (const key of keys) {
-            if (key.toLowerCase().startsWith('x-')) {
-                headers[key] = request.getHeader(key)!;
+            if (key.toLowerCase() === 'content-type' && ['post', 'put', 'patch'].includes(request.method.toLowerCase())) {
+                headers[key.toLowerCase()] = request.getHeader(key)!;
             } else {
+                // pascal-case everything else (including `X-` headers)
                 headers[this.toPascalCase(key)] = request.getHeader(key)!;
             }
 
