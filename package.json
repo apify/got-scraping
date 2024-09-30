@@ -1,6 +1,6 @@
 {
     "name": "@ali-sharif/got-scraping",
-    "version": "4.0.6-fork.6",
+    "version": "4.0.6-fork.15",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com/"
     },
@@ -23,6 +23,7 @@
     "types": "./dist/index.d.ts",
     "type": "module",
     "dependencies": {
+        "agentkeepalive": "^4.5.0",
         "got": "^14.2.1",
         "header-generator": "^2.1.41",
         "http2-wrapper": "^2.2.0",

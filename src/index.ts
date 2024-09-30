@@ -1,9 +1,7 @@
-import http from 'node:http';
-import https from 'node:https';
-
 import { got as originalGot, Options } from 'got';
 import { HeaderGenerator } from 'header-generator';
 
+import AgentKeepAlive, { HttpsAgent as AgentKeepAliveHttps } from 'agentkeepalive';
 import { TransformHeadersAgent } from './agent/transform-headers-agent.js';
 
 import { browserHeadersHook } from './hooks/browser-headers.js';
@@ -63,8 +61,11 @@ const gotScraping = originalGot.extend({
         insecureHTTPParser: true,
     },
     agent: {
-        http: new TransformHeadersAgent(http.globalAgent),
-        https: new TransformHeadersAgent(https.globalAgent),
+        // turn on keep-alive by default for our use-case
+        // see: https://connectreport.com/blog/tuning-http-keep-alive-in-node-js/
+        // https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html
+        http: new TransformHeadersAgent(new AgentKeepAlive()),
+        https: new TransformHeadersAgent(new AgentKeepAliveHttps()),
     },
     hooks: {
         init,
