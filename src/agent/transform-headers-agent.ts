@@ -62,7 +62,12 @@ export class TransformHeadersAgent<T extends Agent> extends WrappedAgent<T> {
             // Note: This uses private `_removedTE` property.
             //       This property tells us whether the transfer-encoding was explicitly removed or not.
             if (!hasTrailer && !typedRequest._removedContLen && typeof typedRequest._contentLength === 'number') {
-                headers['Content-Length'] = typedRequest._contentLength;
+                // don't add content-length=0 header on get requests (it's theoretically possible to have non-empty get body)
+                // https://www.baeldung.com/cs/http-get-with-body
+                const isGetRequestWithEmptyBody = request.method.toLowerCase() == 'get' && typedRequest._contentLength == 0
+                if (!isGetRequestWithEmptyBody) {
+                    headers['Content-Length'] = typedRequest._contentLength;
+                }
             } else if (!typedRequest._removedTE) {
                 headers['Transfer-Encoding'] = 'chunked';
             }
