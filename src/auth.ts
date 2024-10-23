@@ -9,8 +9,8 @@ export function getBasic(url: URL): string | null {
         return null;
     }
 
-    const username = decodeURIComponent(url.username);
-    const password = decodeURIComponent(url.password);
+    const username = decodeURIComponent(url.username ?? '');
+    const password = decodeURIComponent(url.password ?? '');
 
     const basic = Buffer.from(`${username}:${password}`).toString('base64');
 
