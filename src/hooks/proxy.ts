@@ -3,6 +3,7 @@ import http2, { auto } from 'http2-wrapper';
 import { URL } from 'node:url';
 import { HttpProxyAgent, HttpRegularProxyAgent, HttpsProxyAgent } from '../agent/h1-proxy-agent.js';
 import { TransformHeadersAgent } from '../agent/transform-headers-agent.js';
+import { buildBasicAuthHeader } from '../auth.js';
 
 const {
     HttpOverHttp2,
@@ -37,10 +38,19 @@ function validateProxyProtocol(protocol: string) {
 async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
     // Sockets must not be reused, the proxy server may rotate upstream proxies as well.
 
+    const headers: Record<string, string> = {};
+    const basic = buildBasicAuthHeader(parsedProxyUrl);
+
+    if (basic) {
+        headers.authorization = basic;
+        headers['proxy-authorization'] = basic;
+    }
+
     // `http2-wrapper` Agent options
     const wrapperOptions = {
         proxyOptions: {
             url: parsedProxyUrl,
+            headers,
 
             // Based on the got https.rejectUnauthorized option
             rejectUnauthorized,

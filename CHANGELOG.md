@@ -1,3 +1,7 @@
+4.0.7 / 2024/10/23
+====================
+- Handles proxy authentication consistently throughout the codebase (solves e.g. this [`http2-wrapper`](https://github.com/szmarczak/http2-wrapper/issues/108) issue).
+
 4.0.6 / 2024/05/22
 ====================
 - Logging `CONNECT` error response body instead of the length only
