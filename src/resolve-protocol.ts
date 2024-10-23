@@ -5,7 +5,7 @@ import { type Headers } from 'got';
 import { auto, type ResolveProtocolConnectFunction, type ResolveProtocolFunction } from 'http2-wrapper';
 import QuickLRU from 'quick-lru';
 import { ProxyError } from './hooks/proxy.js';
-import { getBasic } from './auth.js';
+import { buildBasicAuthHeader } from './auth.js';
 
 const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callback: () => void) => new Promise<TLSSocket>((resolve, reject) => {
     let host = `${options.host}:${options.port}`;
@@ -21,7 +21,7 @@ const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callbac
             };
 
             const url = new URL(proxyUrl);
-            const basic = getBasic(url);
+            const basic = buildBasicAuthHeader(url);
 
             if (basic) {
                 headers.authorization = basic;

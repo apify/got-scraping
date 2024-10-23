@@ -4,7 +4,7 @@ import https from 'node:https';
 import { isIPv6 } from 'node:net';
 import tls, { type ConnectionOptions } from 'node:tls';
 import { URL } from 'node:url';
-import { getBasic } from '../auth.js';
+import { buildBasicAuthHeader } from '../auth.js';
 
 interface AgentOptions extends http.AgentOptions {
     proxy: string | URL;
@@ -63,7 +63,7 @@ export class HttpRegularProxyAgent extends http.Agent {
 
         request.path = url.href;
 
-        const basic = getBasic(this.proxy);
+        const basic = buildBasicAuthHeader(this.proxy);
         if (basic) {
             request.setHeader('proxy-authorization', basic);
         }
@@ -101,7 +101,7 @@ export class HttpProxyAgent extends http.Agent {
             host: hostport,
         };
 
-        const basic = getBasic(this.proxy);
+        const basic = buildBasicAuthHeader(this.proxy);
         if (basic) {
             headers['proxy-authorization'] = basic;
             headers.authorization = basic;

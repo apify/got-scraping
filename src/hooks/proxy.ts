@@ -3,7 +3,7 @@ import http2, { auto } from 'http2-wrapper';
 import { URL } from 'node:url';
 import { HttpProxyAgent, HttpRegularProxyAgent, HttpsProxyAgent } from '../agent/h1-proxy-agent.js';
 import { TransformHeadersAgent } from '../agent/transform-headers-agent.js';
-import { getBasic } from '../auth.js';
+import { buildBasicAuthHeader } from '../auth.js';
 
 const {
     HttpOverHttp2,
@@ -39,7 +39,7 @@ async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
     // Sockets must not be reused, the proxy server may rotate upstream proxies as well.
 
     const headers: Record<string, string> = {};
-    const basic = getBasic(parsedProxyUrl);
+    const basic = buildBasicAuthHeader(parsedProxyUrl);
 
     if (basic) {
         headers.authorization = basic;

@@ -4,7 +4,7 @@
  * @param url URL object to process
  * @returns `Basic BASE64` string
  */
-export function getBasic(url: URL): string | null {
+export function buildBasicAuthHeader(url: URL): string | null {
     if (!url.username && !url.password) {
         return null;
     }
