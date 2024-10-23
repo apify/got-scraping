@@ -5,6 +5,7 @@ import { type Headers } from 'got';
 import { auto, type ResolveProtocolConnectFunction, type ResolveProtocolFunction } from 'http2-wrapper';
 import QuickLRU from 'quick-lru';
 import { ProxyError } from './hooks/proxy.js';
+import { getBasic } from './auth.js';
 
 const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callback: () => void) => new Promise<TLSSocket>((resolve, reject) => {
     let host = `${options.host}:${options.port}`;
@@ -20,12 +21,11 @@ const connect = async (proxyUrl: string, options: tls.ConnectionOptions, callbac
             };
 
             const url = new URL(proxyUrl);
-            const username = decodeURIComponent(url.username);
-            const password = decodeURIComponent(url.password);
+            const basic = getBasic(url);
 
-            if (username || password) {
-                headers.authorization = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
-                headers['proxy-authorization'] = headers.authorization;
+            if (basic) {
+                headers.authorization = basic;
+                headers['proxy-authorization'] = basic;
             }
 
             const request = await auto(url, {
