@@ -56,7 +56,22 @@ const onResponse = (response: IncomingMessage, propagate: (fixedResponse: Incomi
             }
         });
     } else if (encoding === 'br') {
-        useDecompressor(zlib.createBrotliDecompress());
+        let read = false;
+
+        response.once('data', (chunk: Buffer) => {
+            read = true;
+
+            response.unshift(chunk);
+
+            const decompressor = zlib.createBrotliDecompress();
+            useDecompressor(decompressor);
+        });
+
+        response.once('end', () => {
+            if (!read) {
+                propagate(response);
+            }
+        });
     } else {
         propagate(response);
     }
