@@ -35,7 +35,7 @@ function validateProxyProtocol(protocol: string) {
     }
 }
 
-async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
+export async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean) {
     // Sockets must not be reused, the proxy server may rotate upstream proxies as well.
 
     const headers: Record<string, string> = {};
