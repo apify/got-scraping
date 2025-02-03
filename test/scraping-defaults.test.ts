@@ -1,6 +1,7 @@
 import type { AddressInfo } from 'node:net';
 import { DEFAULT_CIPHERS } from 'node:tls';
 import { Server } from 'node:http';
+import { describe, test, beforeAll, afterAll } from 'vitest';
 import { gotScraping } from '../src/index.js';
 import { startDummyServer } from './helpers/dummy-server.js';
 
@@ -17,10 +18,10 @@ describe('Scraping defaults', () => {
         server.close();
     });
 
-    test('should allow user to override the defaults', async () => {
+    test('should allow user to override the defaults', async (t) => {
         const customOptions = { https: { ciphers: DEFAULT_CIPHERS }, http2: false, throwHttpErrors: false };
         const response = await gotScraping.get(`http://localhost:${port}/html`, customOptions);
 
-        expect(response.request.options).toMatchObject(customOptions);
+        t.expect(response.request.options).toMatchObject(customOptions);
     });
 });
