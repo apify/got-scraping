@@ -1,3 +1,4 @@
+import { describe, beforeEach, test } from 'vitest';
 import {
     optionsValidationHandler,
 } from '../src/hooks/options-validation.js';
@@ -10,39 +11,39 @@ describe('Options validation', () => {
         };
     });
 
-    test('should validate proxyUrl', () => {
-        expect(() => optionsValidationHandler(options)).not.toThrow();
+    test('should validate proxyUrl', (t) => {
+        t.expect(() => optionsValidationHandler(options)).not.toThrow();
 
         options.proxyUrl = 'test';
 
-        expect(() => optionsValidationHandler(options)).toThrow(/Expected property string/);
+        t.expect(() => optionsValidationHandler(options)).toThrow(/Expected property string/);
 
         options.proxyUrl = 'http://user:password@localhost:8000';
 
-        expect(() => optionsValidationHandler(options)).not.toThrow();
+        t.expect(() => optionsValidationHandler(options)).not.toThrow();
     });
 
-    test('should validate useHeaderGenerator', () => {
-        expect(() => optionsValidationHandler(options)).not.toThrow();
+    test('should validate useHeaderGenerator', (t) => {
+        t.expect(() => optionsValidationHandler(options)).not.toThrow();
 
         options.useHeaderGenerator = 'test';
 
-        expect(() => optionsValidationHandler(options)).toThrow(/Expected property `useHeaderGenerator` to be of type `boolean`/);
+        t.expect(() => optionsValidationHandler(options)).toThrow(/Expected property `useHeaderGenerator` to be of type `boolean`/);
 
         options.useHeaderGenerator = true;
 
-        expect(() => optionsValidationHandler(options)).not.toThrow();
+        t.expect(() => optionsValidationHandler(options)).not.toThrow();
     });
 
-    test('should validate headerGeneratorOptions', () => {
-        expect(() => optionsValidationHandler(options)).not.toThrow();
+    test('should validate headerGeneratorOptions', (t) => {
+        t.expect(() => optionsValidationHandler(options)).not.toThrow();
 
         options.headerGeneratorOptions = 'test';
 
-        expect(() => optionsValidationHandler(options)).toThrow(/Expected property `headerGeneratorOptions` to be of type `object`/);
+        t.expect(() => optionsValidationHandler(options)).toThrow(/Expected property `headerGeneratorOptions` to be of type `object`/);
 
         options.headerGeneratorOptions = {};
 
-        expect(() => optionsValidationHandler(options)).not.toThrow();
+        t.expect(() => optionsValidationHandler(options)).not.toThrow();
     });
 });

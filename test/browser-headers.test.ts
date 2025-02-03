@@ -3,7 +3,7 @@ import type { AddressInfo } from 'node:net';
 import http, { Server } from 'node:http';
 import { HeaderGenerator } from 'header-generator';
 import { got } from 'got';
-import { jest } from '@jest/globals';
+import { vi, describe, test, beforeAll, beforeEach, afterAll } from 'vitest';
 
 import { browserHeadersHook, mergeHeaders } from '../src/hooks/browser-headers.js';
 import { TransformHeadersAgent } from '../src/agent/transform-headers-agent.js';
@@ -13,7 +13,7 @@ import { startDummyServer } from './helpers/dummy-server.js';
 import { sessionDataHook } from '../src/hooks/storage.js';
 
 describe('Browser headers', () => {
-    const generatorSpy = jest.spyOn(HeaderGenerator.prototype, 'getHeaders');
+    const generatorSpy = vi.spyOn(HeaderGenerator.prototype, 'getHeaders');
 
     let options: Options & Context;
     let server: Server;
@@ -45,12 +45,12 @@ describe('Browser headers', () => {
         server.close();
     });
 
-    test('should not generate headers without useHeaderGenerator', async () => {
+    test('should not generate headers without useHeaderGenerator', async (t) => {
         await browserHeadersHook(options);
-        expect(options).toEqual(options);
+        t.expect(options).toEqual(options);
     });
 
-    test('should generate headers with useHeaderGenerator', async () => {
+    test('should generate headers with useHeaderGenerator', async (t) => {
         options.headers = {
             foo: 'bar',
         };
@@ -66,13 +66,13 @@ describe('Browser headers', () => {
 
         await browserHeadersHook(options);
 
-        expect(generatorSpy).toHaveBeenCalled();
+        t.expect(generatorSpy).toHaveBeenCalled();
 
-        expect(options.headers).toMatchObject(mockedHeaders);
-        expect(options.headers.foo).toBe('bar');
+        t.expect(options.headers).toMatchObject(mockedHeaders);
+        t.expect(options.headers.foo).toBe('bar');
     });
 
-    test('should add headers when http2 is used', async () => {
+    test('should add headers when http2 is used', async (t) => {
         options.http2 = true;
         options.context = {
             headerGenerator,
@@ -86,11 +86,11 @@ describe('Browser headers', () => {
 
         await browserHeadersHook(options);
 
-        expect(generatorSpy).toHaveBeenCalled();
-        expect(options.headers).toEqual(mockedHeaders);
+        t.expect(generatorSpy).toHaveBeenCalled();
+        t.expect(options.headers).toEqual(mockedHeaders);
     });
 
-    test('should add headers when http1 is used', async () => {
+    test('should add headers when http1 is used', async (t) => {
         options.http2 = false;
         options.context = {
             headerGenerator,
@@ -104,11 +104,11 @@ describe('Browser headers', () => {
 
         await browserHeadersHook(options);
 
-        expect(generatorSpy).toHaveBeenCalled();
-        expect(options.headers).toEqual(mockedHeaders);
+        t.expect(generatorSpy).toHaveBeenCalled();
+        t.expect(options.headers).toEqual(mockedHeaders);
     });
 
-    test('should pass option to header generator', async () => {
+    test('should pass option to header generator', async (t) => {
         options.context = {
             headerGenerator,
             useHeaderGenerator: true,
@@ -120,10 +120,10 @@ describe('Browser headers', () => {
         };
         await browserHeadersHook(options);
 
-        expect(generatorSpy).toHaveBeenLastCalledWith(expect.objectContaining(options.context.headerGeneratorOptions));
+        t.expect(generatorSpy).toHaveBeenLastCalledWith(t.expect.objectContaining(options.context.headerGeneratorOptions));
     });
 
-    test('should override default ua header', async () => {
+    test('should override default ua header', async (t) => {
         options.context = {
             headerGenerator,
             useHeaderGenerator: true,
@@ -133,11 +133,11 @@ describe('Browser headers', () => {
         };
         await browserHeadersHook(options);
 
-        expect(options.headers).toEqual(mockedHeaders);
+        t.expect(options.headers).toEqual(mockedHeaders);
     });
 
     // Just a health check - header generator should have its own tests.
-    test('should have working generator', async () => {
+    test('should have working generator', async (t) => {
         generatorSpy.mockRestore();
 
         const headers = await got(`http://localhost:${port}/headers`, {
@@ -163,12 +163,12 @@ describe('Browser headers', () => {
             },
         }).json();
 
-        expect(headers).toMatchObject({
-            'User-Agent': expect.stringContaining('Chrome'),
+        t.expect(headers).toMatchObject({
+            'User-Agent': t.expect.stringContaining('Chrome'),
         });
     });
 
-    test('should have capitalized headers with http1', async () => {
+    test('should have capitalized headers with http1', async (t) => {
         generatorSpy.mockRestore();
 
         const o = {
@@ -184,12 +184,12 @@ describe('Browser headers', () => {
 
         const headers = await gotScraping(o).json();
 
-        expect(headers).toMatchObject({
-            'User-Agent': expect.stringContaining('Chrome'),
+        t.expect(headers).toMatchObject({
+            'User-Agent': t.expect.stringContaining('Chrome'),
         });
     });
 
-    test('should respect casing of unrecognized headers', async () => {
+    test('should respect casing of unrecognized headers', async (t) => {
         generatorSpy.mockRestore();
 
         const headers = await got(`http://localhost:${port}/headers`, {
@@ -213,20 +213,20 @@ describe('Browser headers', () => {
             },
         }).json();
 
-        expect(headers).toMatchObject({
+        t.expect(headers).toMatchObject({
             'x-test': 'foo',
         });
     });
 
     describe('sessionToken', () => {
-        const checkHeaders = (headers: Record<string, unknown>) => {
+        const checkHeaders = (t, headers: Record<string, unknown>) => {
             const keys = Object.keys(headers);
             const lowercasedKeys = keys.map((key) => key.toLowerCase());
 
-            expect(lowercasedKeys.includes('user-agent')).toBe(true);
+            t.expect(lowercasedKeys.includes('user-agent')).toBe(true);
         };
 
-        test('gives the same headers with the same protocol', async () => {
+        test('gives the same headers with the same protocol', async (t) => {
             generatorSpy.mockRestore();
 
             options.resolveProtocol = () => ({ alpnProtocol: 'http/1.1' });
@@ -253,11 +253,11 @@ describe('Browser headers', () => {
             await browserHeadersHook(options as unknown as Options);
             const secondHeaders = options.headers;
 
-            expect(headers).toEqual(secondHeaders);
-            checkHeaders(headers);
+            t.expect(headers).toEqual(secondHeaders);
+            checkHeaders(t, headers);
         });
 
-        test('gives different headers with different protocol', async () => {
+        test('gives different headers with different protocol', async (t) => {
             generatorSpy.mockRestore();
 
             options.resolveProtocol = () => ({ alpnProtocol: 'http/1.1' });
@@ -286,12 +286,12 @@ describe('Browser headers', () => {
             await browserHeadersHook(options as unknown as Options);
             const secondHeaders = options.headers;
 
-            expect(headers).not.toEqual(secondHeaders);
-            checkHeaders(headers);
-            checkHeaders(secondHeaders);
+            t.expect(headers).not.toEqual(secondHeaders);
+            checkHeaders(t, headers);
+            checkHeaders(t, secondHeaders);
         });
 
-        test('gives different headers with different token', async () => {
+        test('gives different headers with different token', async (t) => {
             generatorSpy.mockRestore();
 
             options.resolveProtocol = () => ({ alpnProtocol: 'http/1.1' });
@@ -321,14 +321,14 @@ describe('Browser headers', () => {
             await browserHeadersHook(options as unknown as Options);
             const secondHeaders = options.headers;
 
-            expect(headers).not.toEqual(secondHeaders);
-            checkHeaders(headers);
-            checkHeaders(secondHeaders);
+            t.expect(headers).not.toEqual(secondHeaders);
+            checkHeaders(t, headers);
+            checkHeaders(t, secondHeaders);
         });
     });
 
     describe('mergeHeaders', () => {
-        test('should merge headers', () => {
+        test('should merge headers', (t) => {
             const generatedHeaders = {
                 accept: 'TEST',
             };
@@ -338,10 +338,10 @@ describe('Browser headers', () => {
 
             const mergedHeaders = mergeHeaders(generatedHeaders, userOverrides);
 
-            expect(mergedHeaders.accept).toEqual(userOverrides.accept);
+            t.expect(mergedHeaders.accept).toEqual(userOverrides.accept);
         });
 
-        test('should allow deleting header', () => {
+        test('should allow deleting header', (t) => {
             const generatedHeaders = {
                 accept: 'TEST',
             };
@@ -351,10 +351,10 @@ describe('Browser headers', () => {
 
             const mergedHeaders = mergeHeaders(generatedHeaders, userOverrides);
 
-            expect(mergedHeaders.accept).toBeUndefined();
+            t.expect(mergedHeaders.accept).toBeUndefined();
         });
 
-        test('should allow adding header', () => {
+        test('should allow adding header', (t) => {
             const generatedHeaders = {
                 accept: 'TEST',
             };
@@ -364,7 +364,7 @@ describe('Browser headers', () => {
 
             const mergedHeaders = mergeHeaders(generatedHeaders, userOverrides);
 
-            expect(mergedHeaders.referer).toEqual(userOverrides.referer);
+            t.expect(mergedHeaders.referer).toEqual(userOverrides.referer);
         });
     });
 });

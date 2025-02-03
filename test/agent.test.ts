@@ -1,6 +1,7 @@
 import type { AddressInfo } from 'node:net';
 import http, { Server } from 'node:http';
 import getStream from 'get-stream';
+import { describe, beforeAll, afterAll, test } from 'vitest';
 import { TransformHeadersAgent } from '../src/agent/transform-headers-agent.js';
 import { startDummyServer } from './helpers/dummy-server.js';
 
@@ -23,14 +24,14 @@ describe('TransformHeadersAgent', () => {
         server.close();
     });
 
-    test('Pascal-Case', () => {
+    test('Pascal-Case', (t) => {
         const transformAgent = new TransformHeadersAgent(agent);
 
-        expect(transformAgent.toPascalCase('connection')).toBe('Connection');
-        expect(transformAgent.toPascalCase('user-agent')).toBe('User-Agent');
+        t.expect(transformAgent.toPascalCase('connection')).toBe('Connection');
+        t.expect(transformAgent.toPascalCase('user-agent')).toBe('User-Agent');
     });
 
-    test('transformRequest', (done) => {
+    test('transformRequest', (t) => new Promise<void>((done) => {
         const requestHeaders = {
             cookie: 'test=1',
             'user-agent': 'not a chrome',
@@ -42,12 +43,12 @@ describe('TransformHeadersAgent', () => {
             const body = await getStream(response);
             const headers = JSON.parse(body);
 
-            expect(headers.Cookie).toBe(requestHeaders.cookie);
-            expect(headers['User-Agent']).toBe(requestHeaders['user-agent']);
+            t.expect(headers.Cookie).toBe(requestHeaders.cookie);
+            t.expect(headers['User-Agent']).toBe(requestHeaders['user-agent']);
             if (NODE_MAJOR_VERSION >= 19) {
-                expect(headers.Connection).toBe('keep-alive');
+                t.expect(headers.Connection).toBe('keep-alive');
             } else {
-                expect(headers.Connection).toBe('close');
+                t.expect(headers.Connection).toBe('close');
             }
 
             done();
@@ -57,9 +58,9 @@ describe('TransformHeadersAgent', () => {
         transformAgent.transformRequest(request, { sortHeaders: true });
 
         request.end();
-    });
+    }));
 
-    test('leaves x-header as it is', (done) => {
+    test('leaves x-header as it is', (t) => new Promise<void>((done) => {
         const request = http.request(`http://localhost:${port}/headers`, {
             headers: {
                 'x-foo': 'bar',
@@ -69,8 +70,8 @@ describe('TransformHeadersAgent', () => {
             const body = await getStream(response);
             const headers = JSON.parse(body);
 
-            expect(headers['x-foo']).toBe('bar');
-            expect(headers['x-this-doesnt-exist']).toBe('definitely');
+            t.expect(headers['x-foo']).toBe('bar');
+            t.expect(headers['x-this-doesnt-exist']).toBe('definitely');
 
             done();
         });
@@ -79,9 +80,9 @@ describe('TransformHeadersAgent', () => {
         transformAgent.transformRequest(request, { sortHeaders: true });
 
         request.end();
-    });
+    }));
 
-    test('http.request with agent', (done) => {
+    test('http.request with agent', (t) => new Promise<void>((done) => {
         const transformAgent = new TransformHeadersAgent(new http.Agent({
             keepAlive: true,
         }));
@@ -92,7 +93,7 @@ describe('TransformHeadersAgent', () => {
             const body = await getStream(response);
             const headers = JSON.parse(body);
 
-            expect(headers.Connection).toBe('keep-alive');
+            t.expect(headers.Connection).toBe('keep-alive');
 
             transformAgent.destroy();
 
@@ -100,9 +101,9 @@ describe('TransformHeadersAgent', () => {
         });
 
         request.end();
-    });
+    }));
 
-    test('first header in sortedHeaders is always first', (done) => {
+    test('first header in sortedHeaders is always first', (t) => new Promise<void>((done) => {
         const transformAgent = new TransformHeadersAgent(new http.Agent({
             keepAlive: true,
         }));
@@ -113,8 +114,8 @@ describe('TransformHeadersAgent', () => {
             const body = await getStream(response);
             const headers = JSON.parse(body);
 
-            expect(Object.keys(headers)[0]).toBe('Host');
-            expect(headers.Host).toBe(`localhost:${port}`);
+            t.expect(Object.keys(headers)[0]).toBe('Host');
+            t.expect(headers.Host).toBe(`localhost:${port}`);
 
             transformAgent.destroy();
 
@@ -122,10 +123,10 @@ describe('TransformHeadersAgent', () => {
         });
 
         request.end();
-    });
+    }));
 
     describe('respects native behavior', () => {
-        test('content-length removal', (done) => {
+        test('content-length removal', (t) => new Promise<void>((done) => {
             const transformAgent = new TransformHeadersAgent(new http.Agent({
                 keepAlive: true,
             }));
@@ -136,7 +137,7 @@ describe('TransformHeadersAgent', () => {
                 const body = await getStream(response);
                 const headers = JSON.parse(body);
 
-                expect(headers['Transfer-Encoding']).toBe('chunked');
+                t.expect(headers['Transfer-Encoding']).toBe('chunked');
 
                 transformAgent.destroy();
 
@@ -146,9 +147,9 @@ describe('TransformHeadersAgent', () => {
             request.removeHeader('content-length');
 
             request.end();
-        });
+        }));
 
-        test('transfer-encoding removal', (done) => {
+        test('transfer-encoding removal', (t) => new Promise<void>((done) => {
             const transformAgent = new TransformHeadersAgent(new http.Agent({
                 keepAlive: true,
             }));
@@ -159,8 +160,8 @@ describe('TransformHeadersAgent', () => {
                 const body = await getStream(response);
                 const headers = JSON.parse(body);
 
-                expect(headers['Transfer-Encoding']).toBe(undefined);
-                expect(headers['Content-Length']).toBe(undefined);
+                t.expect(headers['Transfer-Encoding']).toBe(undefined);
+                t.expect(headers['Content-Length']).toBe(undefined);
 
                 transformAgent.destroy();
 
@@ -171,9 +172,9 @@ describe('TransformHeadersAgent', () => {
             request.removeHeader('transfer-encoding');
 
             request.end();
-        });
+        }));
 
-        test('explicit content-length', (done) => {
+        test('explicit content-length', (t) => new Promise<void>((done) => {
             const transformAgent = new TransformHeadersAgent(new http.Agent({
                 keepAlive: true,
             }));
@@ -187,7 +188,7 @@ describe('TransformHeadersAgent', () => {
                 const body = await getStream(response);
                 const headers = JSON.parse(body);
 
-                expect(headers['Content-Length']).toBe('5');
+                t.expect(headers['Content-Length']).toBe('5');
 
                 transformAgent.destroy();
 
@@ -196,9 +197,9 @@ describe('TransformHeadersAgent', () => {
 
             request.write('hello');
             request.end();
-        });
+        }));
 
-        test('explicit connection', (done) => {
+        test('explicit connection', (t) => new Promise<void>((done) => {
             const transformAgent = new TransformHeadersAgent(new http.Agent({
                 keepAlive: true,
             }));
@@ -212,7 +213,7 @@ describe('TransformHeadersAgent', () => {
                 const body = await getStream(response);
                 const headers = JSON.parse(body);
 
-                expect(headers.Connection).toBe('close');
+                t.expect(headers.Connection).toBe('close');
 
                 transformAgent.destroy();
 
@@ -220,6 +221,6 @@ describe('TransformHeadersAgent', () => {
             });
 
             request.end();
-        });
+        }));
     });
 });

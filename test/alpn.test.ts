@@ -1,8 +1,9 @@
 import dns from 'node:dns';
+import { describe, test } from 'vitest';
 import { gotScraping, type OptionsInit } from '../src/index.js';
 
 describe('ALPN negotiation', () => {
-    test('does not leak alpn', async () => {
+    test('does not leak alpn', async (t) => {
         const dnsQueries: string[] = [];
         const { lookup } = dns;
 
@@ -24,7 +25,7 @@ describe('ALPN negotiation', () => {
 
         // eslint-disable-next-line no-console
         console.log('dns', dnsQueries);
-        expect(dnsQueries.includes('api.apify.com')).toBe(false);
+        t.expect(dnsQueries.includes('api.apify.com')).toBe(false);
 
         dns.lookup = lookup;
     });
