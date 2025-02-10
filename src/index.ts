@@ -98,6 +98,7 @@ setupDecodeURI();
 
 export * from 'got';
 export { gotScraping, TransformHeadersAgent };
+export { getAgents } from './hooks/proxy.js';
 
 export const hooks = {
     init,
