@@ -74,7 +74,7 @@ Whether to use the generation of the browser-like headers.
 
 #### `headerGeneratorOptions`
 
-See the [`HeaderGeneratorOptions`](https://github.com/apify/header-generator/tree/master#headergeneratoroptions) docs.
+See the [`HeaderGeneratorOptions`](https://github.com/apify/fingerprint-suite/tree/master/packages/header-generator#headergeneratoroptions) docs.
 
 ```javascript
 const response = await gotScraping({
@@ -100,7 +100,7 @@ A non-primitive unique object which describes the current session. By default, i
 
 ## Under the hood
 
-Thanks to the included [`header-generator`](https://github.com/apify/header-generator) package, you can choose various browsers from different operating systems and devices. It generates all the headers automatically so you can focus on the important stuff instead.
+Thanks to the included [`header-generator`](https://github.com/apify/fingerprint-suite/tree/master/packages/header-generator) package, you can choose various browsers from different operating systems and devices. It generates all the headers automatically so you can focus on the important stuff instead.
 
 Yet another goal is to simplify the usage of proxies. Just pass the `proxyUrl` option and you are set. Got Scraping automatically detects the HTTP protocol that the proxy server supports. After the connection is established, it does another ALPN negotiation for the end server. Once that is complete, Got Scraping can proceed with HTTP requests.
 
