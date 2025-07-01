@@ -143,22 +143,18 @@ export class WrappedAgent<T extends HttpAgent> implements HttpAgent {
     }
 
     createConnection(options: NetConnectOpts, callback?: (err: Error | null, stream: Duplex) => void): Duplex {
-        // @ts-ignore @types/node might have incorrect types
         return this.agent.createConnection(options, callback);
     }
 
     keepSocketAlive(socket: Duplex): void {
-        // @ts-ignore @types/node might have incorrect types
         this.agent.keepSocketAlive(socket);
     }
 
     reuseSocket(socket: Duplex, request: ClientRequest): void {
-        // @ts-ignore @types/node might have incorrect types
         this.agent.reuseSocket(socket, request);
     }
 
     getName(options?: any): string {
-        // @ts-ignore @types/node might have incorrect types
         return this.agent.getName(options);
     }
 }

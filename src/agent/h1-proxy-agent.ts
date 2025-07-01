@@ -79,10 +79,12 @@ export class HttpProxyAgent extends http.Agent {
     constructor(options: AgentOptions) {
         super(options);
 
+        // @ts-expect-error New @types/node patch has narrower types than the originally exported got-scraping interface
         initialize(this, options);
     }
 
-    createConnection(options: ConnectionOptions, callback: (error: Error | undefined, socket?: unknown) => void): void {
+    // @ts-expect-error New @types/node patch has narrower types than the originally exported got-scraping interface
+    override createConnection(options: ConnectionOptions, callback: (error: Error | undefined, socket?: unknown) => void): void {
         if (options.path) {
             // @ts-expect-error @types/node is missing types
             super.createConnection(options, callback);
@@ -150,10 +152,12 @@ export class HttpsProxyAgent extends https.Agent {
     constructor(options: AgentOptions) {
         super(options);
 
+        // @ts-expect-error New @types/node patch has narrower types than the originally exported got-scraping interface
         initialize(this, options);
     }
 
-    createConnection(options: ConnectionOptions, callback: (error: Error | undefined, socket?: unknown) => void): void {
+    // @ts-expect-error New @types/node patch has narrower types than the originally exported got-scraping interface
+    override createConnection(options: ConnectionOptions, callback: (error: Error | undefined, socket?: unknown) => void): void {
         HttpProxyAgent.prototype.createConnection.call(this, options, callback);
     }
 }
