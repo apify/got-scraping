@@ -1,4 +1,13 @@
-# Got Scraping
+> # ⚠️⚠️⚠️ `got-scraping` is EOL ⚠️⚠️⚠️
+>
+> After many years of development, we decided to deprecate the `got-scraping` package.
+> The package will no longer receive updates or support.
+>
+> For new projects, we recommend using [`impit`](https://github.com/apify/impit). `impit` is a modern, powerful, and flexible HTTP client with `fetch` API based on Rust's `reqwest` library. It provides a similar feature set to `got-scraping`, including browser-like request headers, proxy support, and more.
+>
+
+
+## Got Scraping
 
 Got Scraping is a small but powerful [`got` extension](https://github.com/sindresorhus/got) with the purpose of sending browser-like requests out of the box. This is very essential in the web scraping industry to blend in with the website traffic.
 
