@@ -1,6 +1,6 @@
-import type { NetConnectOpts } from 'net';
+import type { NetConnectOpts } from 'node:net';
 import { ClientRequest, Agent as HttpAgent, type AgentOptions, type ClientRequestArgs } from 'node:http';
-import type { Duplex } from 'stream';
+import type { Duplex } from 'node:stream';
 
 /**
  * @see https://github.com/nodejs/node/blob/533cafcf7e3ab72e98a2478bc69aedfdf06d3a5e/lib/_http_client.js#L129-L162
