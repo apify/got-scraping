@@ -8,6 +8,7 @@
 	},
 	"rules": {
 		"@typescript-eslint/no-explicit-any": "off",
-		"no-void": "off"
+		"no-void": "off",
+		"@typescript-eslint/ban-ts-comment": "warn"
 	}
  }
