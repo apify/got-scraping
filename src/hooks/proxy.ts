@@ -99,7 +99,9 @@ export async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean
         } else {
             // Upstream proxies hang up connections on CONNECT + unsecure HTTP
             agent = {
+                // @ts-expect-error New @types/node patch has narrower types than the originally exported got-scraping interface
                 http: new TransformHeadersAgent(new HttpProxyAgent(nativeOptions)),
+                // @ts-expect-error New @types/node patch has narrower types than the originally exported got-scraping interface
                 https: new TransformHeadersAgent(new HttpsProxyAgent(nativeOptions)),
                 http2: new Http2OverHttps(wrapperOptions),
             };
@@ -108,6 +110,7 @@ export async function getAgents(parsedProxyUrl: URL, rejectUnauthorized: boolean
         // Upstream proxies hang up connections on CONNECT + unsecure HTTP
         agent = {
             http: new TransformHeadersAgent(new HttpRegularProxyAgent(nativeOptions)),
+            // @ts-expect-error New @types/node patch has narrower types than the originally exported got-scraping interface
             https: new TransformHeadersAgent(new HttpsProxyAgent(nativeOptions)),
             http2: new Http2OverHttp(wrapperOptions),
         };

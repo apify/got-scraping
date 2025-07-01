@@ -1,4 +1,6 @@
+import type { NetConnectOpts } from 'node:net';
 import { ClientRequest, Agent as HttpAgent, type AgentOptions, type ClientRequestArgs } from 'node:http';
+import type { Duplex } from 'node:stream';
 
 /**
  * @see https://github.com/nodejs/node/blob/533cafcf7e3ab72e98a2478bc69aedfdf06d3a5e/lib/_http_client.js#L129-L162
@@ -138,5 +140,21 @@ export class WrappedAgent<T extends HttpAgent> implements HttpAgent {
     prependOnceListener(eventName: string | symbol, listener: (...args: any[]) => void): this {
         this.agent.prependOnceListener(eventName, listener);
         return this;
+    }
+
+    createConnection(options: NetConnectOpts, callback?: (err: Error | null, stream: Duplex) => void): Duplex {
+        return this.agent.createConnection(options, callback);
+    }
+
+    keepSocketAlive(socket: Duplex): void {
+        this.agent.keepSocketAlive(socket);
+    }
+
+    reuseSocket(socket: Duplex, request: ClientRequest): void {
+        this.agent.reuseSocket(socket, request);
+    }
+
+    getName(options?: any): string {
+        return this.agent.getName(options);
     }
 }
