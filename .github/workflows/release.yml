@@ -9,6 +9,10 @@ on:
   release:
     types: [ published ]
 
+permissions:
+  contents: write
+  id-token: write
+
 jobs:
   build_and_test:
     name: Build & Test
@@ -21,18 +25,18 @@ jobs:
         node-version: [18, 20, 22]
 
     steps:
-      -
-        uses: actions/checkout@v4
-      -
-        name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v6
         with:
-          node-version: ${{ matrix.node-version }}
-      -
-        name: Install Dependencies
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install Dependencies
         run: npm install
-      -
-        name: Run Tests
+
+      - name: Run Tests
         run: npm test
         env:
           APIFY_PROXY_PASSWORD: ${{ secrets.APIFY_TEST_USER_PROXY_PASSWORD }}
@@ -42,53 +46,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      -
-        uses: actions/checkout@v4
-      -
-        name: Use Node.js 22
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
-      -
-        run: npm install
-      -
-        run: npm run lint
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
 
+      - run: npm install
 
-  # The deploy job is long but there are only 2 important parts. NPM publish
-  # and triggering of docker image builds in the apify-actor-docker repo.
+      - run: npm run lint
+
   deploy:
     name: Publish to NPM
     needs: [build_and_test, lint]
     runs-on: ubuntu-latest
     steps:
-      -
-        uses: actions/checkout@v4
-      -
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org/
-      -
-        # Determine if this is a beta or latest release
-        name: Set Release Tag
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Set Release Tag
         run: echo "RELEASE_TAG=$(if [ ${{ github.event_name }} = release ]; then echo latest; else echo beta; fi)" >> $GITHUB_ENV
-      -
-        # Check version consistency and increment pre-release version number for beta only.
-        name: Bump pre-release version
+
+      - name: Bump pre-release version
         if: env.RELEASE_TAG == 'beta'
         run: node ./.github/scripts/before-beta-release.cjs
-      -
-        name: Install Dependencies
+
+      - name: Install Dependencies
         run: npm install
-      -
-        name: Publish to NPM
+
+      - name: Publish to NPM
         run: npm publish --tag ${{ env.RELEASE_TAG }} --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.APIFY_SERVICE_ACCOUNT_NPM_TOKEN }}
-      -
-        # Latest version is tagged by the release process so we only tag beta here.
-        name: Tag Version
+
+      - name: Tag Version
         if: env.RELEASE_TAG == 'beta'
         run: |
           git_tag=v`node -p "require('./package.json').version"`
