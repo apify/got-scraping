@@ -110,13 +110,11 @@ export class WrappedAgent<T extends HttpAgent> implements HttpAgent {
         return this.agent.getMaxListeners();
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    listeners(eventName: string | symbol): Function[] {
+    listeners(eventName: Parameters<HttpAgent['listeners']>[0]): ReturnType<HttpAgent['listeners']> {
         return this.agent.listeners(eventName);
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    rawListeners(eventName: string | symbol): Function[] {
+    rawListeners(eventName: Parameters<HttpAgent['rawListeners']>[0]): ReturnType<HttpAgent['rawListeners']> {
         return this.agent.rawListeners(eventName);
     }
 
