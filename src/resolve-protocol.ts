@@ -106,9 +106,9 @@ export const createResolveProtocol = (proxyUrl: string, sessionData?: ProtocolCa
         // so we keep isolation without storing secrets in cleartext.
         const canonicalProxyUrl = new URL(proxyUrl).href;
         const cacheKey = createHash('sha256').update(canonicalProxyUrl).digest('hex');
-        const perProxyCaches = DEFAULTS_BY_PROXY_URL.get(cacheKey) ?? createCaches();
-        DEFAULTS_BY_PROXY_URL.set(cacheKey, perProxyCaches);
-        { protocolCache, resolveAlpnQueue } = perProxyCaches;
+        const perProxyCaches = PROTOCOL_CACHE_BY_PROXY_URL.get(cacheKey) ?? createCaches();
+        PROTOCOL_CACHE_BY_PROXY_URL.set(cacheKey, perProxyCaches);
+        ({ protocolCache, resolveAlpnQueue } = perProxyCaches);
     }
 
     const connectWithProxy: ResolveProtocolConnectFunction = async (pOptions, pCallback) => {
