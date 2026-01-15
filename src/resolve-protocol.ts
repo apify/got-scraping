@@ -104,8 +104,9 @@ export const createResolveProtocol = (proxyUrl: string, sessionData?: ProtocolCa
         // We still want to isolate caches for different "proxy identities" (including credentials) because some
         // providers rotate upstreams based on username/password/session. Use a stable hash of the canonicalized URL
         // so we keep isolation without storing secrets in cleartext.
-        const canonicalProxyUrl = new URL(proxyUrl).href;
-        const cacheKey = createHash('sha256').update(canonicalProxyUrl).digest('hex');
+        // Use the raw input string to avoid throwing here when `proxyUrl` is invalid.
+        // (Invalid `proxyUrl` will still fail later when we actually try to use it.)
+        const cacheKey = createHash('sha256').update(proxyUrl).digest('hex');
         const perProxyCaches = PROTOCOL_CACHE_BY_PROXY_URL.get(cacheKey) ?? createCaches();
         PROTOCOL_CACHE_BY_PROXY_URL.set(cacheKey, perProxyCaches);
         ({ protocolCache, resolveAlpnQueue } = perProxyCaches);
