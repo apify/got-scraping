@@ -107,8 +107,13 @@ describe('resolve-protocol cache', () => {
                     clientSocket.pipe(upstreamSocket);
                 });
 
-                upstreamSocket.on('error', () => clientSocket.destroy());
-                clientSocket.on('error', () => upstreamSocket.destroy());
+                const destroyBoth = () => {
+                    upstreamSocket.destroy();
+                    clientSocket.destroy();
+                };
+
+                upstreamSocket.on('error', destroyBoth);
+                clientSocket.on('error', destroyBoth);
             });
 
             try {
