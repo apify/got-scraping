@@ -77,7 +77,7 @@ type ProtocolCaches = ReturnType<typeof createCaches>;
 // proxy CONNECT/ALPN resolve could poison retries that rotate proxies.
 //
 // We keep this intentionally simple (got-scraping is EOL): use a bounded per-proxy cache.
-const DEFAULTS_BY_PROXY_URL = new QuickLRU<string, ProtocolCaches>({ maxSize: 100 });
+const PROTOCOL_CACHE_BY_PROXY_URL = new QuickLRU<string, ProtocolCaches>({ maxSize: 100 });
 
 const defaults = createCaches();
 
