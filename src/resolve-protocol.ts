@@ -108,7 +108,7 @@ export const createResolveProtocol = (proxyUrl: string, sessionData?: ProtocolCa
         const cacheKey = createHash('sha256').update(canonicalProxyUrl).digest('hex');
         const perProxyCaches = DEFAULTS_BY_PROXY_URL.get(cacheKey) ?? createCaches();
         DEFAULTS_BY_PROXY_URL.set(cacheKey, perProxyCaches);
-        ({ protocolCache, resolveAlpnQueue } = perProxyCaches);
+        { protocolCache, resolveAlpnQueue } = perProxyCaches;
     }
 
     const connectWithProxy: ResolveProtocolConnectFunction = async (pOptions, pCallback) => {
