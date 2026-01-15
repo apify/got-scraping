@@ -48,7 +48,8 @@
         "prepublishOnly": "npm run build",
         "lint": "eslint src test",
         "lint:fix": "eslint src test --fix",
-        "test": "npx vitest",
+        "test": "vitest run",
+        "test:watch": "vitest",
         "pretest:blocking": "npm run build",
         "test:blocking": "ts-node -T ./test/live-testing/index.js"
     },

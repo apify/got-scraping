@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { isIPv6 } from 'node:net';
 import tls, { TLSSocket } from 'node:tls';
 import { URL } from 'node:url';
@@ -69,6 +70,15 @@ const createCaches = () => ({
     resolveAlpnQueue: new Map(),
 });
 
+type ProtocolCaches = ReturnType<typeof createCaches>;
+
+// When `sessionData` is not provided, got-scraping previously used a single global
+// `resolveAlpnQueue`. That queue key does not include the proxy URL, so a hanging
+// proxy CONNECT/ALPN resolve could poison retries that rotate proxies.
+//
+// We keep this intentionally simple (got-scraping is EOL): use a bounded per-proxy cache.
+const DEFAULTS_BY_PROXY_URL = new QuickLRU<string, ProtocolCaches>({ maxSize: 100 });
+
 const defaults = createCaches();
 
 export interface ProtocolCache {
@@ -86,6 +96,19 @@ export const createResolveProtocol = (proxyUrl: string, sessionData?: ProtocolCa
 
         protocolCache = sessionData.protocolCache!;
         resolveAlpnQueue = sessionData.resolveAlpnQueue!;
+    } else {
+        // Scope the ALPN resolve queue to the proxy URL so a hung proxy doesn't block resolution through other proxies.
+        // IMPORTANT: Do not use `URL.href` here because it includes credentials (username/password).
+        // Keeping secrets in long-lived global caches increases exposure (heap dumps, logs, etc).
+        //
+        // We still want to isolate caches for different "proxy identities" (including credentials) because some
+        // providers rotate upstreams based on username/password/session. Use a stable hash of the canonicalized URL
+        // so we keep isolation without storing secrets in cleartext.
+        const canonicalProxyUrl = new URL(proxyUrl).href;
+        const cacheKey = createHash('sha256').update(canonicalProxyUrl).digest('hex');
+        const perProxyCaches = DEFAULTS_BY_PROXY_URL.get(cacheKey) ?? createCaches();
+        DEFAULTS_BY_PROXY_URL.set(cacheKey, perProxyCaches);
+        ({ protocolCache, resolveAlpnQueue } = perProxyCaches);
     }
 
     const connectWithProxy: ResolveProtocolConnectFunction = async (pOptions, pCallback) => {
