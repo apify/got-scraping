@@ -1,6 +1,8 @@
 import { URL } from 'node:url';
 import { Options } from 'got';
-import { auto, type AutoRequestOptions } from 'http2-wrapper';
+import http2Wrapper, { type AutoRequestOptions } from 'http2-wrapper';
+
+const { auto } = http2Wrapper;
 import type { Context } from '../context.js';
 import { createResolveProtocol } from '../resolve-protocol.js';
 

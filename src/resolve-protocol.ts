@@ -3,7 +3,9 @@ import { isIPv6 } from 'node:net';
 import tls, { TLSSocket } from 'node:tls';
 import { URL } from 'node:url';
 import { type Headers } from 'got';
-import { auto, type ResolveProtocolConnectFunction, type ResolveProtocolFunction } from 'http2-wrapper';
+import http2Wrapper, { type ResolveProtocolConnectFunction, type ResolveProtocolFunction } from 'http2-wrapper';
+
+const { auto } = http2Wrapper;
 import QuickLRU from 'quick-lru';
 import { ProxyError } from './hooks/proxy.js';
 import { buildBasicAuthHeader } from './auth.js';
