@@ -9,6 +9,7 @@ import { gotScraping, type OptionsInit } from '../src/index.js';
 import { startDummyServer } from './helpers/dummy-server.js';
 
 const getPort = (server: TCPServer) => (server.address() as AddressInfo).port;
+const testWithApifyProxy = process.env.APIFY_PROXY_PASSWORD ? test : test.skip;
 
 // All `fixme`s here are related with https://github.com/sindresorhus/got/issues/1117
 
@@ -239,7 +240,7 @@ describe('GotScraping', () => {
             t.expect(response.httpVersion).toBe('1.1');
         });
 
-        test('should work with proxyUrl and unsecure http1', async (t) => {
+        testWithApifyProxy('should work with proxyUrl and unsecure http1', async (t) => {
             const unproxiedResponse = await gotScraping({
                 responseType: 'json',
                 url: 'http://httpbin.org/anything',
@@ -262,7 +263,7 @@ describe('GotScraping', () => {
             t.expect(typedResponse.body.origin).not.toBe(origin);
         });
 
-        test('should work with proxyUrl and http1', async (t) => {
+        testWithApifyProxy('should work with proxyUrl and http1', async (t) => {
             const response = await gotScraping({
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
@@ -300,7 +301,7 @@ describe('GotScraping', () => {
             t.expect(rawHeaders[0].toLowerCase()).toBe('connection');
         });
 
-        test('should work with proxyUrl and http2', async (t) => {
+        testWithApifyProxy('should work with proxyUrl and http2', async (t) => {
             const response = await gotScraping({
                 responseType: 'json',
                 url: 'https://api.apify.com/v2/browser-info',
@@ -527,7 +528,7 @@ describe('GotScraping', () => {
                 t.expect(response.httpVersion).toBe('1.1');
             });
 
-            test('should work with proxyUrl and http1', async (t) => {
+            testWithApifyProxy('should work with proxyUrl and http1', async (t) => {
                 const stream = gotScraping.stream({
                     url: 'https://api.apify.com/v2/browser-info',
                     http2: false,
@@ -562,7 +563,7 @@ describe('GotScraping', () => {
                 t.expect(responseProxy.httpVersion).toBe('1.1');
             });
 
-            test('should work with proxyUrl and http2', async (t) => {
+            testWithApifyProxy('should work with proxyUrl and http2', async (t) => {
                 const stream = gotScraping.stream({
                     url: 'https://api.apify.com/v2/browser-info',
                 });

@@ -2,8 +2,10 @@ import dns from 'node:dns';
 import { describe, test } from 'vitest';
 import { gotScraping, type OptionsInit } from '../src/index.js';
 
+const testWithApifyProxy = process.env.APIFY_PROXY_PASSWORD ? test : test.skip;
+
 describe('ALPN negotiation', () => {
-    test('does not leak alpn', async (t) => {
+    testWithApifyProxy('does not leak alpn', async (t) => {
         const dnsQueries: string[] = [];
         const { lookup } = dns;
 
