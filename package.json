@@ -1,6 +1,6 @@
 {
     "name": "got-scraping",
-    "version": "4.1.3",
+    "version": "4.2.0",
     "description": "HTTP client made for scraping based on got.",
     "engines": {
         "node": ">=16"
