@@ -1,9 +1,12 @@
 import { Options, type Agents } from 'got';
-import http2, { auto } from 'http2-wrapper';
+import http2Wrapper from 'http2-wrapper';
 import { URL } from 'node:url';
 import { HttpProxyAgent, HttpRegularProxyAgent, HttpsProxyAgent } from '../agent/h1-proxy-agent.js';
 import { TransformHeadersAgent } from '../agent/transform-headers-agent.js';
 import { buildBasicAuthHeader } from '../auth.js';
+
+const http2 = http2Wrapper;
+const { auto } = http2Wrapper;
 
 const {
     HttpOverHttp2,
