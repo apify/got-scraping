@@ -1,10 +1,10 @@
 import { URL } from 'node:url';
 import { Options } from 'got';
 import http2Wrapper, { type AutoRequestOptions } from 'http2-wrapper';
-
-const { auto } = http2Wrapper;
 import type { Context } from '../context.js';
 import { createResolveProtocol } from '../resolve-protocol.js';
+
+const { auto } = http2Wrapper;
 
 export function http2Hook(options: Options): void {
     const { proxyUrl, sessionData } = options.context as Context;
