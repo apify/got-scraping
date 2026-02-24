@@ -1,92 +1,71 @@
-name: Check & Release
+name: Publish to NPM
 
 on:
-  # Push to master will deploy a beta version
-  push:
-    branches:
-      - master
-  # A release via GitHub releases will deploy a latest version
-  release:
-    types: [ published ]
+  workflow_call:
+    inputs:
+      ref:
+        description: Git ref to publish (branch, tag, or commit SHA)
+        required: true
+        type: string
+      dist-tag:
+        description: NPM dist-tag (latest or next)
+        required: false
+        type: string
+        default: 'latest'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref to publish (branch, tag, or commit SHA)
+        required: true
+        type: string
+      dist-tag:
+        description: NPM dist-tag (latest or next)
+        required: false
+        type: string
+        default: 'latest'
+
+concurrency:
+  group: publish-to-npm
+  cancel-in-progress: false
 
 permissions:
-  contents: write
   id-token: write
+  contents: write
 
 jobs:
-  build_and_test:
-    name: Build & Test
-    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [18, 20, 22]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup node ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ matrix.node-version }}
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Run Tests
-        run: npm test
-        env:
-          APIFY_PROXY_PASSWORD: ${{ secrets.APIFY_TEST_USER_PROXY_PASSWORD }}
-
-  lint:
-    name: Lint
+  publish_to_npm:
+    name: Publish to NPM (${{ inputs.dist-tag }})
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
+          fetch-depth: 0
 
-      - name: Setup node
+      - name: Use Node.js 24
         uses: actions/setup-node@v6
         with:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
 
-      - run: npm install
-
-      - run: npm run lint
-
-  deploy:
-    name: Publish to NPM
-    needs: [build_and_test, lint]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Set Release Tag
-        run: echo "RELEASE_TAG=$(if [ ${{ github.event_name }} = release ]; then echo latest; else echo beta; fi)" >> $GITHUB_ENV
-
-      - name: Bump pre-release version
-        if: env.RELEASE_TAG == 'beta'
-        run: node ./.github/scripts/before-beta-release.cjs
-
       - name: Install Dependencies
         run: npm install
 
-      - name: Publish to NPM
-        run: npm publish --tag ${{ env.RELEASE_TAG }} --access public
+      - name: Publish to NPM (@latest)
+        if: inputs.dist-tag == 'latest'
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 5
+          retry_wait_seconds: 30
+          command: npm publish --tag latest --access public
 
-      - name: Tag Version
-        if: env.RELEASE_TAG == 'beta'
-        run: |
-          git_tag=v`node -p "require('./package.json').version"`
-          git tag $git_tag
-          git push origin $git_tag
+      - name: Publish to NPM (@next)
+        if: inputs.dist-tag == 'next'
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 5
+          retry_wait_seconds: 30
+          command: npm publish --tag next --access public

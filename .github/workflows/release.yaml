@@ -1,0 +1,94 @@
+name: Release @latest
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: The version to bump (if you choose custom, please include it under custom version)
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - 'patch'
+          - 'minor'
+          - 'major'
+          - 'custom'
+      custom_version:
+        description: The custom version to bump to (only for "custom" type)
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  build_and_test:
+    name: Build & Test
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [18, 20, 22]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests
+        run: npm test
+        env:
+          APIFY_PROXY_PASSWORD: ${{ secrets.APIFY_TEST_USER_PROXY_PASSWORD }}
+
+  release:
+    name: "Bump got-scraping: ${{ inputs.version }} version (${{ inputs.custom_version || 'n/a' }} custom version)"
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Configure git
+        run: |
+          git config user.name "Apify Release Bot"
+          git config user.email "noreply@apify.com"
+
+      - name: Bump version to custom version
+        if: ${{ github.event.inputs.version == 'custom' && github.event.inputs.custom_version != '' }}
+        run: npm version ${{ github.event.inputs.custom_version }}
+
+      - name: Bump version to ${{ github.event.inputs.version }} version
+        if: ${{ github.event.inputs.version != 'custom' }}
+        run: npm version ${{ github.event.inputs.version }}
+
+      - name: Push version commit and tag
+        run: git push --follow-tags
+
+      - name: Get release SHA
+        id: release
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Publish packages
+        uses: apify/workflows/execute-workflow@main
+        with:
+          workflow: publish-to-npm.yaml
+          inputs: >
+            {
+              "ref": "${{ steps.release.outputs.sha }}",
+              "dist-tag": "latest"
+            }
