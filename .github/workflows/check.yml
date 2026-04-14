@@ -15,38 +15,31 @@ jobs:
             fail-fast: false
             matrix:
                 os: [ubuntu-latest, windows-latest, macos-latest]
-                node-version: [18, 20, 22]
+                node-version: [18, 20, 22, 24]
 
         steps:
-            -
-                uses: actions/checkout@v4
-            -
-                name: Use Node.js ${{ matrix.node-version }}
-                uses: actions/setup-node@v4
-                with:
-                    node-version: ${{ matrix.node-version }}
-            -
-                name: Install Dependencies
-                run: npm install
-            -
-                name: Run Tests
-                run: npm test
-                env:
-                    APIFY_PROXY_PASSWORD: ${{ secrets.APIFY_TEST_USER_PROXY_PASSWORD }}
+            - uses: actions/checkout@v4
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - name: Install pnpm and dependencies
+              uses: ./.github/actions/pnpm-install
+            - name: Run Tests
+              run: pnpm test
+              env:
+                  APIFY_PROXY_PASSWORD: ${{ secrets.APIFY_TEST_USER_PROXY_PASSWORD }}
 
     lint:
         name: Lint
         runs-on: ubuntu-latest
 
         steps:
-            -
-                uses: actions/checkout@v4
-            -
-                name: Use Node.js 22
-                uses: actions/setup-node@v4
-                with:
-                    node-version: 22
-            -
-                run: npm install
-            -
-                run: npm run lint
+            - uses: actions/checkout@v4
+            - name: Use Node.js 24
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+            - name: Install pnpm and dependencies
+              uses: ./.github/actions/pnpm-install
+            - run: pnpm lint

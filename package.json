@@ -3,7 +3,7 @@
     "version": "4.2.1",
     "description": "HTTP client made for scraping based on got.",
     "engines": {
-        "node": ">=16"
+        "node": ">=18"
     },
     "files": [
         "dist"
@@ -45,14 +45,15 @@
     },
     "scripts": {
         "build": "tsc --noEmit && tsup && node ./scripts/es-fixes.mjs",
-        "prepublishOnly": "npm run build",
+        "prepublishOnly": "pnpm build",
         "lint": "eslint src test",
         "lint:fix": "eslint src test --fix",
         "test": "vitest run",
         "test:watch": "vitest",
-        "pretest:blocking": "npm run build",
+        "pretest:blocking": "pnpm build",
         "test:blocking": "ts-node -T ./test/live-testing/index.js"
     },
+    "packageManager": "pnpm@10.24.0",
     "author": {
         "name": "Apify",
         "email": "support@apify.com",
