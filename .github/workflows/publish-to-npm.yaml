@@ -50,7 +50,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install pnpm and dependencies
-        uses: ./.github/actions/pnpm-install
+        uses: apify/workflows/pnpm-install@main
 
       - name: Publish to NPM (@latest)
         if: inputs.dist-tag == 'latest'

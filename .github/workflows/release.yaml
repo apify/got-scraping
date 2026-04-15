@@ -37,7 +37,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install pnpm and dependencies
-        uses: ./.github/actions/pnpm-install
+        uses: apify/workflows/pnpm-install@main
 
       - name: Run Tests
         run: pnpm test
@@ -61,7 +61,7 @@ jobs:
           node-version: 24
 
       - name: Install pnpm and dependencies
-        uses: ./.github/actions/pnpm-install
+        uses: apify/workflows/pnpm-install@main
 
       - name: Configure git
         run: |
