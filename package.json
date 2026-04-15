@@ -5,6 +5,13 @@
     "engines": {
         "node": ">=18"
     },
+    "devEngines": {
+        "packageManager": {
+            "name": "pnpm",
+            "version": "10.x",
+            "onFail": "error"
+        }
+    },
     "files": [
         "dist"
     ],
