@@ -5,13 +5,6 @@
     "engines": {
         "node": ">=16"
     },
-    "devEngines": {
-        "packageManager": {
-            "name": "pnpm",
-            "version": "10.x",
-            "onFail": "error"
-        }
-    },
     "files": [
         "dist"
     ],
@@ -58,7 +51,8 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "pretest:blocking": "pnpm build",
-        "test:blocking": "ts-node -T ./test/live-testing/index.js"
+        "test:blocking": "ts-node -T ./test/live-testing/index.js",
+        "preinstall": "npx only-allow pnpm"
     },
     "packageManager": "pnpm@10.24.0",
     "author": {
