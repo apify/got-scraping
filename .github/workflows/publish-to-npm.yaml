@@ -49,8 +49,8 @@ jobs:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Install pnpm and dependencies
+        uses: apify/workflows/pnpm-install@main
 
       - name: Publish to NPM (@latest)
         if: inputs.dist-tag == 'latest'
@@ -59,7 +59,7 @@ jobs:
           timeout_minutes: 10
           max_attempts: 5
           retry_wait_seconds: 30
-          command: npm publish --tag latest --access public
+          command: pnpm publish --tag latest --access public --no-git-checks
 
       - name: Publish to NPM (@next)
         if: inputs.dist-tag == 'next'
@@ -68,4 +68,4 @@ jobs:
           timeout_minutes: 10
           max_attempts: 5
           retry_wait_seconds: 30
-          command: npm publish --tag next --access public
+          command: pnpm publish --tag next --access public --no-git-checks

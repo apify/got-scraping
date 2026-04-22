@@ -68,7 +68,7 @@ const gotScraping = originalGot.extend({
     },
     hooks: {
         init,
-        beforeRequest,
+        beforeRequest: beforeRequest as never,
         beforeRedirect,
     },
 }) as GotScraping;

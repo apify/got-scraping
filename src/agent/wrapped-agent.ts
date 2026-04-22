@@ -141,7 +141,7 @@ export class WrappedAgent<T extends HttpAgent> implements HttpAgent {
     }
 
     createConnection(options: NetConnectOpts, callback?: (err: Error | null, stream: Duplex) => void): Duplex {
-        return this.agent.createConnection(options, callback);
+        return this.agent.createConnection(options, callback) as Duplex;
     }
 
     keepSocketAlive(socket: Duplex): void {

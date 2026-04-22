@@ -1,0 +1,30 @@
+{
+    "extends": ["config:base", ":semanticCommitTypeAll(chore)"],
+    "pinVersions": false,
+    "separateMajorMinor": false,
+    "dependencyDashboard": false,
+    "semanticCommits": "enabled",
+    "schedule": ["every weekday"],
+    "minimumReleaseAge": "1 day",
+    "internalChecksFilter": "strict",
+    "lockFileMaintenance": {
+        "enabled": true,
+        "schedule": ["before 2am"],
+        "automerge": true,
+        "automergeType": "branch"
+    },
+    "packageRules": [
+        {
+            "matchUpdateTypes": ["patch", "minor"],
+            "matchCurrentVersion": "!/^0/",
+            "groupName": "patch/minor dependencies",
+            "groupSlug": "all-non-major",
+            "automerge": true,
+            "automergeType": "branch"
+        },
+        {
+            "matchPackageNames": ["@apify/*", "@crawlee/*", "apify-client", "apify", "crawlee", "got-scraping"],
+            "minimumReleaseAge": "0 days"
+        }
+    ]
+}
