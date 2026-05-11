@@ -51,10 +51,9 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "pretest:blocking": "pnpm build",
-        "test:blocking": "ts-node -T ./test/live-testing/index.js",
-        "preinstall": "npx only-allow pnpm"
+        "test:blocking": "ts-node -T ./test/live-testing/index.js"
     },
-    "packageManager": "pnpm@10.24.0",
+    "packageManager": "pnpm@10.33.4",
     "author": {
         "name": "Apify",
         "email": "support@apify.com",
@@ -67,5 +66,12 @@
     },
     "bugs": {
         "url": "https://github.com/apify/got-scraping/issues"
+    },
+    "devEngines": {
+        "packageManager": {
+            "name": "pnpm",
+            "version": "10.33.4",
+            "onFail": "warn"
+        }
     }
 }
