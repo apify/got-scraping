@@ -37,7 +37,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install pnpm and dependencies
-        uses: apify/workflows/pnpm-install@main
+        uses: apify/actions/pnpm-install@v1.0.0
 
       - name: Run Tests
         run: pnpm test
@@ -61,7 +61,7 @@ jobs:
           node-version: 24
 
       - name: Install pnpm and dependencies
-        uses: apify/workflows/pnpm-install@main
+        uses: apify/actions/pnpm-install@v1.0.0
 
       - name: Configure git
         run: |
@@ -84,7 +84,7 @@ jobs:
         run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
       - name: Publish packages
-        uses: apify/workflows/execute-workflow@main
+        uses: apify/actions/execute-workflow@v1.0.0
         with:
           workflow: publish-to-npm.yaml
           inputs: >
