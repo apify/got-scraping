@@ -1,8 +1,24 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-bitwise */
+import { createSecureContext } from 'node:tls';
+
 import { Options } from 'got';
 
-const supportsFirefoxFully = Number(process.versions.node.split('.')[0]) >= 17;
+/**
+ * Whether this runtime's TLS library accepts the RFC 7919 finite-field groups
+ * Firefox offers. Node.js 17+ (OpenSSL 3) does; older Node.js and BoringSSL-based
+ * runtimes such as Bun 1.4 do not, and `tls.connect` throws
+ * `Failed to set ECDH curve` for them. The Node.js version alone cannot tell
+ * these apart because Bun reports a modern `process.versions.node`, so probe once.
+ */
+const supportsFirefoxFully = (() => {
+    try {
+        createSecureContext({ ecdhCurve: 'ffdhe2048:ffdhe3072' });
+        return true;
+    } catch {
+        return false;
+    }
+})();
 
 const SSL_OP_TLSEXT_PADDING = 1 << 4;
 const SSL_OP_NO_ENCRYPT_THEN_MAC = 1 << 19;

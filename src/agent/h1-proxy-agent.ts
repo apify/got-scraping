@@ -128,10 +128,23 @@ export class HttpProxyAgent extends http.Agent {
             }
 
             if ((options as any).protocol === 'https:') {
-                callback(undefined, tls.connect({
-                    ...options,
-                    socket,
-                }));
+                // `tls.connect` throws synchronously on invalid TLS options (for
+                // example an `ecdhCurve` the runtime cannot set). Thrown here, the
+                // error escapes this listener as an uncaught exception; route it
+                // to the request instead so the caller can retry or fail it.
+                let tlsSocket: tls.TLSSocket;
+                try {
+                    tlsSocket = tls.connect({
+                        ...options,
+                        socket,
+                    });
+                } catch (error) {
+                    socket.destroy();
+                    callback(error as Error);
+                    return;
+                }
+
+                callback(undefined, tlsSocket);
                 return;
             }
 
