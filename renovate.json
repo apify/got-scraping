@@ -5,7 +5,7 @@
     "dependencyDashboard": false,
     "semanticCommits": "enabled",
     "schedule": ["every weekday"],
-    "minimumReleaseAge": "1 day",
+    "minimumReleaseAge": "7 days",
     "internalChecksFilter": "strict",
     "lockFileMaintenance": {
         "enabled": true,
