@@ -12,3 +12,7 @@ linkWorkspacePackages: true
 preferWorkspacePackages: true
 publicHoistPattern:
     - "*"
+
+overrides:
+  "@typescript-eslint/typescript-estree>minimatch": ^9.0.7
+  gray-matter>toml: ^4.1.2
