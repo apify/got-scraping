@@ -6,6 +6,7 @@ minimumReleaseAgeExclude:
   - "apify"
   - "crawlee"
   - "got-scraping"
+  - "body-parser@1.20.9"
 
 nodeLinker: hoisted
 linkWorkspacePackages: true
@@ -15,4 +16,4 @@ publicHoistPattern:
 
 overrides:
   "@typescript-eslint/typescript-estree>minimatch": ^9.0.7
-  gray-matter>toml: ^4.1.2
+  gray-matter>toml: ^5.0.1
