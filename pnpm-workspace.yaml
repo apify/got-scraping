@@ -6,6 +6,7 @@ minimumReleaseAgeExclude:
   - "apify"
   - "crawlee"
   - "got-scraping"
+  - "body-parser@1.20.9"
 
 nodeLinker: hoisted
 linkWorkspacePackages: true
